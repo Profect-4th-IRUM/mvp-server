@@ -1,5 +1,5 @@
 ## 🛠️ Issue Number
-### Closes #
+### [Closes # ]
 
 📌 **작업 내용 및 특이사항**
 
