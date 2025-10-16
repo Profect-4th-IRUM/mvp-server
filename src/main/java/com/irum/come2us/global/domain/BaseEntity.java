@@ -21,7 +21,7 @@ public class BaseEntity {
 
     @CreatedBy
     @Column(updatable = false, nullable = false)
-    private String createdBy;
+    private Long createdBy;
 
     @LastModifiedDate
     @Column(nullable = false)
@@ -29,7 +29,7 @@ public class BaseEntity {
 
     @LastModifiedBy
     @Column(nullable = false)
-    private String updatedBy;
+    private Long updatedBy;
 
     private LocalDateTime deletedAt;
 }
