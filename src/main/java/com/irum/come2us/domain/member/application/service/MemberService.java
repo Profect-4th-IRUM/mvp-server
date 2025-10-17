@@ -77,7 +77,7 @@ public class MemberService {
 
     private Member getMember() {
         return clientRepository
-                .findById(0L)
+                .findByMemberId(0L)
                 .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
     } // Spring Security 도입 후 SecurityContextHolder를 통해 검증하도록 변경 예정
 
