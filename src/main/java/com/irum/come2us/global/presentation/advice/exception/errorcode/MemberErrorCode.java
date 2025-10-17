@@ -13,7 +13,8 @@ public enum MemberErrorCode implements BaseErrorCode {
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 형식입니다."),
     INVALID_CONTACT(HttpStatus.BAD_REQUEST, "유효하지 않은 연락처 형식입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "유효한 비밀번호가 아닙니다."),
-    DUPLICATED_PASSWORD(HttpStatus.CONFLICT, "변경되는 비밀번호는 기존 비밀번호와 동일할 수 없습니다.");
+    DUPLICATED_PASSWORD(HttpStatus.CONFLICT, "변경되는 비밀번호는 기존 비밀번호와 동일할 수 없습니다."),
+    ROLE_ALREADY_GRANTED(HttpStatus.CONFLICT, "중복된 역할을 부여할 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

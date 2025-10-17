@@ -85,6 +85,14 @@ public class Member {
         this.contact = contact;
     }
 
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void grantOwner() {
+        this.role = Role.OWNER;
+    }
+
     private static final Pattern EMAIL_PATTERN = Pattern.compile(RegexConstants.EMAIL);
     private static final Pattern PHONE_NUMBER_PATTERN =
             Pattern.compile(RegexConstants.PHONE_NUMBER);
