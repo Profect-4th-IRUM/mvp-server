@@ -17,20 +17,20 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_email", nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "member_password", nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "member_name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "member_contact", nullable = false)
+    @Column(name = "contact", nullable = false)
     private String contact;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "member_role", nullable = false)
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @Builder(access = AccessLevel.PRIVATE)
