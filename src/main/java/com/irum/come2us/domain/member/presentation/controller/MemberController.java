@@ -35,7 +35,7 @@ public class MemberController {
     public ResponseEntity<Void> updateMemberInfo(@RequestBody MemberInfoUpdateRequest request) {
         log.info("멤버 개인정보 수정 요청: {}", request);
         memberService.changeMemberNameAndContact(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/password")
@@ -43,12 +43,18 @@ public class MemberController {
             @RequestBody MemberPasswordUpdateRequest request) {
         log.info("멤버 비밀번호 변경 요청: {}", request);
         memberService.changeMemberPassword(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/role")
-    public ResponseEntity<Void> updateMemberRole() {
+    public ResponseEntity<Void> updateCustomerToOwner() {
         memberService.changeCustomerRoleToOwner();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteCustomer() {
+        memberService.withdrawCustomer();
+        return ResponseEntity.noContent().build();
     }
 }
