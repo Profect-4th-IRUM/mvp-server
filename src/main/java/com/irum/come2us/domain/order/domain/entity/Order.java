@@ -1,12 +1,10 @@
 package com.irum.come2us.domain.order.domain.entity;
 
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
-import com.irum.come2us.domain.order.domain.entity.enums.PaymentMethod;
-import com.irum.come2us.domain.order.domain.entity.enums.PaymentStatus;
+import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
+import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
@@ -51,5 +49,8 @@ public class Order {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
+    //결제
+
+    //TODO: 상점, 회원 Many to one
 
 }

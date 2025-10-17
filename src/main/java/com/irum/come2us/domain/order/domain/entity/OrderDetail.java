@@ -47,4 +47,7 @@ public class OrderDetail {
     @JoinColumn(name="order_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Order order;
+
+
+    // TODO: 옵션, 상품 many to one
 }
