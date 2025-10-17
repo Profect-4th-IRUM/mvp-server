@@ -2,6 +2,7 @@ package com.irum.come2us.domain.member.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.global.constants.RegexConstants;
+import com.irum.come2us.global.domain.BaseEntity;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import jakarta.persistence.*;
@@ -10,16 +11,20 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
 @Table(name = "p_member")
+@SQLDelete(sql = "UPDATE p_member SET deleted_at = NOW() WHERE member_id = ?")
+@Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long memberId;
 
     @Column(name = "email", nullable = false)
     private String email;
