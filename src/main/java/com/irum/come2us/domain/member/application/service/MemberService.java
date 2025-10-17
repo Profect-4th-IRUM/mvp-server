@@ -9,10 +9,10 @@ import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpd
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
-import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -34,6 +34,7 @@ public class MemberService {
                         request.email(), request.password(), request.name(), request.contact()));
     }
 
+    @Transactional(readOnly = true)
     public MemberInfoResponse findMemberInfo() {
         Member member = getMember();
         return MemberInfoResponse.createMemberInfoResponse(member);
