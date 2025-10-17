@@ -19,14 +19,14 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> customerCreate(@RequestBody MemberCreateRequest request) {
+    public ResponseEntity<Void> joinCustomer(@RequestBody MemberCreateRequest request) {
         log.info("고객 회원가입 요청: {}", request);
         memberService.createCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/owner-signup")
-    public ResponseEntity<Void> ownerCreate(@RequestBody MemberCreateRequest request) {
+    public ResponseEntity<Void> joinOwner(@RequestBody MemberCreateRequest request) {
         log.info("판매자 회원가입 요청: {}", request);
         memberService.createOwner(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
