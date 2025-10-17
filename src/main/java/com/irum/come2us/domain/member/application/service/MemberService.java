@@ -47,8 +47,14 @@ public class MemberService {
 
     public void changeCustomerRoleToOwner() {
         Member member = getMember();
-        assertMemberIsNotOwner(member);
+        assertMemberIsNotAlreadyOwner(member);
         member.grantOwner();
+    }
+
+    public void withdrawCustomer() {
+        Member member = getMember();
+        assertMemberIsNotOwner(member);
+        clientRepository.delete(member);
     }
 
     // 검증 로직
@@ -77,12 +83,17 @@ public class MemberService {
 
     private Member getMember() {
         return clientRepository
-                .findByMemberId(0L)
+                .findByMemberId(1L)
                 .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
     } // Spring Security 도입 후 SecurityContextHolder를 통해 검증하도록 변경 예정
 
-    private void assertMemberIsNotOwner(Member member) {
+    private void assertMemberIsNotAlreadyOwner(Member member) {
         if (member.getRole().equals(Role.OWNER))
             throw new CommonException(MemberErrorCode.ROLE_ALREADY_GRANTED);
+    }
+
+    private void assertMemberIsNotOwner(Member member) {
+        if (member.getRole().equals(Role.OWNER))
+            throw new CommonException(MemberErrorCode.OWNER_CANNOT_WITHDRAW);
     }
 }
