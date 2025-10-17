@@ -18,25 +18,25 @@ public class MemberService {
     private final ClientRepository clientRepository;
 
     public void createCustomer(MemberCreateRequest request) {
-        verifyCustomerAlreadyExist(request.email());
+        verifyCustomerAlreadyExists(request.email());
         clientRepository.save(
                 Member.createCustomer(
                         request.email(), request.password(), request.name(), request.contact()));
     }
 
     public void createOwner(MemberCreateRequest request) {
-        verifyMemberAlreadyExist(request.email());
+        verifyMemberAlreadyExists(request.email());
         clientRepository.save(
                 Member.createOwner(
                         request.email(), request.password(), request.name(), request.contact()));
     }
 
-    private void verifyCustomerAlreadyExist(String email) {
+    private void verifyCustomerAlreadyExists(String email) {
         if (clientRepository.findByEmail(email).isPresent())
             throw new CommonException(MemberErrorCode.MEMBER_ALREADY_EXISTS);
     }
 
-    private void verifyMemberAlreadyExist(String email) {
+    private void verifyMemberAlreadyExists(String email) {
         Optional<Member> member = clientRepository.findByEmail(email);
         if (member.isPresent()) {
             Role role = member.get().getRole();
