@@ -1,7 +1,11 @@
 package com.irum.come2us.domain.member.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
+import com.irum.come2us.global.constants.RegexConstants;
+import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import jakarta.persistence.*;
+import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,10 +39,10 @@ public class Member {
 
     @Builder(access = AccessLevel.PRIVATE)
     private Member(String email, String password, String name, String contact, Role role) {
-        this.email = email;
+        this.email = validEmail(email);
         this.password = password;
         this.name = name;
-        this.contact = contact;
+        this.contact = validContact(contact);
         this.role = role;
     }
 
@@ -81,5 +85,21 @@ public class Member {
         this.contact = contact;
     }
 
-    // 공통예외핸들러 개발 후 이메일, 연락처 정규화 로직 추가 예정
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(RegexConstants.EMAIL);
+    private static final Pattern PHONE_NUMBER_PATTERN =
+            Pattern.compile(RegexConstants.PHONE_NUMBER);
+
+    private String validEmail(String email) {
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new CommonException(MemberErrorCode.INVALID_EMAIL);
+        }
+        return email;
+    }
+
+    private String validContact(String email) {
+        if (!PHONE_NUMBER_PATTERN.matcher(email).matches()) {
+            throw new CommonException(MemberErrorCode.INVALID_CONTACT);
+        }
+        return email;
+    }
 }
