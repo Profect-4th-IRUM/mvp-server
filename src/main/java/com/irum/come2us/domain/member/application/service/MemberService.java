@@ -6,6 +6,7 @@ import com.irum.come2us.domain.member.domain.repository.ClientRepository;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberCreateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberInfoUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpdateRequest;
+import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import jakarta.transaction.Transactional;
@@ -31,6 +32,11 @@ public class MemberService {
         clientRepository.save(
                 Member.createOwner(
                         request.email(), request.password(), request.name(), request.contact()));
+    }
+
+    public MemberInfoResponse findMemberInfo() {
+        Member member = getMember();
+        return MemberInfoResponse.createMemberInfoResponse(member);
     }
 
     public void changeMemberNameAndContact(MemberInfoUpdateRequest request) {

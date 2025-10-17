@@ -4,6 +4,7 @@ import com.irum.come2us.domain.member.application.service.MemberService;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberCreateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberInfoUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpdateRequest;
+import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,11 @@ public class MemberController {
         log.info("판매자 회원가입 요청: {}", request);
         memberService.createOwner(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/info")
+    public MemberInfoResponse getMemberInfo() {
+        return memberService.findMemberInfo();
     }
 
     @PatchMapping("/info")
