@@ -21,7 +21,7 @@ import java.util.UUID;
 @Table(name="p_order_datail")
 public class OrderDetail {
     @Id
-    @UuidGenerator
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name="order_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID orderDetailId;
 

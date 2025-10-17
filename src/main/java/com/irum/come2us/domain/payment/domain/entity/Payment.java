@@ -16,9 +16,9 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "p_payment")
 public class Payment {
     @Id
-    @UuidGenerator
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name="payment_id", columnDefinition = "uuid", nullable = false, updatable = false)
-    private String payment_id;
+    private String paymentId;
 
     private PaymentMethod paymentMethod;
 

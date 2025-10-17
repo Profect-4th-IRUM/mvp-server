@@ -1,6 +1,7 @@
 package com.irum.come2us.domain.order.domain.entity;
 
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
+import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Table(name = "p_order")
 public class Order {
     @Id
-    @UuidGenerator
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name="order_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID orderId;
 
@@ -49,7 +50,9 @@ public class Order {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
-    //결제
+    @OneToOne
+    @JoinColumn(name="payment_id")
+    private Payment payment;
 
     //TODO: 상점, 회원 Many to one
 

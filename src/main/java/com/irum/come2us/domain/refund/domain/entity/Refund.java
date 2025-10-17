@@ -19,7 +19,7 @@ import java.util.UUID;
 @Table(name = "p_refund")
 public class Refund {
     @Id
-    @UuidGenerator
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name="refund_id",columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID refund_id;
 
