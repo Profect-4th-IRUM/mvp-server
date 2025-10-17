@@ -1,5 +1,4 @@
 package com.irum.come2us.domain.store.domain.entity;
-
 import com.irum.come2us.domain.member.domain.entity.Member;
 
 import jakarta.persistence.Entity;
@@ -7,10 +6,9 @@ import lombok.Getter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
-
 
 @Getter
 @Entity
@@ -20,11 +18,10 @@ import java.util.UUID;
 public class Store {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name = "store_id", updatable = false, nullable = false)
     private UUID storeId;
-
 
     @Column(name = "store_name", nullable = false, length = 50)
     private String storeName;
