@@ -1,0 +1,22 @@
+package com.irum.come2us.global.presentation.advice.exception.errorcode;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+@AllArgsConstructor
+public enum StoreErrorCode implements BaseErrorCode {
+    INVALID_MEMBER_ROLE(HttpStatus.FORBIDDEN, "상점을 생성할 권한이 없습니다."),
+    STORE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 상점을 보유하고 있습니다."),
+    BUSINESS_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "사업자등록번호가 이미 존재합니다."),
+    TELEMARKETING_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "통신판매업번호가 이미 존재합니다.");
+
+    private final HttpStatus httpStatus;
+    private final String message;
+
+    @Override
+    public String errorClassName() {
+        return this.name();
+    }
+}
