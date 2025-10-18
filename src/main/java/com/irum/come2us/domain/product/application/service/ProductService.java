@@ -3,14 +3,20 @@ package com.irum.come2us.domain.product.application.service;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
+import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import jakarta.transaction.Transactional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
 
@@ -25,5 +31,63 @@ public class ProductService {
                         request.isPublic());
 
         return ProductResponse.from(productRepository.save(product));
+    }
+
+    public ProductResponse updateProduct(UUID productId, ProductUpdateRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (request.name() == null
+                && request.description() == null
+                && request.detailDescription() == null
+                && request.price() == null
+                && request.isPublic() == null) {
+            log.warn("상품 수정 실패: 변경된 필드가 없습니다. productId={}", productId);
+            throw new CommonException(ProductErrorCode.PRODUCT_NOT_MODIFIED);
+        }
+
+        String updatedName = request.name() != null ? request.name() : product.getName();
+        String updatedDescription =
+                request.description() != null ? request.description() : product.getDescription();
+        String updatedDetailDescription =
+                request.detailDescription() != null
+                        ? request.detailDescription()
+                        : product.getDetailDescription();
+        int updatedPrice = request.price() != null ? request.price() : product.getPrice();
+        boolean updatedIsPublic =
+                request.isPublic() != null ? request.isPublic() : product.isPublic();
+
+        log.info("상품 수정 시작: productId={}", productId);
+
+        if (!product.getName().equals(updatedName)) {
+            log.info("상품명 변경: {} → {}", product.getName(), updatedName);
+        }
+        if (!product.getDescription().equals(updatedDescription)) {
+            log.info("상품 설명 변경: {} → {}", product.getDescription(), updatedDescription);
+        }
+        if (!product.getDetailDescription().equals(updatedDetailDescription)) {
+            log.info(
+                    "상품 상세설명 변경: {} → {}",
+                    product.getDetailDescription(),
+                    updatedDetailDescription);
+        }
+        if (product.getPrice() != updatedPrice) {
+            log.info("상품 가격 변경: {} → {}", product.getPrice(), updatedPrice);
+        }
+        if (product.isPublic() != updatedIsPublic) {
+            log.info("공개여부 변경: {} → {}", product.isPublic(), updatedIsPublic);
+        }
+
+        product.updateProduct(
+                updatedName,
+                updatedDescription,
+                updatedDetailDescription,
+                updatedPrice,
+                updatedIsPublic);
+
+        log.info("상품 수정 완료: productId={}", productId);
+        return ProductResponse.from(product);
     }
 }
