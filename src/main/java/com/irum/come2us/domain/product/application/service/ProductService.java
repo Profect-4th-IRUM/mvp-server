@@ -3,6 +3,7 @@ package com.irum.come2us.domain.product.application.service;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -88,6 +89,33 @@ public class ProductService {
                 updatedIsPublic);
 
         log.info("상품 수정 완료: productId={}", productId);
+        return ProductResponse.from(product);
+    }
+
+    public ProductResponse updateProductPublicStatus(
+            UUID productId, ProductPublicUpdateRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        boolean newStatus = request.isPublic();
+        boolean currentStatus = product.isPublic();
+
+        if (newStatus == currentStatus) {
+            log.warn("상품 공개 상태 변경 실패: 동일한 상태 요청 productId={}, isPublic={}", productId, newStatus);
+            throw new CommonException(ProductErrorCode.PRODUCT_NOT_MODIFIED);
+        }
+
+        log.info("상품 공개 상태 변경: productId={}, {} -> {}", productId, currentStatus, newStatus);
+
+        product.updateProduct(
+                product.getName(),
+                product.getDescription(),
+                product.getDetailDescription(),
+                product.getPrice(),
+                newStatus);
+
         return ProductResponse.from(product);
     }
 }
