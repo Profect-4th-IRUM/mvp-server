@@ -63,4 +63,9 @@ public class MemberValidator {
             }
         }
     }
+
+    public void assertMemberIsManager(Member member) {
+        if (!member.getRole().equals(Role.MANAGER))
+            throw new CommonException(MemberErrorCode.MEMBER_IS_NOT_MANAGER);
+    }
 }

@@ -35,7 +35,6 @@ public class ManagerService {
 
     @Transactional(readOnly = true)
     public MemberInfoListResponse findManagerInfoList(Long lastMemberId, int pageSize) {
-        Member member = memberValidator.getCurrentMember();
         int limit = pageSize + 1;
         List<MemberInfoResponse> memberInfoList =
                 memberRepository.findMembersByCursor(lastMemberId, limit);
@@ -62,15 +61,9 @@ public class ManagerService {
         member.updatePassword(request.newPassword());
     } // 추후 BCryptEncoder 사용한 암/복호화 검증 로직 적용 예정
 
-    public void changeManagerRoleToMaster(Long memberId) {
-        Member member = memberValidator.getMemberById(memberId);
-        memberValidator.assertMemberIsNotOwner(member);
-        member.grantOwner();
-    }
-
     public void removeManager(Long memberId) {
         Member member = memberValidator.getMemberById(memberId);
-        memberValidator.assertMemberIsCustomer(member);
+        memberValidator.assertMemberIsManager(member);
         memberRepository.delete(member);
     }
 }
