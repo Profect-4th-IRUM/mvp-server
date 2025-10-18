@@ -1,0 +1,80 @@
+package com.irum.come2us.domain.store.application.service;
+
+import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.member.domain.entity.enums.Role;
+import com.irum.come2us.domain.store.domain.entity.Store;
+import com.irum.come2us.domain.store.domain.repository.StoreRepository;
+import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
+import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
+import jakarta.transaction.Transactional;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class StoreService {
+
+    private final StoreRepository storeRepository;
+
+    // TODO : Member id 맵핑. 시큐리티 적용?
+    public UUID createStore(StoreCreateRequest request) {
+        // 더미 (변경 해야함)
+        Member member = createDummyMember();
+
+        validateMemberRole(member); // 권한 체크
+        validateMemberHasNoStore(member); // 1인 1상점 제한
+        validateBusinessNumber(request.businessRegistrationNumber()); // 사업자번호 중복 체크
+        validateTelemarketingNumber(request.telemarketingRegistrationNumber()); // 통신판매번호 중복 체크
+
+        Store store =
+                Store.createStore(
+                        request.name(),
+                        request.contact(),
+                        request.address(),
+                        request.businessRegistrationNumber(),
+                        request.telemarketingRegistrationNumber(),
+                        request.deliveryFee(),
+                        member);
+
+        storeRepository.save(store);
+        return store.getId();
+    }
+
+    // 권한 체크
+    //    더미 (변경 해야함)
+    private Member createDummyMember() {
+        return Member.createOwner("dummy@email.com", "password", "테스트사용자", "010-0000-0000");
+    }
+
+    private void validateMemberRole(Member member) {
+        Role role = member.getRole();
+        if (!(Role.OWNER.equals(role) || Role.MANAGER.equals(role))) {
+            throw new CommonException(StoreErrorCode.INVALID_MEMBER_ROLE);
+        }
+    }
+
+    // 1인 1상점 제한
+    private void validateMemberHasNoStore(Member member) {
+        if (storeRepository.existsByMember(member)) {
+            throw new CommonException(StoreErrorCode.STORE_ALREADY_EXISTS);
+        }
+    }
+
+    // 사업자등록번호 중복 체크
+    private void validateBusinessNumber(String businessRegistrationNumber) {
+        if (storeRepository.existsByBusinessRegistrationNumber(businessRegistrationNumber)) {
+            throw new CommonException(StoreErrorCode.BUSINESS_NUMBER_DUPLICATED);
+        }
+    }
+
+    // 통신판매업번호 중복 체크
+    private void validateTelemarketingNumber(String telemarketingRegistrationNumber) {
+        if (storeRepository.existsByTelemarketingRegistrationNumber(
+                telemarketingRegistrationNumber)) {
+            throw new CommonException(StoreErrorCode.TELEMARKETING_NUMBER_DUPLICATED);
+        }
+    }
+}
