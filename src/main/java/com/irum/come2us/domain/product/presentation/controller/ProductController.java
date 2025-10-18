@@ -2,16 +2,15 @@ package com.irum.come2us.domain.product.presentation.controller;
 
 import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/products")
@@ -26,6 +25,16 @@ public class ProductController {
         log.info("상품 등록 요청: {}", request);
         ProductResponse response = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        // TODO: Security 적용
+    }
+
+    @PatchMapping("/{productId}")
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable UUID productId, @RequestBody ProductUpdateRequest request) {
+        log.info("상품 정보 수정 요청: productId={}, request={}", productId, request);
+        ProductResponse response = productService.updateProduct(productId, request);
+        return ResponseEntity.ok(response);
 
         // TODO: Security 적용
     }
