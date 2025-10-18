@@ -2,6 +2,7 @@ package com.irum.come2us.domain.product.presentation.controller;
 
 import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
@@ -37,5 +38,13 @@ public class ProductController {
         return ResponseEntity.ok(response);
 
         // TODO: Security 적용
+    }
+
+    @PatchMapping("/{productId}/public")
+    public ResponseEntity<ProductResponse> updateProductPublicStatus(
+            @PathVariable UUID productId, @Valid @RequestBody ProductPublicUpdateRequest request) {
+        log.info("상품 공개 상태 변경 요청: productId={}, isPublic={}", productId, request.isPublic());
+        ProductResponse response = productService.updateProductPublicStatus(productId, request);
+        return ResponseEntity.ok(response);
     }
 }
