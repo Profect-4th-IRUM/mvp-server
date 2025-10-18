@@ -52,12 +52,33 @@ public class Store {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee) {
+            int deliveryFee,
+            Member member) {
         this.name = name;
         this.contact = contact;
         this.address = address;
         this.businessRegistrationNumber = businessRegistrationNumber;
         this.telemarketingRegistrationNumber = telemarketingRegistrationNumber;
         this.deliveryFee = deliveryFee;
+        this.member = member;
+    }
+
+    public static Store createStore(
+            String name,
+            String contact,
+            String address,
+            String businessRegistrationNumber,
+            String telemarketingRegistrationNumber,
+            int deliveryFee,
+            Member member) {
+        return Store.builder()
+                .name(name)
+                .contact(contact)
+                .address(address)
+                .businessRegistrationNumber(businessRegistrationNumber)
+                .telemarketingRegistrationNumber(telemarketingRegistrationNumber)
+                .deliveryFee(deliveryFee)
+                .member(member)
+                .build();
     }
 }
