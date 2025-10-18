@@ -1,15 +1,12 @@
 package com.irum.come2us.domain.member.application.service;
 
+import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.member.domain.entity.enums.Role;
-import com.irum.come2us.domain.member.domain.repository.ClientRepository;
+import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberCreateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberInfoUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
-import com.irum.come2us.global.presentation.advice.exception.CommonException;
-import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,89 +15,50 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class MemberService {
-    private final ClientRepository clientRepository;
+    private final MemberRepository memberRepository;
+    private final MemberValidator memberValidator;
 
     public void createCustomer(MemberCreateRequest request) {
-        assertEmailIsNotTaken(request.email());
-        clientRepository.save(
+        memberValidator.assertEmailIsNotTaken(request.email());
+        memberRepository.save(
                 Member.createCustomer(
                         request.email(), request.password(), request.name(), request.contact()));
     }
 
     public void createOwner(MemberCreateRequest request) {
-        validateNewOwnerRegistration(request.email());
-        clientRepository.save(
+        memberValidator.validateNewOwnerRegistration(request.email());
+        memberRepository.save(
                 Member.createOwner(
                         request.email(), request.password(), request.name(), request.contact()));
     }
 
     @Transactional(readOnly = true)
     public MemberInfoResponse findMemberInfo() {
-        Member member = getMember();
+        Member member = memberValidator.getCurrentMember();
         return MemberInfoResponse.createMemberInfoResponse(member);
     }
 
     public void changeMemberNameAndContact(MemberInfoUpdateRequest request) {
-        Member member = getMember();
+        Member member = memberValidator.getCurrentMember();
         member.updateName(request.name());
         member.updateContact(request.contact());
     }
 
     public void changeMemberPassword(MemberPasswordUpdateRequest request) {
-        Member member = getMember();
-        validatePassword(request.originalPassword(), request.newPassword(), member);
+        Member member = memberValidator.getCurrentMember();
+        memberValidator.validatePassword(request.originalPassword(), request.newPassword(), member);
         member.updatePassword(request.newPassword());
     } // 추후 BCryptEncoder 사용한 암/복호화 검증 로직 적용 예정
 
     public void changeCustomerRoleToOwner() {
-        Member member = getMember();
-        assertMemberIsNotAlreadyOwner(member);
+        Member member = memberValidator.getCurrentMember();
+        memberValidator.assertMemberIsNotOwner(member);
         member.grantOwner();
     }
 
     public void withdrawCustomer() {
-        Member member = getMember();
-        assertMemberIsNotOwner(member);
-        clientRepository.delete(member);
-    }
-
-    // 검증 로직
-    private void assertEmailIsNotTaken(String email) {
-        if (clientRepository.findByEmail(email).isPresent())
-            throw new CommonException(MemberErrorCode.MEMBER_ALREADY_EXISTS);
-    }
-
-    private void validateNewOwnerRegistration(String email) {
-        Optional<Member> member = clientRepository.findByEmail(email);
-        if (member.isPresent()) {
-            Role role = member.get().getRole();
-            switch (role) {
-                case OWNER -> throw new CommonException(MemberErrorCode.MEMBER_ALREADY_EXISTS);
-                case CUSTOMER -> throw new CommonException(MemberErrorCode.OWNER_UPGRADE_REQUIRED);
-            }
-        }
-    }
-
-    private void validatePassword(String originalPassword, String newPassword, Member member) {
-        if (member.getPassword().equals(originalPassword))
-            throw new CommonException(MemberErrorCode.INVALID_PASSWORD);
-        if (member.getPassword().equals(newPassword))
-            throw new CommonException(MemberErrorCode.DUPLICATED_PASSWORD);
-    }
-
-    private Member getMember() {
-        return clientRepository
-                .findByMemberId(1L)
-                .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-    } // Spring Security 도입 후 SecurityContextHolder를 통해 검증하도록 변경 예정
-
-    private void assertMemberIsNotAlreadyOwner(Member member) {
-        if (member.getRole().equals(Role.OWNER))
-            throw new CommonException(MemberErrorCode.ROLE_ALREADY_GRANTED);
-    }
-
-    private void assertMemberIsNotOwner(Member member) {
-        if (member.getRole().equals(Role.OWNER))
-            throw new CommonException(MemberErrorCode.OWNER_CANNOT_WITHDRAW);
+        Member member = memberValidator.getCurrentMember();
+        memberValidator.assertMemberIsCustomer(member);
+        memberRepository.delete(member);
     }
 }

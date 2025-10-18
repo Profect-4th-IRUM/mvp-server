@@ -15,7 +15,8 @@ public enum MemberErrorCode implements BaseErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "유효한 비밀번호가 아닙니다."),
     DUPLICATED_PASSWORD(HttpStatus.CONFLICT, "변경되는 비밀번호는 기존 비밀번호와 동일할 수 없습니다."),
     ROLE_ALREADY_GRANTED(HttpStatus.CONFLICT, "중복된 역할을 부여할 수 없습니다."),
-    OWNER_CANNOT_WITHDRAW(HttpStatus.FORBIDDEN, "판매자 권한 멤버는 계정 삭제가 불가능합니다.");
+    OWNER_CANNOT_WITHDRAW(HttpStatus.FORBIDDEN, "판매자 권한 멤버는 계정을 삭제할 수 없습니다."),
+    MANAGER_CANNOT_WITHDRAW(HttpStatus.FORBIDDEN, "관리자 권한 멤버는 마스터 권한 없이 계정을 삭제할 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
