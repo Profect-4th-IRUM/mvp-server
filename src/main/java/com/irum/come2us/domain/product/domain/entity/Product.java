@@ -1,13 +1,12 @@
 package com.irum.come2us.domain.product.domain.entity;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -30,6 +29,7 @@ public class Product {
 
     @Column(name = "is_public", nullable = false)
     private boolean isPublic;
+
     // enum 생성
 
     @Column(name = "avg_rating")
@@ -42,11 +42,12 @@ public class Product {
     private int price;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Product(String name,
-                    String description,
-                    boolean isPublic,
-                    String detailDescription,
-                    int price) {
+    private Product(
+            String name,
+            String description,
+            boolean isPublic,
+            String detailDescription,
+            int price) {
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
@@ -54,11 +55,12 @@ public class Product {
         this.price = price;
     }
 
-    public static Product createProduct(String name,
-                                        String description,
-                                        String detailDescription,
-                                        int price,
-                                        boolean isPublic) {
+    public static Product createProduct(
+            String name,
+            String description,
+            String detailDescription,
+            int price,
+            boolean isPublic) {
         return Product.builder()
                 .name(name)
                 .description(description)
@@ -68,18 +70,18 @@ public class Product {
                 .build();
     }
 
-    public void updateProduct(String name,
-                              String description,
-                              String detailDescription,
-                              int price,
-                              boolean isPublic) {
+    public void updateProduct(
+            String name,
+            String description,
+            String detailDescription,
+            int price,
+            boolean isPublic) {
         this.name = name;
         this.description = description;
         this.detailDescription = detailDescription;
         this.price = price;
         this.isPublic = isPublic;
     }
-
 
     public void updateRating(Double avgRating, Integer reviewCount) {
         this.avgRating = avgRating;
