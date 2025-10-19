@@ -121,14 +121,23 @@ public class ProductService {
         return ProductResponse.from(product);
     }
 
-    public List<ProductResponse> getProductList(UUID cursor, Integer size) {
+    public List<ProductResponse> getProductList(UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
         }
 
-        List<ProductResponse> products = productRepository.findProductsByCursor(cursor, size);
-        log.info("상품 목록 조회 완료: cursor={}, size={}, count={}", cursor, size, products.size());
+        List<ProductResponse> products;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            log.info("상품 검색 요청: keyword={}, cursor={}, size={}", keyword, cursor, size);
+            products = productRepository.findProductsByKeyword(cursor, size, keyword);
+        } else {
+            log.info("상품 목록 조회 요청: cursor={}, size={}", cursor, size);
+            products = productRepository.findProductsByCursor(cursor, size);
+        }
+
+        log.info("상품 목록 조회 완료: keyword={}, count={}", keyword, products.size());
         return products;
     }
 

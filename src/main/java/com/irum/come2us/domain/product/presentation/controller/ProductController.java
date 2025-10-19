@@ -53,9 +53,10 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getProductList(
             @RequestParam(required = false) UUID cursor,
-            @RequestParam(required = false) Integer size) {
-        log.info("상품 목록 조회 요청: cursor={}, size={}", cursor, size);
-        List<ProductResponse> response = productService.getProductList(cursor, size);
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false) String keyword) {
+        log.info("상품 목록 조회 요청: cursor={}, size={}, keyword={}", cursor, size, keyword);
+        List<ProductResponse> response = productService.getProductList(cursor, size, keyword);
         return ResponseEntity.ok(response);
     }
 

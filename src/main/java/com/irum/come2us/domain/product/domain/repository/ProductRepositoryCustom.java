@@ -6,4 +6,6 @@ import java.util.UUID;
 
 public interface ProductRepositoryCustom {
     List<ProductResponse> findProductsByCursor(UUID cursor, int size);
+
+    List<ProductResponse> findProductsByKeyword(UUID cursor, int size, String keyword);
 }
