@@ -86,6 +86,16 @@ public class Store {
                 .build();
     }
 
+    public void updateBasicInfo(String name, String contact, String address) {
+        this.name = name;
+        this.contact = contact;
+        this.address = address;
+    }
+
+    public void changeDeliveryFee(int deliveryFee) {
+        this.deliveryFee = validDeliveryFee(deliveryFee);
+    }
+
     private static final Pattern PHONE_NUMBER_PATTERN =
             Pattern.compile(RegexConstants.PHONE_NUMBER);
 
