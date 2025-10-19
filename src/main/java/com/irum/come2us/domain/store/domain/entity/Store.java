@@ -1,9 +1,13 @@
 package com.irum.come2us.domain.store.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.global.constants.RegexConstants;
+import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -80,5 +84,44 @@ public class Store {
                 .deliveryFee(deliveryFee)
                 .member(member)
                 .build();
+    }
+
+    private static final Pattern PHONE_NUMBER_PATTERN =
+            Pattern.compile(RegexConstants.PHONE_NUMBER);
+
+    private static final Pattern TELEMARKETING_REGISTRATION_NUMBER_PATTERN =
+            Pattern.compile(RegexConstants.TELEMARKETING_REGISTRATION_NUMBER);
+
+    private static final Pattern BUSINESS_REGISTRATION_NUMBER_PATTERN =
+            Pattern.compile(RegexConstants.BUSINESS_REGISTRATION_NUMBER);
+
+    private String validContact(String contact) {
+        if (!PHONE_NUMBER_PATTERN.matcher(contact).matches()) {
+            throw new CommonException(StoreErrorCode.INVALID_CONTACT);
+        }
+        return contact;
+    }
+
+    private String validTelemarketingRegistrationNumber(String telemarketingRegistrationNumber) {
+        if (!TELEMARKETING_REGISTRATION_NUMBER_PATTERN
+                .matcher(telemarketingRegistrationNumber)
+                .matches()) {
+            throw new CommonException(StoreErrorCode.INVALID_TELEMARKETING_REGISTRATION_NUMBER);
+        }
+        return telemarketingRegistrationNumber;
+    }
+
+    private String validBusinessRegistrationNumber(String businessRegistrationNumber) {
+        if (!BUSINESS_REGISTRATION_NUMBER_PATTERN.matcher(businessRegistrationNumber).matches()) {
+            throw new CommonException(StoreErrorCode.INVALID_BUSINESS_REGISTRATION_NUMBER);
+        }
+        return businessRegistrationNumber;
+    }
+
+    private static int validDeliveryFee(int deliveryFee) {
+        if (deliveryFee < 0) {
+            throw new CommonException(StoreErrorCode.INVALID_DELIVERY_FEE);
+        }
+        return deliveryFee;
     }
 }
