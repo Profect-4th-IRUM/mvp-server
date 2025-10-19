@@ -27,8 +27,9 @@ public class MemberValidator {
     } // Spring Security 도입 후 SecurityContextHolder를 통해 검증하도록 변경 예정
 
     public void validatePassword(String originalPassword, String newPassword, Member member) {
-        if (member.getPassword().equals(originalPassword))
-            throw new CommonException(MemberErrorCode.INVALID_PASSWORD);
+        if (!member.getPassword()
+                .equals(originalPassword)) // 추후 단순 equal 값 비교가 아닌 인코딩 복호화값 비교 로직으로 변환 예정
+        throw new CommonException(MemberErrorCode.INVALID_PASSWORD);
         if (member.getPassword().equals(newPassword))
             throw new CommonException(MemberErrorCode.DUPLICATED_PASSWORD);
     }
