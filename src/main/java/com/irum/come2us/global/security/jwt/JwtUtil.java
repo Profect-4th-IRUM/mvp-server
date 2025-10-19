@@ -68,6 +68,19 @@ public class JwtUtil {
         }
     }
 
+    public String resolveToken(String headerValue) {
+        if (headerValue != null && headerValue.startsWith("Bearer ")) {
+            return headerValue.substring(7);
+        }
+        return null;
+    }
+
+    public long getRemainingExpirationMillis(String tokenValue) {
+        Jws<Claims> claims = getClaims(tokenValue, getAccessTokenKey());
+        Date exp = claims.getBody().getExpiration();
+        return Math.max(exp.getTime() - System.currentTimeMillis(), 0);
+    }
+
     public RefreshTokenDto parseRefreshToken(String refreshTokenValue) throws ExpiredJwtException {
         try {
             Jws<Claims> claims = getClaims(refreshTokenValue, getRefreshTokenKey());
