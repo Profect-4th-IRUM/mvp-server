@@ -47,11 +47,22 @@ public class MemberValidator {
                 .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
     } // 타 사용자의 정보 조회(MANAGER, MASTER 권한)
 
+    public Member getMemberByEmail(String email) {
+        return memberRepository
+                .findMemberByEmail(email)
+                .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+    } // 로그인 된 유저 정보 조회
+
     public void validatePassword(String originalPassword, String newPassword, Member member) {
         if (!passwordEncoder.matches(originalPassword, member.getPassword()))
             throw new CommonException(MemberErrorCode.INVALID_PASSWORD);
         if (passwordEncoder.matches(newPassword, member.getPassword()))
             throw new CommonException(MemberErrorCode.DUPLICATED_PASSWORD);
+    }
+
+    public void assertPassword(String password, Member member) {
+        if (!passwordEncoder.matches(password, member.getPassword()))
+            throw new CommonException(MemberErrorCode.INVALID_PASSWORD);
     }
 
     public void validateNewOwnerRegistration(String email) {
