@@ -4,7 +4,7 @@ import com.irum.come2us.domain.product.domain.entity.Product;
 import java.util.UUID;
 
 /**
- * ProductResponse - 상품 등록/수정/조회 공용 DTO - 추후 ProductListResponse를 분리할지 고민
+ * 상품 상세 조회 DTO - 추후 Store, Category, Images, Options 확장 예정
  *
  * @param id
  * @param name
@@ -15,7 +15,7 @@ import java.util.UUID;
  * @param avgRating
  * @param reviewCount
  */
-public record ProductResponse(
+public record ProductDetailResponse(
         UUID id,
         String name,
         String description,
@@ -23,9 +23,14 @@ public record ProductResponse(
         int price,
         boolean isPublic,
         Double avgRating,
-        Integer reviewCount) {
-    public static ProductResponse from(Product product) {
-        return new ProductResponse(
+        Integer reviewCount
+        // TODO: StoreInfoResponse store,
+        // TODO: CategoryInfoResponse category,
+        // TODO: List<ImageResponse> images,
+        // TODO: List<OptionGroupResponse> optionGroups
+        ) {
+    public static ProductDetailResponse from(Product product) {
+        return new ProductDetailResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
