@@ -1,13 +1,11 @@
 package com.irum.come2us.domain.coupon.domain.entity;
 
-
 import com.irum.come2us.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 // 1. 엔티티
 
@@ -33,6 +31,7 @@ public class Coupon {
 
     @Column(name = "expiration") // 유효기간
     private LocalDateTime expiration;
+
     /*
     향후 쿠폰 사용 기능 추가시 주석 해제
 
@@ -65,9 +64,5 @@ public class Coupon {
                 .expiration(expiration)
                 .member(member)
                 .build();
-
     }
 }
-
-
-
