@@ -51,9 +51,10 @@ public class SecurityConfig {
                         auth // API 개발 완료 후 비즈니스 로직에 맞게 설정 변경 예정
                                 .requestMatchers("/members")
                                 .hasAnyRole(
-                                        String.valueOf(Role.CUSTOMER),
-                                        String.valueOf(Role.OWNER),
-                                        String.valueOf(Role.MANAGER))
+                                        Role.CUSTOMER.name(),
+                                        Role.OWNER.name(),
+                                        Role.MANAGER.name(),
+                                        Role.MASTER.name())
                                 .requestMatchers(HttpMethod.DELETE, "/members/me")
                                 .hasRole(String.valueOf(Role.CUSTOMER))
                                 .requestMatchers("/managers/**")
@@ -63,4 +64,11 @@ public class SecurityConfig {
         // .authenticated() 옵션으로 변경할 예정
         return http.build();
     }
+    //
+    //    @Bean
+    //    public JwtAuthenticationFilter jwtAuthenticationFilter(
+    //            JwtTokenService jwtTokenService, CookieUtil cookieUtil) {
+    //        return new JwtAuthenticationFilter(jwtTokenService, cookieUtil);
+    //    }
+
 }
