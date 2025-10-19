@@ -2,7 +2,7 @@ package com.irum.come2us.domain.member.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.global.constants.RegexConstants;
-import com.irum.come2us.global.domain.BaseEntity;
+import com.irum.come2us.global.domain.BaseTimeEntity;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import jakarta.persistence.*;
@@ -20,7 +20,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE p_member SET deleted_at = NOW() WHERE member_id = ?")
 @Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+public class Member extends BaseTimeEntity {
     @Id
     @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
