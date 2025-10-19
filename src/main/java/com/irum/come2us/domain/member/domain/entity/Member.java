@@ -109,8 +109,8 @@ public class Member extends BaseTimeEntity {
         return email;
     }
 
-    private String validContact(String email) {
-        if (!PHONE_NUMBER_PATTERN.matcher(email).matches()) {
+    private String validContact(String contact) {
+        if (!PHONE_NUMBER_PATTERN.matcher(contact).matches()) {
             throw new CommonException(MemberErrorCode.INVALID_CONTACT);
         }
         return email;
