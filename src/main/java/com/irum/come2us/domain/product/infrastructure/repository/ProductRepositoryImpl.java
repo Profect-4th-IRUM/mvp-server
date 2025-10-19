@@ -31,17 +31,23 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     public List<ProductResponse> findProductsByCursor(UUID cursor, int size) {
         QProduct product = QProduct.product;
 
-        var query =
-                queryFactory
-                        .selectFrom(product)
-                        .where(product.isPublic.isTrue())
-                        .orderBy(product.id.desc()) // Auditing 추가 후, createdAt 기반 생성일자 정렬
-                        .limit(size);
-        if (cursor != null) {
-            query.where(product.id.lt(cursor));
-        }
-
-        return query.fetch().stream().map(ProductResponse::from).toList();
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                ProductResponse.class,
+                                product.id,
+                                product.name,
+                                product.description,
+                                product.detailDescription,
+                                product.price,
+                                product.isPublic,
+                                product.avgRating,
+                                product.reviewCount))
+                .from(product)
+                .where(product.isPublic.isTrue(), ltCursor(cursor, product))
+                .orderBy(product.id.desc()) // createdAt 기준 정렬로 변경 예정
+                .limit(size)
+                .fetch();
     }
 
     @Override
@@ -65,7 +71,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.isPublic.isTrue(),
                         ltCursor(cursor, product),
                         containsKeyword(keyword, product))
-                .orderBy(product.id.desc())  // createdAt 기준 정렬로 변경 예정
+                .orderBy(product.id.desc()) // createdAt 기준 정렬로 변경 예정
                 .limit(size)
                 .fetch();
     }
