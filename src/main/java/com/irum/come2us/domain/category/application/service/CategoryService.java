@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -14,33 +15,19 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    // 전체 카테고리 조회
-    public List<Category> getAllCategories() {
+    public List<Category> findAll() {
         return categoryRepository.findAll();
     }
 
-    // 단일 카테고리 조회
-    public Optional<Category> getCategoryById(String categoryId) {
-        return categoryRepository.findById(categoryId);
+    public Optional<Category> findById(UUID id) {
+        return categoryRepository.findById(id);
     }
 
-    // 부모 카테고리 기준 하위 카테고리 조회
-    public List<Category> getSubCategories(String parentId) {
-        return categoryRepository.findByParentId(parentId);
-    }
-
-    // 카테고리 생성
-    public Category createCategory(Category category) {
+    public Category save(Category category) {
         return categoryRepository.save(category);
     }
 
-    // 카테고리 수정
-    public Category updateCategory(Category category) {
-        return categoryRepository.save(category);
-    }
-
-    // 카테고리 삭제
-    public void deleteCategory(String categoryId) {
-        categoryRepository.deleteById(categoryId);
+    public void delete(UUID id) {
+        categoryRepository.deleteById(id);
     }
 }
