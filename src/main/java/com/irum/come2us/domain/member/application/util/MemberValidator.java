@@ -11,12 +11,14 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class MemberValidator {
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public Member getCurrentMember() {
         return memberRepository
@@ -45,11 +47,22 @@ public class MemberValidator {
                 .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
     } // 타 사용자의 정보 조회(MANAGER, MASTER 권한)
 
+    public Member getMemberByEmail(String email) {
+        return memberRepository
+                .findMemberByEmail(email)
+                .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+    } // 로그인 된 유저 정보 조회
+
     public void validatePassword(String originalPassword, String newPassword, Member member) {
-        if (member.getPassword().equals(originalPassword))
+        if (!passwordEncoder.matches(originalPassword, member.getPassword()))
             throw new CommonException(MemberErrorCode.INVALID_PASSWORD);
-        if (member.getPassword().equals(newPassword))
+        if (passwordEncoder.matches(newPassword, member.getPassword()))
             throw new CommonException(MemberErrorCode.DUPLICATED_PASSWORD);
+    }
+
+    public void assertPassword(String password, Member member) {
+        if (!passwordEncoder.matches(password, member.getPassword()))
+            throw new CommonException(MemberErrorCode.INVALID_PASSWORD);
     }
 
     public void validateNewOwnerRegistration(String email) {
