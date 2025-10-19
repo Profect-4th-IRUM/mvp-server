@@ -1,8 +1,6 @@
 package com.irum.come2us.domain.auth.application.service;
 
-import com.irum.come2us.domain.auth.domain.entity.BlackListToken;
 import com.irum.come2us.domain.auth.domain.entity.RefreshToken;
-import com.irum.come2us.domain.auth.domain.repository.BlackListTokenRepository;
 import com.irum.come2us.domain.auth.domain.repository.RefreshTokenRepository;
 import com.irum.come2us.domain.auth.presentation.dto.request.AccessTokenDto;
 import com.irum.come2us.domain.auth.presentation.dto.request.RefreshTokenDto;
@@ -18,7 +16,6 @@ public class JwtTokenService {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final BlackListTokenRepository blackListTokenRepository;
 
     public AccessTokenDto createAccessTokenDto(Long memberId, Role authority) {
         return jwtUtil.generateAccessTokenDto(memberId, authority);
@@ -89,14 +86,5 @@ public class JwtTokenService {
 
     private Optional<RefreshToken> getRefreshToken(Long memberId) {
         return refreshTokenRepository.findById(memberId);
-    }
-
-    public void putAccessTokenOnBlackList(String accessTokenValue) {
-        String accessToken = jwtUtil.resolveToken(accessTokenValue);
-        if (accessToken == null) return;
-        long remainingMs = jwtUtil.getRemainingExpirationMillis(accessToken);
-        long ttlSeconds = remainingMs > 0 ? remainingMs / 1000 : 0;
-        BlackListToken black = BlackListToken.createBlackListToken(accessToken, ttlSeconds);
-        blackListTokenRepository.save(black);
     }
 }

@@ -24,10 +24,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-            HttpServletResponse response) {
-        HttpHeaders headers = authService.processMemberLogout(authorizationHeader);
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        HttpHeaders headers = authService.processMemberLogout();
         response.addHeader(HttpHeaders.SET_COOKIE, headers.getFirst(HttpHeaders.SET_COOKIE));
         return ResponseEntity.noContent().build();
     }

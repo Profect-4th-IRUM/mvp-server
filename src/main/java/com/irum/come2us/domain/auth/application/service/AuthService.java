@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.auth.application.service;
 
-import com.irum.come2us.domain.auth.domain.repository.BlackListTokenRepository;
 import com.irum.come2us.domain.auth.domain.repository.RefreshTokenRepository;
 import com.irum.come2us.domain.auth.presentation.dto.request.MemberLoginRequest;
 import com.irum.come2us.domain.auth.presentation.dto.response.MemberLoginResponse;
@@ -20,7 +19,6 @@ public class AuthService {
     private final MemberValidator memberValidator;
     private final JwtTokenService jwtTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final BlackListTokenRepository blackListTokenRepository;
     private final CookieUtil cookieUtil;
 
     public MemberLoginResponse processMemberLogin(MemberLoginRequest request) {
@@ -32,10 +30,9 @@ public class AuthService {
         return MemberLoginResponse.of(accessToken, refreshToken);
     }
 
-    public HttpHeaders processMemberLogout(String authorizationHeader) {
+    public HttpHeaders processMemberLogout() {
         Member member = memberValidator.getCurrentMember();
         refreshTokenRepository.deleteById(member.getMemberId());
-        jwtTokenService.putAccessTokenOnBlackList(authorizationHeader);
         return cookieUtil.deleteRefreshTokenCookie();
     }
 }
