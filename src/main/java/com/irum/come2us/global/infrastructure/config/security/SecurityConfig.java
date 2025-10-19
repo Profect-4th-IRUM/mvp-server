@@ -64,11 +64,4 @@ public class SecurityConfig {
         // .authenticated() 옵션으로 변경할 예정
         return http.build();
     }
-    //
-    //    @Bean
-    //    public JwtAuthenticationFilter jwtAuthenticationFilter(
-    //            JwtTokenService jwtTokenService, CookieUtil cookieUtil) {
-    //        return new JwtAuthenticationFilter(jwtTokenService, cookieUtil);
-    //    }
-
 }

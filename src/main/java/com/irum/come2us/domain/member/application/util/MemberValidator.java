@@ -4,9 +4,13 @@ import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.AuthErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
+import com.irum.come2us.global.security.MemberDetails;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,15 +20,30 @@ public class MemberValidator {
 
     public Member getCurrentMember() {
         return memberRepository
-                .findByMemberId(1L)
+                .findByMemberId(getCurrentMemberId())
                 .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-    } // Spring Security 도입 후 SecurityContextHolder를 통해 검증하도록 변경 예정
+    } // 로그인 된 유저 정보 조회
+
+    private Long getCurrentMemberId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
+        }
+        try {
+            MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
+            return memberDetails.getMember().getMemberId();
+        } catch (ClassCastException e) {
+            throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
+        } catch (Exception e) {
+            throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
+        }
+    }
 
     public Member getMemberById(Long memberId) {
         return memberRepository
                 .findByMemberId(memberId)
                 .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-    } // Spring Security 도입 후 SecurityContextHolder를 통해 검증하도록 변경 예정
+    } // 타 사용자의 정보 조회(MANAGER, MASTER 권한)
 
     public void validatePassword(String originalPassword, String newPassword, Member member) {
         if (member.getPassword().equals(originalPassword))
