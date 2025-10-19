@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 import java.util.UUID;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "p_category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
