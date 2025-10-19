@@ -33,11 +33,7 @@ public class ReviewImage extends BaseEntity {
     }
 
     public static ReviewImage create(String id, String imageUrl, Review review) {
-        return ReviewImage.builder()
-                .id(id)
-                .imageUrl(imageUrl)
-                .review(review)
-                .build();
+        return ReviewImage.builder().id(id).imageUrl(imageUrl).review(review).build();
     }
 
     public void changeReview(Review review) {

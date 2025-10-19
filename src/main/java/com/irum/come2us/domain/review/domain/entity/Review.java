@@ -43,7 +43,8 @@ public class Review extends BaseEntity {
         this.product = product;
     }
 
-    public static Review createReview(String id, String content, Integer rate, Member member, Product product) {
+    public static Review createReview(
+            String id, String content, Integer rate, Member member, Product product) {
         return Review.builder()
                 .id(id)
                 .content(content)
