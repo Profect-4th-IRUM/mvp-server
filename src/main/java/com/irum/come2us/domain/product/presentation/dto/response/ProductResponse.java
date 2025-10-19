@@ -4,8 +4,6 @@ import com.irum.come2us.domain.product.domain.entity.Product;
 import java.util.UUID;
 
 /**
- * ProductResponse - 상품 등록/수정/조회 공용 DTO - 추후 ProductListResponse를 분리할지 고민
- *
  * @param id
  * @param name
  * @param description
