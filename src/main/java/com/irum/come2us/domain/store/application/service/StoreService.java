@@ -5,6 +5,7 @@ import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
+import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import jakarta.transaction.Transactional;
@@ -43,6 +44,14 @@ public class StoreService {
         return store.getId();
     }
 
+    public void updateStore(UUID storeId, StoreUpdateRequest request) {
+        Store store = getStoreById(storeId);
+
+        // TODO: 권한 체크 (현재는 dummy이므로 나중에 다시 만들기)
+        store.updateBasicInfo(request.name(), request.contact(), request.address());
+        store.changeDeliveryFee(request.deliveryFee());
+    }
+
     // 권한 체크
     //    더미 (변경 해야함)
     private Member createDummyMember() {
@@ -76,5 +85,11 @@ public class StoreService {
                 telemarketingRegistrationNumber)) {
             throw new CommonException(StoreErrorCode.TELEMARKETING_NUMBER_DUPLICATED);
         }
+    }
+
+    private Store getStoreById(UUID storeId) {
+        return storeRepository
+                .findById(storeId)
+                .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
     }
 }
