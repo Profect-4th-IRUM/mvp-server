@@ -5,6 +5,7 @@ import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
@@ -129,5 +130,14 @@ public class ProductService {
         List<ProductResponse> products = productRepository.findProductsByCursor(cursor, size);
         log.info("상품 목록 조회 완료: cursor={}, size={}, count={}", cursor, size, products.size());
         return products;
+    }
+
+    public ProductDetailResponse getProductById(UUID productId) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        return ProductDetailResponse.from(product);
     }
 }
