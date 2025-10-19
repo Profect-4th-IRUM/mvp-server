@@ -6,6 +6,7 @@ import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpd
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,15 @@ public class ProductController {
             @PathVariable UUID productId, @Valid @RequestBody ProductPublicUpdateRequest request) {
         log.info("상품 공개 상태 변경 요청: productId={}, isPublic={}", productId, request.isPublic());
         ProductResponse response = productService.updateProductPublicStatus(productId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getProductList(
+            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) Integer size) {
+        log.info("상품 목록 조회 요청: cursor={}, size={}", cursor, size);
+        List<ProductResponse> response = productService.getProductList(cursor, size);
         return ResponseEntity.ok(response);
     }
 }
