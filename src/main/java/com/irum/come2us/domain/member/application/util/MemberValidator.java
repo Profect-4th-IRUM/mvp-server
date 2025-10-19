@@ -31,7 +31,7 @@ public class MemberValidator {
         }
         try {
             MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
-            return memberDetails.getMember().getMemberId();
+            return Long.parseLong(memberDetails.getUsername());
         } catch (ClassCastException e) {
             throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
         } catch (Exception e) {
