@@ -1,6 +1,11 @@
 package com.irum.come2us.global.infrastructure.config.security;
 
+import com.irum.come2us.domain.auth.application.service.JwtTokenService;
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
+import com.irum.come2us.domain.member.domain.repository.MemberRepository;
+import com.irum.come2us.global.security.JwtAuthenticationFilter;
+import com.irum.come2us.global.util.CookieUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,13 +15,18 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final MemberRepository memberRepository;
+    private final JwtTokenService jwtTokenService;
+    private final CookieUtil cookieUtil;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -62,6 +72,19 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .permitAll()); // API 완료 후 허용된 public endpoints 외 모든 경로
         // .authenticated() 옵션으로 변경할 예정
+
+        http.addFilterBefore(
+                jwtAuthenticationFilter(memberRepository, jwtTokenService, cookieUtil),
+                UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(
+            MemberRepository memberRepository,
+            JwtTokenService jwtTokenService,
+            CookieUtil cookieUtil) {
+        return new JwtAuthenticationFilter(memberRepository, jwtTokenService, cookieUtil);
     }
 }
