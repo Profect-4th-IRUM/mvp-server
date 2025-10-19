@@ -4,6 +4,7 @@ import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -55,6 +56,14 @@ public class ProductController {
             @RequestParam(required = false) Integer size) {
         log.info("상품 목록 조회 요청: cursor={}, size={}", cursor, size);
         List<ProductResponse> response = productService.getProductList(cursor, size);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductDetailResponse> getProduct(@PathVariable UUID productId) {
+        log.info("상품 상세 조회 요청: productId={}", productId);
+
+        ProductDetailResponse response = productService.getProductById(productId);
         return ResponseEntity.ok(response);
     }
 }
