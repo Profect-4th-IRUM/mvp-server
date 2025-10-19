@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -16,41 +17,27 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // ✅ 전체 카테고리 조회
     @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+        return ResponseEntity.ok(categoryService.findAll());
     }
 
-    // ✅ 단일 카테고리 조회
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable("id") String id) {
-        return categoryService.getCategoryById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Category> getCategoryById(@PathVariable UUID id) {
+        Optional<Category> category = categoryService.findById(id);
+        return category.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ✅ 새 카테고리 생성
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.createCategory(category));
+        Category saved = categoryService.save(category);
+        return ResponseEntity.ok(saved);
     }
 
-    // ✅ 카테고리 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(
-            @PathVariable("id") String id,
-            @RequestBody Category category
-    ) {
-        // 요청된 카테고리의 ID를 명시적으로 설정 (엔티티에서 사용)
-        category.setId(UUID.fromString(id));
-        return ResponseEntity.ok(categoryService.updateCategory(category));
-    }
-
-    // ✅ 카테고리 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("id") String id) {
-        categoryService.deleteCategory(id);
+    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
+        categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
