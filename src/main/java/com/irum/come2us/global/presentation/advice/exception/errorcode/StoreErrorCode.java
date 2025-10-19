@@ -14,7 +14,9 @@ public enum StoreErrorCode implements BaseErrorCode {
     INVALID_CONTACT(HttpStatus.BAD_REQUEST, "유효하지 않은 연락처 형식입니다."),
     INVALID_BUSINESS_REGISTRATION_NUMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 사업자등록번호 형식입니다."),
     INVALID_TELEMARKETING_REGISTRATION_NUMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 통신판매업번호 형식입니다."),
-    INVALID_DELIVERY_FEE(HttpStatus.BAD_REQUEST, "배달비는 0원 이상이어야 합니다.");
+    INVALID_DELIVERY_FEE(HttpStatus.BAD_REQUEST, "배달비는 0원 이상이어야 합니다."),
+    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 상점을 찾을 수 없습니다."),
+    STORE_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "상점을 수정할 권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
