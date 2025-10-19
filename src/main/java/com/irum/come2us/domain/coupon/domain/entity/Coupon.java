@@ -10,7 +10,7 @@ import org.hibernate.annotations.UuidGenerator;
 // 1. 엔티티
 
 @Entity
-@Table(name = "Coupon")
+@Table(name = "p_coupon")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Coupon {
@@ -45,6 +45,8 @@ public class Coupon {
     @JoinColumn(insertable = false, updatable = false)
     private Member member;
 
+    // 2. 생성자
+
     @Builder(access = AccessLevel.PRIVATE)
     private Coupon(String name, Integer discountAmount, LocalDateTime expiration, Member member) {
         this.name = name;
@@ -54,7 +56,7 @@ public class Coupon {
         //  this.isUsed = false;
     }
 
-    // 2. 쿠폰 생성 정적 팩토리 메서드
+    // 3. 쿠폰 생성 정적 팩토리 메서드
 
     public static Coupon createCoupon(
             String name, Integer discountAmount, LocalDateTime expiration, Member member) {
