@@ -23,7 +23,7 @@ public class AppliedCoupon extends BaseEntity {
 
     @Id // 적용 쿠폰 아이디
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
-    @Column(name = "applied_coupon_id", nullable = false)
+    @Column(name = "applied_coupon_id", nullable = false, updatable = false)
     private UUID appliedCouponId;
 
     @ManyToOne(fetch = FetchType.LAZY)
