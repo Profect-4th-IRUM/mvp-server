@@ -66,9 +66,9 @@ public class SecurityConfig {
                                         Role.MANAGER.name(),
                                         Role.MASTER.name())
                                 .requestMatchers(HttpMethod.DELETE, "/members/me")
-                                .hasRole(String.valueOf(Role.CUSTOMER))
+                                .hasRole(Role.CUSTOMER.name())
                                 .requestMatchers("/managers/**")
-                                .hasRole(String.valueOf(Role.MASTER))
+                                .hasRole(Role.MASTER.name())
                                 .anyRequest()
                                 .permitAll()); // API 완료 후 허용된 public endpoints 외 모든 경로
         // .authenticated() 옵션으로 변경할 예정
