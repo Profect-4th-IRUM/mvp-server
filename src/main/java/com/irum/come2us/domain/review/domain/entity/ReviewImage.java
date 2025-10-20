@@ -2,8 +2,10 @@ package com.irum.come2us.domain.review.domain.entity;
 
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Where;
 
 @Getter
@@ -15,8 +17,9 @@ import org.hibernate.annotations.Where;
 public class ReviewImage extends BaseEntity {
 
     @Id
-    @Column(name = "review_image_id", length = 50, updatable = false, nullable = false)
-    private String id;
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @Column(name = "review_image_id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "image_url", columnDefinition = "TEXT", nullable = false)
     private String imageUrl;
@@ -26,17 +29,12 @@ public class ReviewImage extends BaseEntity {
     private Review review;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private ReviewImage(String id, String imageUrl, Review review) {
-        this.id = id;
+    private ReviewImage(String imageUrl, Review review) {
         this.imageUrl = imageUrl;
         this.review = review;
     }
 
-    public static ReviewImage create(String id, String imageUrl, Review review) {
-        return ReviewImage.builder().id(id).imageUrl(imageUrl).review(review).build();
-    }
-
-    public void changeReview(Review review) {
-        this.review = review;
+    public static ReviewImage create(String imageUrl, Review review) {
+        return ReviewImage.builder().imageUrl(imageUrl).review(review).build();
     }
 }

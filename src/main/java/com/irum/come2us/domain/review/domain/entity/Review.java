@@ -4,9 +4,10 @@ import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 @Getter
 @Entity
@@ -14,16 +15,18 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_review SET deleted_at = NOW() WHERE review_id = ?")
 @Where(clause = "deleted_at IS NULL")
+@Check(constraints = "rate BETWEEN 1 AND 5")
 public class Review extends BaseEntity {
 
     @Id
-    @Column(name = "review_id", length = 50, updatable = false, nullable = false)
-    private String id;
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @Column(name = "review_id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "rate", nullable = false)
+    @Column(name = "rate", nullable = false, columnDefinition = "TINYINT")
     private Integer rate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,8 +38,7 @@ public class Review extends BaseEntity {
     private Product product;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Review(String id, String content, Integer rate, Member member, Product product) {
-        this.id = id;
+    private Review(String content, Integer rate, Member member, Product product) {
         this.content = content;
         this.rate = rate;
         this.member = member;
@@ -44,18 +46,15 @@ public class Review extends BaseEntity {
     }
 
     public static Review createReview(
-            String id, String content, Integer rate, Member member, Product product) {
-        return Review.builder()
-                .id(id)
-                .content(content)
-                .rate(rate)
-                .member(member)
-                .product(product)
-                .build();
+            String content, Integer rate, Member member, Product product) {
+        return Review.builder().content(content).rate(rate).member(member).product(product).build();
     }
 
-    public void updateReview(String content, Integer rate) {
-        if (content != null) this.content = content;
-        if (rate != null) this.rate = rate;
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateRate(Integer rate) {
+        this.rate = rate;
     }
 }
