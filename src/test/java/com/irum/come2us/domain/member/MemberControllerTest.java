@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.irum.come2us.domain.member.application.service.MemberService;
 import com.irum.come2us.domain.member.presentation.controller.MemberController;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberCreateRequest;
+import com.irum.come2us.global.config.SecurityTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,11 +22,13 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MemberController.class)
 @AutoConfigureRestDocs
+@Import(SecurityTestConfig.class)
 public class MemberControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberService memberService;
@@ -57,6 +61,7 @@ public class MemberControllerTest {
         // When & Then
         mockMvc.perform(
                         post("/members/signup")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestJson))
                 .andExpect(status().isCreated())
