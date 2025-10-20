@@ -29,15 +29,6 @@ public class Order {
 
     private Integer deliveryFee;
 
-    @Column(nullable = false)
-    private String address;
-
-    @Column(nullable = false)
-    private String recipientName;
-
-    @Column(nullable = false)
-    private String recipientPhone;
-
     private String deliveryRequest;
 
     private OrderStatus orderStatusAll;
