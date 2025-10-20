@@ -31,4 +31,11 @@ public class OrderService {
 
         orderDetail.updateStatusToShipment();
     }
+
+    public void updateOrderStatusToComplete(UUID orderDetailId) {
+        OrderDetail orderDetail = orderDetailRepository.findByOrderDetailId(orderDetailId)
+                .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_DETAIL_NOT_FOUND));
+
+        orderDetail.updateStatusToComplete();
+    }
 }

@@ -68,4 +68,8 @@ public class OrderDetail extends BaseEntity {
     public void updateStatusToShipment() {
         this.orderStatusIndi = OrderStatus.SHIPMENT;
     }
+
+    public void updateStatusToComplete() {
+        this.orderStatusIndi = OrderStatus.COMPLETE;
+    }
 }
