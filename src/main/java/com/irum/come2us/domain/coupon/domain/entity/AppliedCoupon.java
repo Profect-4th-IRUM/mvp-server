@@ -26,7 +26,6 @@ public class AppliedCoupon extends BaseEntity {
     @Column(name = "applied_coupon_id", nullable = false)
     private UUID appliedCouponId;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
@@ -34,6 +33,7 @@ public class AppliedCoupon extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id", nullable = false)
     private Coupon coupon;
+
 
     // 2. 생성자
     public AppliedCoupon(Payment payment, Coupon coupon) {
