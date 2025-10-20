@@ -8,6 +8,7 @@ import com.irum.come2us.domain.member.presentation.dto.request.MemberInfoUpdateR
 import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,19 +18,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberValidator memberValidator;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public void createCustomer(MemberCreateRequest request) {
         memberValidator.assertEmailIsNotTaken(request.email());
         memberRepository.save(
                 Member.createCustomer(
-                        request.email(), request.password(), request.name(), request.contact()));
+                        request.email(),
+                        passwordEncoder.encode(request.password()),
+                        request.name(),
+                        request.contact()));
     }
 
     public void createOwner(MemberCreateRequest request) {
         memberValidator.validateNewOwnerRegistration(request.email());
         memberRepository.save(
                 Member.createOwner(
-                        request.email(), request.password(), request.name(), request.contact()));
+                        request.email(),
+                        passwordEncoder.encode(request.password()),
+                        request.name(),
+                        request.contact()));
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +55,7 @@ public class MemberService {
     public void changeMemberPassword(MemberPasswordUpdateRequest request) {
         Member member = memberValidator.getCurrentMember();
         memberValidator.validatePassword(request.originalPassword(), request.newPassword(), member);
-        member.updatePassword(request.newPassword());
+        member.updatePassword(passwordEncoder.encode(request.newPassword()));
     } // 추후 BCryptEncoder 사용한 암/복호화 검증 로직 적용 예정
 
     public void changeCustomerRoleToOwner() {
