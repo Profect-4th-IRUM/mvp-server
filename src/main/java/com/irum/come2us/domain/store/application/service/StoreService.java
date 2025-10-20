@@ -5,6 +5,7 @@ import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
+import com.irum.come2us.domain.store.presentation.dto.request.StoreDeliveryFeeUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
@@ -51,6 +52,10 @@ public class StoreService {
         Store store = getStoreById(storeId);
         // TODO: 권한 체크 (현재는 dummy이므로 나중에 다시 만들기)
         store.updateBasicInfo(request.name(), request.contact(), request.address());
+    }
+
+    public void changeDeliveryFee(UUID storeId, StoreDeliveryFeeUpdateRequest request) {
+        Store store = getStoreById(storeId);
         store.changeDeliveryFee(request.deliveryFee());
     }
 

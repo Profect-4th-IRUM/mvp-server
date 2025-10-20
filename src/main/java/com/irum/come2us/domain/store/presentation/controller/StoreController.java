@@ -2,6 +2,7 @@ package com.irum.come2us.domain.store.presentation.controller;
 
 import com.irum.come2us.domain.store.application.service.StoreService;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
+import com.irum.come2us.domain.store.presentation.dto.request.StoreDeliveryFeeUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreCreateResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
@@ -38,6 +39,14 @@ public class StoreController {
         log.info("상점 정보 수정 요청: storeId={}, request={}", storeId, request);
         storeService.updateStore(storeId, request);
         return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    @PatchMapping("/delivery_fee/{storeId}")
+    public ResponseEntity<Void> changeDeliveryFee(
+            @PathVariable UUID storeId, @Valid @RequestBody StoreDeliveryFeeUpdateRequest request) {
+        log.info("상점 배달비 수정 요청: storeId={}, request={}", storeId, request);
+        storeService.changeDeliveryFee(storeId, request);
+        return ResponseEntity.noContent().build();
     }
 
     // TODO: Security 적용
