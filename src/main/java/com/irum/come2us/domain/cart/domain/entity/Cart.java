@@ -31,7 +31,7 @@ public class Cart {
     // private OptionValue optionValue;
 
     @Column(name = "quantity", nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Cart(Member member, /* OptionValue optionValue, */ int quantity) {
