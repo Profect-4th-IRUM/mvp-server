@@ -2,9 +2,9 @@ package com.irum.come2us.domain.coupon.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.math.BigDecimal;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -37,7 +37,8 @@ public class Coupon {
     // 2. 생성자
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Coupon(String name, BigDecimal discountAmount, LocalDateTime expiration, Member member) {
+    private Coupon(
+            String name, BigDecimal discountAmount, LocalDateTime expiration, Member member) {
         this.name = name;
         this.discountAmount = discountAmount;
         this.expiration = expiration;
