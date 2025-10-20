@@ -16,7 +16,6 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,21 +37,13 @@ public class Order extends BaseEntity {
 
     private String deliveryRequest;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus orderStatusAll;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentStatus paymentStatus;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentMethod paymentMethod;
 
     @OneToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;
-
-    // TODO: 상점, 배송지주소 Many to one
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
