@@ -4,7 +4,7 @@ import com.irum.come2us.domain.store.domain.entity.Store;
 import java.util.UUID;
 
 public record StoreListResponse(
-        UUID id, String name, String contact, String address, int deliveryFee) {
+        UUID id, String name, String contact, String address, Integer deliveryFee) {
     public static StoreListResponse from(Store store) {
         return new StoreListResponse(
                 store.getId(),

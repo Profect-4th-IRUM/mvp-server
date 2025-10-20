@@ -47,7 +47,7 @@ public class Store {
     private String telemarketingRegistrationNumber;
 
     @Column(name = "delivery_fee", nullable = false)
-    private int deliveryFee;
+    private Integer deliveryFee;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id", nullable = false, unique = true)
@@ -60,7 +60,7 @@ public class Store {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee,
+            Integer deliveryFee,
             Member member) {
         this.name = name;
         this.contact = contact;
@@ -77,7 +77,7 @@ public class Store {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee,
+            Integer deliveryFee,
             Member member) {
         return Store.builder()
                 .name(name)
@@ -96,7 +96,7 @@ public class Store {
         this.address = address;
     }
 
-    public void changeDeliveryFee(int deliveryFee) {
+    public void changeDeliveryFee(Integer deliveryFee) {
         this.deliveryFee = validDeliveryFee(deliveryFee);
     }
 
@@ -132,7 +132,7 @@ public class Store {
         return businessRegistrationNumber;
     }
 
-    private static int validDeliveryFee(int deliveryFee) {
+    private static Integer validDeliveryFee(Integer deliveryFee) {
         if (deliveryFee < 0) {
             throw new CommonException(StoreErrorCode.INVALID_DELIVERY_FEE);
         }
