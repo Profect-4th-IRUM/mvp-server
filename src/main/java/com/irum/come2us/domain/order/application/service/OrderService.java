@@ -24,4 +24,11 @@ public class OrderService {
 
         orderDetail.updateStatusToPreparation();
     }
+
+    public void updateOrderStatusToShipment(UUID orderDetailId) {
+        OrderDetail orderDetail = orderDetailRepository.findByOrderDetailId(orderDetailId)
+                .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_DETAIL_NOT_FOUND));
+
+        orderDetail.updateStatusToShipment();
+    }
 }
