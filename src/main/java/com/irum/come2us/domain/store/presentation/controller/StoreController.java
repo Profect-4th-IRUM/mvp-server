@@ -4,6 +4,7 @@ import com.irum.come2us.domain.store.application.service.StoreService;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreCreateResponse;
+import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -54,6 +55,13 @@ public class StoreController {
             @RequestParam(required = false) Integer size) {
         log.info("상점 목록 조회 요청: cursor={}, size={}", cursor, size);
         List<StoreListResponse> response = storeService.getStoreList(cursor, size);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<StoreInfoResponse> getStoreDetail(@PathVariable UUID storeId) {
+        log.info("상점 상세 조회 요청: storeId={}", storeId);
+        StoreInfoResponse response = storeService.getStoreInfo(storeId);
         return ResponseEntity.ok(response);
     }
 }

@@ -6,6 +6,7 @@ import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
+import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
@@ -64,8 +65,12 @@ public class StoreService {
             size = 10;
         }
 
-        List<StoreListResponse> stores = storeRepository.findStoresByCursor(cursor, size);
-        return stores;
+        return storeRepository.findStoresByCursor(cursor, size);
+    }
+
+    public StoreInfoResponse getStoreInfo(UUID storeId) {
+        Store store = getStoreById(storeId);
+        return StoreInfoResponse.from(store);
     }
 
     // 권한 체크
