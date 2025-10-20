@@ -6,7 +6,10 @@ import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 import java.util.UUID;
 
@@ -15,6 +18,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE p_order SET deleted_at = NOW() WHERE order_id=?")
+@SQLRestriction("deleted_at is null")
 @Table(name = "p_order")
 public class Order {
     @Id
@@ -45,6 +50,6 @@ public class Order {
     @JoinColumn(name="payment_id")
     private Payment payment;
 
-    //TODO: 상점, 회원 Many to one
+    //TODO: 상점, 회원, 배송지주소 Many to one
 
 }

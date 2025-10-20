@@ -4,16 +4,21 @@ import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.refund.domain.entity.enums.RefundReason;
 import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE p_refund SET deleted_at = NOW() WHERE refund_id=?")
+@SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Builder
 @Table(name = "p_refund")

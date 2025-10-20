@@ -2,13 +2,9 @@ package com.irum.come2us.domain.order.domain.entity;
 
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UuidGenerator;
+import jakarta.persistence.Table;
+import lombok.*;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,13 +12,15 @@ import java.util.UUID;
 @Entity
 @Builder
 @Setter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE p_order_detail SET deleted_at = NOW() WHERE order_detail_id=?")
+@SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Table(name="p_order_datail")
 public class OrderDetail {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
-    @Column(name="order_id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Column(name="order_detail_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID orderDetailId;
 
     private String optionName;
@@ -39,7 +37,7 @@ public class OrderDetail {
     @Column(nullable = false)
     private OrderStatus orderStatusIndi;
 
-    private Integer tracking_number;
+    private Integer trackingNumber;
 
     private LocalDateTime arrivedDate;
 
