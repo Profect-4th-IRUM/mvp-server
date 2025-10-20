@@ -6,9 +6,12 @@ import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
+import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
+import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,10 +49,28 @@ public class StoreService {
 
     public void updateStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
-
         // TODO: 권한 체크 (현재는 dummy이므로 나중에 다시 만들기)
         store.updateBasicInfo(request.name(), request.contact(), request.address());
         store.changeDeliveryFee(request.deliveryFee());
+    }
+
+    public void deleteStore(UUID storeId) {
+        Store store = getStoreById(storeId);
+        // TODO: 권한 체크
+        storeRepository.delete(store);
+    }
+
+    public List<StoreListResponse> getStoreList(UUID cursor, Integer size) {
+        if (size == null || (size != 10 && size != 30 && size != 50)) {
+            size = 10;
+        }
+
+        return storeRepository.findStoresByCursor(cursor, size);
+    }
+
+    public StoreInfoResponse getStoreInfo(UUID storeId) {
+        Store store = getStoreById(storeId);
+        return StoreInfoResponse.from(store);
     }
 
     // 권한 체크

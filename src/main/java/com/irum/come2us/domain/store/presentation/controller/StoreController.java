@@ -4,7 +4,10 @@ import com.irum.come2us.domain.store.application.service.StoreService;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreCreateResponse;
+import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
+import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,5 +39,29 @@ public class StoreController {
         storeService.updateStore(storeId, request);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
+
     // TODO: Security 적용
+
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<Void> deleteStore(@PathVariable UUID storeId) {
+        log.info("상점 삭제 요청 : storeId={}", storeId);
+        storeService.deleteStore(storeId);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    @GetMapping
+    public ResponseEntity<List<StoreListResponse>> getStoreList(
+            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) Integer size) {
+        log.info("상점 목록 조회 요청: cursor={}, size={}", cursor, size);
+        List<StoreListResponse> response = storeService.getStoreList(cursor, size);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<StoreInfoResponse> getStoreDetail(@PathVariable UUID storeId) {
+        log.info("상점 상세 조회 요청: storeId={}", storeId);
+        StoreInfoResponse response = storeService.getStoreInfo(storeId);
+        return ResponseEntity.ok(response);
+    }
 }
