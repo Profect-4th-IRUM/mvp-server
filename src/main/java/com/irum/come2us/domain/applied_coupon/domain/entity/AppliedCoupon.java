@@ -39,7 +39,8 @@ public class AppliedCoupon extends BaseEntity {
     private Coupon coupon;
 
     // 2. 생성자
-    /*public AppliedCoupon(UUID payment, Coupon coupon) {
+    /*
+    public AppliedCoupon(UUID payment, Coupon coupon) {
         this.payment = payment;
         this.coupon = coupon;
     }*/
