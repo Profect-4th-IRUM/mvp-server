@@ -34,7 +34,6 @@ public class AppliedCoupon extends BaseEntity {
     @JoinColumn(name = "coupon_id", nullable = false)
     private Coupon coupon;
 
-
     // 2. 생성자
     public AppliedCoupon(Payment payment, Coupon coupon) {
         this.payment = payment;
