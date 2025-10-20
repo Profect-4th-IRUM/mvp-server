@@ -11,7 +11,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
 
-@Setter
+import java.util.UUID;
+
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_payment SET deleted_at = NOW() WHERE payment_id=?")
@@ -23,13 +24,13 @@ public class Payment extends BaseEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name = "payment_id", columnDefinition = "uuid", nullable = false, updatable = false)
-    private String paymentId;
+    private UUID paymentId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
-    private Integer amount;
+    private int amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

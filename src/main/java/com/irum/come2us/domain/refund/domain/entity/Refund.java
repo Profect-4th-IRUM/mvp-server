@@ -25,14 +25,17 @@ public class Refund extends BaseEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name = "refund_id", columnDefinition = "uuid", nullable = false, updatable = false)
-    private UUID refund_id;
+    private UUID refundId;
 
+    @Enumerated(EnumType.STRING)
     private RefundReason reason;
 
     private String description;
 
-    private Integer price;
+    private int price;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RefundStatus refundStatus;
 
     @OneToOne

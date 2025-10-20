@@ -12,7 +12,6 @@ import org.hibernate.annotations.*;
 
 @Entity
 @Builder
-@Setter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_order_detail SET deleted_at = NOW() WHERE order_detail_id=?")
 @SQLRestriction("deleted_at is null")
@@ -39,6 +38,7 @@ public class OrderDetail extends BaseEntity {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus orderStatusIndi;
 
