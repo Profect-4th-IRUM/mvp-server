@@ -33,4 +33,12 @@ public class OwnerOrderController {
         orderService.updateOrderStatusToShipment(orderDetailId);
         return ResponseEntity.ok( "주문 상태 배송 중으로 업데이트 완료");
     }
+
+    @PatchMapping("/order-details/{orderDetailId}/delivery-complete")
+    public ResponseEntity<String> updateOrderStatusToComplete(
+            @PathVariable UUID orderDetailId
+    ){
+        orderService.updateOrderStatusToComplete(orderDetailId);
+        return ResponseEntity.ok( "주문 상태 배송 중으로 업데이트 완료");
+    }
 }
