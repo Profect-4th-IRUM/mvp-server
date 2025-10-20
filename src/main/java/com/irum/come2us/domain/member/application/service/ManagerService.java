@@ -10,6 +10,7 @@ import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoListRe
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class ManagerService {
     private final MemberRepository memberRepository;
     private final MemberValidator memberValidator;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public void createManager(MemberCreateRequest request) {
         memberValidator.assertEmailIsNotTaken(request.email());
         memberRepository.save(
                 Member.createManager(
-                        request.email(), request.password(), request.name(), request.contact()));
+                        request.email(),
+                        passwordEncoder.encode(request.password()),
+                        request.name(),
+                        request.contact()));
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +63,7 @@ public class ManagerService {
     public void changeManagerPassword(Long memberId, MemberPasswordUpdateRequest request) {
         Member member = memberValidator.getMemberById(memberId);
         memberValidator.validatePassword(request.originalPassword(), request.newPassword(), member);
-        member.updatePassword(request.newPassword());
+        member.updatePassword(passwordEncoder.encode(request.newPassword()));
     } // 추후 BCryptEncoder 사용한 암/복호화 검증 로직 적용 예정
 
     public void removeManager(Long memberId) {
