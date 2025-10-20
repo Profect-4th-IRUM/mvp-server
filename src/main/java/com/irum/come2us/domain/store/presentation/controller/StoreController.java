@@ -36,5 +36,13 @@ public class StoreController {
         storeService.updateStore(storeId, request);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
+
     // TODO: Security 적용
+
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<Void> deleteStore(@PathVariable UUID storeId) {
+        log.info("상점 삭제 요청 : storeId={}", storeId);
+        storeService.deleteStore(storeId);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
 }
