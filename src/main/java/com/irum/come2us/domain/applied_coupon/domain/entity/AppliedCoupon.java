@@ -1,52 +1,46 @@
 package com.irum.come2us.domain.applied_coupon.domain.entity;
 
 import com.irum.come2us.domain.coupon.domain.entity.Coupon;
+import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 // 1. 엔티티
 
 @Entity
 @Table(name = "p_applied_coupon")
 @Getter
+@SQLDelete(sql = "UPDATE p_applied_coupon SET deleted_at = NOW() WHERE applied_coupon_id = ?")
+@Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AppliedCoupon extends BaseEntity {
 
-public class AppliedCoupon {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id // 적용 쿠폰 아이디
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name = "applied_coupon_id", nullable = false)
-    private Long appliedCouponId;
+    private UUID appliedCouponId;
 
-    @Column(name = "payment_id", nullable = false)
-    private UUID paymentId;
+    /*
 
-    @Column(name = "coupon_id", nullable = false)
-    private UUID couponId;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "payment_id", nullable = false)
+        private Payment payment;
 
-    /* 결제 도메인과의 관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", insertable = false, updatable = false)
-    private Payment payment;
     */
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
+    @JoinColumn(name = "coupon_id", nullable = false)
     private Coupon coupon;
 
     // 2. 생성자
-
-    private AppliedCoupon(UUID paymentId, UUID couponId) {
-        this.paymentId = paymentId;
-        this.couponId = couponId;
-    }
-
-    // 3. 정적 팩토리 메서드
-
-    public static AppliedCoupon of(UUID paymentId, UUID couponId) {
-        return new AppliedCoupon(paymentId, couponId);
-    }
+    /*public AppliedCoupon(UUID payment, Coupon coupon) {
+        this.payment = payment;
+        this.coupon = coupon;
+    }*/
 }
