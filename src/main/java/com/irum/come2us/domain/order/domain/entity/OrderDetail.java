@@ -60,4 +60,8 @@ public class OrderDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
+
+    public void updateStatusToPreparation() {
+        this.orderStatusIndi = OrderStatus.PREPARATION;
+    }
 }
