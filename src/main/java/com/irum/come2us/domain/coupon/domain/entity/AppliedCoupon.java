@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.coupon.domain.entity;
 
+import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
@@ -25,20 +26,18 @@ public class AppliedCoupon extends BaseEntity {
     @Column(name = "applied_coupon_id", nullable = false)
     private UUID appliedCouponId;
 
-    /*
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "payment_id", nullable = false)
-        private Payment payment;
-    */
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = false)
+    private Payment payment;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id", nullable = false)
     private Coupon coupon;
 
     // 2. 생성자
-    /*
-    public AppliedCoupon(UUID payment, Coupon coupon) {
+    public AppliedCoupon(Payment payment, Coupon coupon) {
         this.payment = payment;
         this.coupon = coupon;
-    }*/
+    }
 }
