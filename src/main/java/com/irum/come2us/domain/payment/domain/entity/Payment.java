@@ -1,8 +1,10 @@
 package com.irum.come2us.domain.payment.domain.entity;
 
+import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentCorp;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
+import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -17,10 +19,10 @@ import org.hibernate.annotations.UuidGenerator;
 @NoArgsConstructor
 @Entity
 @Table(name = "p_payment")
-public class Payment {
+public class Payment extends BaseEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
-    @Column(name="payment_id", columnDefinition = "uuid", nullable = false, updatable = false)
+    @Column(name = "payment_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private String paymentId;
 
     @Enumerated(EnumType.STRING)
@@ -37,6 +39,7 @@ public class Payment {
     @Column(nullable = false)
     private PaymentCorp paymentCorp;
 
-    // TODO: member @ManyToOne
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 }
