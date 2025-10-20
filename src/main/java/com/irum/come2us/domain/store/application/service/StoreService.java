@@ -11,11 +11,11 @@ import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -65,6 +65,7 @@ public class StoreService {
         storeRepository.delete(store);
     }
 
+    @Transactional(readOnly = true)
     public List<StoreListResponse> getStoreList(UUID cursor, Integer size) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             size = 10;
@@ -73,6 +74,7 @@ public class StoreService {
         return storeRepository.findStoresByCursor(cursor, size);
     }
 
+    @Transactional(readOnly = true)
     public StoreInfoResponse getStoreInfo(UUID storeId) {
         Store store = getStoreById(storeId);
         return StoreInfoResponse.from(store);
