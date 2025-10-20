@@ -67,4 +67,11 @@ public class ProductController {
         ProductDetailResponse response = productService.getProductById(productId);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
+        log.info("상품 삭제 요청: productId={}", productId);
+        productService.deleteProduct(productId);
+        return ResponseEntity.noContent().build();
+    }
 }
