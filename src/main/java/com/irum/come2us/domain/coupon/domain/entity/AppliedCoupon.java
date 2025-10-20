@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.coupon.domain.entity;
 
-import com.irum.come2us.domain.coupon.domain.entity.Coupon;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
