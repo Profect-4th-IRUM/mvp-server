@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.product.domain.entity;
 
+import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -12,7 +13,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Getter
 @Table(name = "p_product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product {
+public class Product extends BaseEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name = "product_id", updatable = false, nullable = false)
