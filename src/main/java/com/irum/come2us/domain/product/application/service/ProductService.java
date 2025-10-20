@@ -149,4 +149,14 @@ public class ProductService {
 
         return ProductDetailResponse.from(product);
     }
+
+    public void deleteProduct(UUID productId) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        productRepository.delete(product);
+        log.info("상품 삭제 완료: productId={}", productId);
+    }
 }
