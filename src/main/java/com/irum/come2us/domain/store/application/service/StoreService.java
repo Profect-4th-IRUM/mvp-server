@@ -46,10 +46,15 @@ public class StoreService {
 
     public void updateStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
-
         // TODO: 권한 체크 (현재는 dummy이므로 나중에 다시 만들기)
         store.updateBasicInfo(request.name(), request.contact(), request.address());
         store.changeDeliveryFee(request.deliveryFee());
+    }
+
+    public void deleteStore(UUID storeId) {
+        Store store = getStoreById(storeId);
+        // TODO: 권한 체크
+        storeRepository.delete(store);
     }
 
     // 권한 체크
