@@ -17,7 +17,7 @@ import org.hibernate.annotations.*;
 @SQLDelete(sql = "UPDATE p_order_detail SET deleted_at = NOW() WHERE order_detail_id=?")
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor
-@Table(name = "p_order_datail")
+@Table(name = "p_order_detail")
 public class OrderDetail extends BaseEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
