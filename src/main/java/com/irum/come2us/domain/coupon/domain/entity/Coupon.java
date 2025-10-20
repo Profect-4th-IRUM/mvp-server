@@ -2,7 +2,6 @@ package com.irum.come2us.domain.coupon.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
@@ -25,7 +24,7 @@ public class Coupon {
     private String name;
 
     @Column(name = "discount_amount", columnDefinition = "MONEY") // 할인 금액
-    private BigDecimal discountAmount;
+    private Integer discountAmount;
 
     @Column(name = "expiration") // 유효기간
     private LocalDateTime expiration;
@@ -38,7 +37,7 @@ public class Coupon {
 
     @Builder(access = AccessLevel.PRIVATE)
     private Coupon(
-            String name, BigDecimal discountAmount, LocalDateTime expiration, Member member) {
+            String name, Integer discountAmount, LocalDateTime expiration, Member member) {
         this.name = name;
         this.discountAmount = discountAmount;
         this.expiration = expiration;
@@ -48,7 +47,7 @@ public class Coupon {
     // 3. 쿠폰 생성 정적 팩토리 메서드
 
     public static Coupon createCoupon(
-            String name, BigDecimal discountAmount, LocalDateTime expiration, Member member) {
+            String name, Integer discountAmount, LocalDateTime expiration, Member member) {
         return Coupon.builder()
                 .name(name)
                 .discountAmount(discountAmount)
