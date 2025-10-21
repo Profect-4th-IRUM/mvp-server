@@ -92,6 +92,18 @@ public class DeliveryAddressService {
         deliveryAddress.markAsDefault();
     }
 
+    public void removeDeliveryAddress(UUID deliveryAddressId) {
+        Member member = memberValidator.getCurrentMember();
+        DeliveryAddress address = validDeliveryAddress(deliveryAddressId);
+        if (address.isDefault()) {
+            // DeliveryAddress 중 가장 최근 것 기본 배송지 설정
+            deliveryAddressRepository
+                    .findLatestAddressByMember(member)
+                    .ifPresent(DeliveryAddress::markAsDefault);
+        }
+        deliveryAddressRepository.delete(address);
+    }
+
     private DeliveryAddress validDeliveryAddress(UUID deliveryAddressId) {
         DeliveryAddress address =
                 deliveryAddressRepository

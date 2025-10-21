@@ -56,4 +56,10 @@ public class DeliveryAddressController {
         deliveryAddressService.changeDefaultDeliveryAddress(deliveryAddressId);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteDeliveryAddress(@RequestParam UUID deliveryAddressId) {
+        deliveryAddressService.removeDeliveryAddress(deliveryAddressId);
+        return ResponseEntity.noContent().build();
+    }
 }
