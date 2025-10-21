@@ -1,7 +1,5 @@
 package com.irum.come2us.domain.review.domain.entity;
 
-import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -26,35 +24,34 @@ public class Review extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "rate", nullable = false, columnDefinition = "TINYINT")
-    private Integer rate;
+    @Column(name = "rate", nullable = false, columnDefinition = "SmallInt")
+    private Short rate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @Column(name = "product_id", nullable = false)
+    private UUID productId;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Review(String content, Integer rate, Member member, Product product) {
+    private Review(String content, Integer rate, Long memberId, UUID productId) {
         this.content = content;
-        this.rate = rate;
-        this.member = member;
-        this.product = product;
+        this.rate = rate != null ? rate.shortValue() : null;
+        this.memberId = memberId;
+        this.productId = productId;
     }
 
-    public static Review createReview(
-            String content, Integer rate, Member member, Product product) {
-        return Review.builder().content(content).rate(rate).member(member).product(product).build();
+    public static Review createReview(String content, Integer rate, Long memberId, UUID productId) {
+        return Review.builder()
+                .content(content)
+                .rate(rate)
+                .memberId(memberId)
+                .productId(productId)
+                .build();
     }
 
-    public void updateContent(String content) {
-        this.content = content;
-    }
-
-    public void updateRate(Integer rate) {
-        this.rate = rate;
+    public void updateReview(String content, Integer rate) {
+        if (content != null) this.content = content;
+        if (rate != null) this.rate = rate.shortValue();
     }
 }
