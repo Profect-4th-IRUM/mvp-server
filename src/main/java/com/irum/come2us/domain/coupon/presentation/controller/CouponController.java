@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,13 +19,13 @@ import org.springframework.web.bind.annotation.*;
 public class CouponController {
     private final CouponService couponService;
 
-    @PostMapping("/generate")
-    public ResponseEntity<Void> generateCoupon(
+    @PostMapping
+    public ResponseEntity<CouponGenerateRequest> createCoupon(
             @Valid @RequestBody CouponGenerateRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long memberId = Long.parseLong(userDetails.getUsername());
-        couponService.generateCoupon(request, memberId);
-        return ResponseEntity.ok().build();
+        couponService.createCoupon(request, memberId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
