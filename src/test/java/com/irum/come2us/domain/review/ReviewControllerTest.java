@@ -53,10 +53,7 @@ public class ReviewControllerTest {
         UUID productId = UUID.randomUUID();
         ReviewCreateRequest request =
                 new ReviewCreateRequest(
-                        "좋은 상품입니다.",
-                        5,
-                        productId,
-                        List.of("https://example.com/review1.jpg"));
+                        "좋은 상품입니다.", 5, productId, List.of("https://example.com/review1.jpg"));
 
         String requestJson = objectMapper.writeValueAsString(request);
 
@@ -90,31 +87,20 @@ public class ReviewControllerTest {
                                                 .optional(),
                                         fieldWithPath("rate").description("평점 (1~5)"),
                                         fieldWithPath("productId").description("상품 ID"),
-                                        fieldWithPath("imageUrls")
-                                                .description("리뷰 이미지 URL 목록")
-                                ),
+                                        fieldWithPath("imageUrls").description("리뷰 이미지 URL 목록")),
                                 responseFields(
                                         fieldWithPath("success").description("요청 성공 여부"),
                                         fieldWithPath("status").description("HTTP 상태 코드"),
                                         fieldWithPath("timestamp").description("응답 생성 시각"),
-                                        subsectionWithPath("data")
-                                                .description("응답 데이터 본문"),
-                                        fieldWithPath("data.reviewId")
-                                                .description("리뷰 ID"),
-                                        fieldWithPath("data.productId")
-                                                .description("상품 ID"),
-                                        fieldWithPath("data.memberId")
-                                                .description("회원 ID"),
-                                        fieldWithPath("data.content")
-                                                .description("리뷰 내용"),
-                                        fieldWithPath("data.rate")
-                                                .description("평점"),
+                                        subsectionWithPath("data").description("응답 데이터 본문"),
+                                        fieldWithPath("data.reviewId").description("리뷰 ID"),
+                                        fieldWithPath("data.productId").description("상품 ID"),
+                                        fieldWithPath("data.memberId").description("회원 ID"),
+                                        fieldWithPath("data.content").description("리뷰 내용"),
+                                        fieldWithPath("data.rate").description("평점"),
                                         fieldWithPath("data.imageUrls")
                                                 .description("리뷰 이미지 URL 목록"),
-                                        fieldWithPath("data.createdAt")
-                                                .description("리뷰 생성 시각"),
-                                        fieldWithPath("data.updatedAt")
-                                                .description("리뷰 수정 시각")
-                                )));
+                                        fieldWithPath("data.createdAt").description("리뷰 생성 시각"),
+                                        fieldWithPath("data.updatedAt").description("리뷰 수정 시각"))));
     }
 }
