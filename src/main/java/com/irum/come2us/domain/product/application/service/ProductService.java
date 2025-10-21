@@ -1,11 +1,10 @@
 package com.irum.come2us.domain.product.application.service;
 
 import com.irum.come2us.domain.product.domain.entity.Product;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionGroup;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -33,6 +32,24 @@ public class ProductService {
                         request.detailDescription(),
                         request.price(),
                         request.isPublic());
+
+        if (request.optionGroups() != null && !request.optionGroups().isEmpty()) {
+            for (ProductOptionGroupRequest groupReq : request.optionGroups()) {
+                ProductOptionGroup group =
+                        ProductOptionGroup.createOptionGroup(product, groupReq.name());
+                product.addOptionGroup(group);
+
+                if (groupReq.optionValues() != null) {
+                    for (ProductOptionValueRequest valueReq : groupReq.optionValues()) {
+                        ProductOptionValue.createOptionValue(
+                                group,
+                                valueReq.name(),
+                                valueReq.stockQuantity(),
+                                valueReq.extraPrice());
+                    }
+                }
+            }
+        }
 
         return ProductResponse.from(productRepository.save(product));
     }
