@@ -39,6 +39,14 @@ public class Category {
     }
 
     public static Category createSubCategory(String name, Category parent) {
-        return Category.builder().name(name).parent(parent).depth(parent.getDepth() + 1).build();
+        Category child =
+                Category.builder().name(name).parent(parent).depth(parent.getDepth() + 1).build();
+
+        parent.addChild(child);
+        return child;
+    }
+
+    private void addChild(Category child) {
+        this.children.add(child);
     }
 }
