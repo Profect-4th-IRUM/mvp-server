@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@Deprecated
 @AllArgsConstructor
 public class Cursor {
     private LocalDateTime createdAt;

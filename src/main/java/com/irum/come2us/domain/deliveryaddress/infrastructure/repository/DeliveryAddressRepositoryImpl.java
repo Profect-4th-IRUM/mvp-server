@@ -6,7 +6,6 @@ import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.Deliver
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -21,25 +20,13 @@ public class DeliveryAddressRepositoryImpl implements DeliveryAddressRepositoryC
         return deliveryAddress.member.memberId.eq(memberId);
     }
 
-    private BooleanExpression ltCursor(
-            LocalDateTime cursorCreatedAt, UUID cursorId, QDeliveryAddress deliveryAddress) {
-        if (cursorCreatedAt == null || cursorId == null) {
-            return null; // 커서가 없으면 조건 무시
-        }
-
-        return deliveryAddress
-                .createdAt
-                .lt(cursorCreatedAt)
-                .or(
-                        deliveryAddress
-                                .createdAt
-                                .eq(cursorCreatedAt)
-                                .and(deliveryAddress.deliveryAddressId.lt(cursorId)));
+    private BooleanExpression ltCursor(UUID cursor, QDeliveryAddress deliveryAddress) {
+        return cursor != null ? deliveryAddress.deliveryAddressId.lt(cursor) : null;
     }
 
     @Override
     public List<DeliveryAddressInfoResponse> findDeliveryAddressByCursor(
-            Long memberId, LocalDateTime cursorCreatedAt, UUID cursorId, int pageSize) {
+            Long memberId, UUID cursor, int pageSize) {
         QDeliveryAddress deliveryAddress = QDeliveryAddress.deliveryAddress;
 
         return queryFactory
@@ -54,7 +41,7 @@ public class DeliveryAddressRepositoryImpl implements DeliveryAddressRepositoryC
                 .from(deliveryAddress)
                 .where(
                         belongsToMember(memberId, deliveryAddress),
-                        ltCursor(cursorCreatedAt, cursorId, deliveryAddress))
+                        ltCursor(cursor, deliveryAddress))
                 .orderBy(deliveryAddress.createdAt.desc(), deliveryAddress.deliveryAddressId.desc())
                 .limit(pageSize)
                 .fetch();

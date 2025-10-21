@@ -12,7 +12,6 @@ import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DeliveryAddressErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
-import com.irum.come2us.global.util.Cursor;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -49,28 +48,22 @@ public class DeliveryAddressService {
                 deliveryAddress.getAddress(),
                 deliveryAddress.getRecipientName(),
                 deliveryAddress.getRecipientContact(),
-                deliveryAddress.isDefault(),
-                deliveryAddress.getCreatedAt());
+                deliveryAddress.isDefault());
     }
 
     @Transactional(readOnly = true)
-    public DeliveryAddressInfoListResponse findDeliveryAddressList(String cursor, int pageSize) {
-        Cursor decoded = Cursor.fromBase64(cursor);
+    public DeliveryAddressInfoListResponse findDeliveryAddressList(UUID cursor, int pageSize) {
         int limit = pageSize + 1;
         List<DeliveryAddressInfoResponse> addressList =
                 deliveryAddressRepository.findDeliveryAddressByCursor(
-                        memberValidator.getCurrentMember().getMemberId(),
-                        decoded.getCreatedAt(),
-                        decoded.getId(),
-                        limit);
+                        memberValidator.getCurrentMember().getMemberId(), cursor, limit);
         boolean hasNext = addressList.size() > pageSize;
         List<DeliveryAddressInfoResponse> resultList =
                 hasNext ? addressList.subList(0, pageSize) : addressList;
-        String nextCursor = null;
+        UUID nextCursor = null;
         if (hasNext) {
             DeliveryAddressInfoResponse lastItem = resultList.get(resultList.size() - 1);
-            Cursor next = new Cursor(lastItem.createdAt(), lastItem.id());
-            nextCursor = next.toString(); // Base64 직렬화
+            nextCursor = lastItem.id();
         }
         return new DeliveryAddressInfoListResponse(resultList, nextCursor, hasNext);
     }

@@ -1,6 +1,9 @@
 package com.irum.come2us.domain.deliveryaddress.presentation.dto.response;
 
 import java.util.List;
+import java.util.UUID;
 
 public record DeliveryAddressInfoListResponse(
-        List<DeliveryAddressInfoResponse> memberInfoList, String nextCursor, boolean hasNext) {}
+        List<DeliveryAddressInfoResponse> deliveryAddressInfoList,
+        UUID nextCursor,
+        boolean hasNext) {}

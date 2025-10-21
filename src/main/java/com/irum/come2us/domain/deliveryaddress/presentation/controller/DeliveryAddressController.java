@@ -34,7 +34,7 @@ public class DeliveryAddressController {
 
     @GetMapping
     public DeliveryAddressInfoListResponse getDeliveryAddressInfoList(
-            @Nullable @RequestParam String cursor, @RequestParam int pageSize) {
+            @Nullable @RequestParam UUID cursor, @RequestParam int pageSize) {
         return deliveryAddressService.findDeliveryAddressList(cursor, pageSize);
     }
 
