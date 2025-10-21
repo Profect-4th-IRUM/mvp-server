@@ -2,7 +2,9 @@ package com.irum.come2us.domain.deliveryaddress.application.service;
 
 import com.irum.come2us.domain.deliveryaddress.domain.entity.DeliveryAddress;
 import com.irum.come2us.domain.deliveryaddress.domain.repository.DeliveryAddressRepository;
+import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.AddressDetailUpdateRequest;
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.DeliveryAddressRegisterRequest;
+import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.RecipientUpdateRequest;
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoListResponse;
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoResponse;
 import com.irum.come2us.domain.member.application.util.MemberValidator;
@@ -73,6 +75,23 @@ public class DeliveryAddressService {
         return new DeliveryAddressInfoListResponse(resultList, nextCursor, hasNext);
     }
 
+    public void changeRecipientInfo(RecipientUpdateRequest request) {
+        DeliveryAddress deliveryAddress = validDeliveryAddress(request.deliveryAddressId());
+        deliveryAddress.updateRecipientName(request.newRecipientName());
+        deliveryAddress.updateRecipientContact(request.newRecipientContact());
+    }
+
+    public void changeAddressDetail(AddressDetailUpdateRequest request) {
+        DeliveryAddress deliveryAddress = validDeliveryAddress(request.deliveryAddressId());
+        deliveryAddress.updateAddressDetail(request.newAddressDetail());
+    }
+
+    public void changeDefaultDeliveryAddress(UUID deliveryAddressId) {
+        getCurrentDefaultAddress().unmarkAsDefault();
+        DeliveryAddress deliveryAddress = validDeliveryAddress(deliveryAddressId);
+        deliveryAddress.markAsDefault();
+    }
+
     private DeliveryAddress validDeliveryAddress(UUID deliveryAddressId) {
         DeliveryAddress address =
                 deliveryAddressRepository
@@ -85,5 +104,15 @@ public class DeliveryAddressService {
         if (!address.getMember().equals(memberValidator.getCurrentMember()))
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
         return address;
+    }
+
+    private DeliveryAddress getCurrentDefaultAddress() {
+        Member member = memberValidator.getCurrentMember();
+        return deliveryAddressRepository
+                .findDefaultAddressByMember(member)
+                .orElseThrow(
+                        () ->
+                                new CommonException(
+                                        DeliveryAddressErrorCode.DELIVERY_ADDRESS_NOT_FOUND));
     }
 }
