@@ -2,6 +2,7 @@ package com.irum.come2us.domain.product.presentation.controller;
 
 import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
@@ -51,12 +52,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getProductList(
+    public ResponseEntity<ProductCursorResponse> getProductList(
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size,
             @RequestParam(required = false) String keyword) {
         log.info("상품 목록 조회 요청: cursor={}, size={}, keyword={}", cursor, size, keyword);
-        List<ProductResponse> response = productService.getProductList(cursor, size, keyword);
+        ProductCursorResponse response = productService.getProductList(cursor, size, keyword);
         return ResponseEntity.ok(response);
     }
 
