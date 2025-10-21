@@ -53,10 +53,11 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .where(
                         o.deletedAt.isNull(),
                         ltCursor(cursor, o),
+                        o.store.id.eq(storeId),
                         o.orderStatusAll.eq(orderStatus)
                 )
                 .orderBy(o.orderId.desc())
-                .limit(size+1) //hasnext판별을 위해
+                .limit(size+1) //hasnext 판별을 위해
                 .fetch();
     }
 
