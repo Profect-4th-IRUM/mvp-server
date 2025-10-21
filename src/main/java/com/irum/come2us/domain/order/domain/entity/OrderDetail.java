@@ -2,6 +2,7 @@ package com.irum.come2us.domain.order.domain.entity;
 
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.product.domain.entity.Product;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -51,11 +52,9 @@ public class OrderDetail extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Order order;
 
-    // TODO: 옵션 many to one
-
-    //    @ManyToOne(fetch = FetchType.LAZY)
-    //    @JoinColumn(name = "option_value_id")
-    //    private OptionValue optionValue;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "option_value_id")
+    private ProductOptionValue productOptionValue;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")

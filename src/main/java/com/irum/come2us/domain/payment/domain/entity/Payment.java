@@ -32,6 +32,8 @@ public class Payment extends BaseEntity {
 
     private int amount;
 
+    private int totalDiscountAmount;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
