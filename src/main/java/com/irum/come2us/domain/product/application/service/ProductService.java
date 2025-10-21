@@ -10,12 +10,12 @@ import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailRe
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -122,6 +122,7 @@ public class ProductService {
         return ProductResponse.from(product);
     }
 
+    @Transactional(readOnly = true)
     public ProductCursorResponse getProductList(UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
@@ -142,6 +143,7 @@ public class ProductService {
         return ProductCursorResponse.of(products);
     }
 
+    @Transactional(readOnly = true)
     public ProductDetailResponse getProductById(UUID productId) {
         Product product =
                 productRepository
