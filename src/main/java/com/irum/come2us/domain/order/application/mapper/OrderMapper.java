@@ -2,7 +2,7 @@ package com.irum.come2us.domain.order.application.mapper;
 
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
-import com.irum.come2us.domain.order.presentation.dto.response.PaymentOrderResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,8 +13,8 @@ public class OrderMapper {
      * Repository DTO -> Response DTO로 변환
      */
 
-    public PaymentOrderResponse.ProductSummary toProductSummary(OrderDetailRow detail) {
-        return new PaymentOrderResponse.ProductSummary(
+    public OwnerOrderListResponse.ProductSummary toProductSummary(OrderDetailRow detail) {
+        return new OwnerOrderListResponse.ProductSummary(
                 detail.orderDetailId().toString(),
                 detail.productName(),
                 detail.productCounts(),
@@ -26,8 +26,8 @@ public class OrderMapper {
     /**
      * Repository DTO -> Response DTO로 변환
      */
-    public PaymentOrderResponse.OrderSummary toOrderSummary(OrderSummaryRow header, List<PaymentOrderResponse.ProductSummary> products) {
-        return new PaymentOrderResponse.OrderSummary(
+    public OwnerOrderListResponse.OrderSummary toOrderSummary(OrderSummaryRow header, List<OwnerOrderListResponse.ProductSummary> products) {
+        return new OwnerOrderListResponse.OrderSummary(
                 header.orderId().toString(),
                 header.recipientName(),
                 header.recipientContact(),

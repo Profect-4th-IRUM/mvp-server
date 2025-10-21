@@ -9,7 +9,7 @@ import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.OrderRepositoryImpl;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
-import com.irum.come2us.domain.order.presentation.dto.response.PaymentOrderResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +33,33 @@ public class OrderService {
 
 
     @Transactional(readOnly = true)
-    public PaymentOrderResponse getPreparingOrderList(UUID storeId, UUID cursor, Integer size) {
+    public OwnerOrderListResponse getPreparingOrderList(UUID storeId, UUID cursor, Integer size) {
         // 1. size validation
         if (size == null || !(size == 10 || size == 30 || size == 50)) {
             log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
             size = 10;
         }
 
+        return getOwnerOrderList(storeId, OrderStatus.PREPARING, cursor, size);
+
+    }
+
+    @Transactional(readOnly = true)
+    public OwnerOrderListResponse getPartiallyShippedOrderList(UUID storeId, UUID cursor, Integer size) {
+        if (size == null || !(size == 10 || size == 30 || size == 50)) {
+            log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
+            size = 10;
+        }
+
+        return getOwnerOrderList(storeId, OrderStatus.PARTIALLY_SHIPPED, cursor, size);
+    }
+
+
+
+    private OwnerOrderListResponse getOwnerOrderList(UUID storeId, OrderStatus orderStatus, UUID cursor, Integer size) {
+
         // 2. order list 검색
-        var headerList = orderRepositoryCustom.fetchOrderHeaderList(storeId, OrderStatus.PREPARING, cursor, size);
+        var headerList = orderRepositoryCustom.fetchOrderHeaderList(storeId, orderStatus, cursor, size);
 
         boolean hasNext = headerList.size() > size;
         if (hasNext) {
@@ -53,7 +71,7 @@ public class OrderService {
         var orderDetailList = orderRepositoryCustom.fetchOrderDetailList(orderIdList);
 
         // 4. orderId로 그룹핑 : productSummary 제작
-        Map<UUID, List<PaymentOrderResponse.ProductSummary>> detailMap = orderDetailList.stream()
+        Map<UUID, List<OwnerOrderListResponse.ProductSummary>> detailMap = orderDetailList.stream()
                 .collect(Collectors.groupingBy(
                         OrderDetailRow::orderId,
                         Collectors.mapping(
@@ -63,7 +81,7 @@ public class OrderService {
                 ));
 
         // 5. orderSummary 제작
-        List<PaymentOrderResponse.OrderSummary> orderSummaryList = headerList.stream()
+        List<OwnerOrderListResponse.OrderSummary> orderSummaryList = headerList.stream()
                 .filter(order -> detailMap.containsKey(order.orderId()))
                 .map(order -> orderMapper.toOrderSummary(
                         order,
@@ -74,9 +92,10 @@ public class OrderService {
         // 6. next cursor계산
         String nextCursor = orderSummaryList.isEmpty() ? null : headerList.getLast().orderId().toString();
 
-        return new PaymentOrderResponse(orderSummaryList, nextCursor, hasNext);
+        return new OwnerOrderListResponse(orderSummaryList, nextCursor, hasNext);
 
     }
+
 
     @Transactional
     public void updateOrderStatusToPreparing(UUID orderDetailId) {
