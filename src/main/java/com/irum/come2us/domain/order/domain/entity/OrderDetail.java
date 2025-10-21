@@ -61,15 +61,15 @@ public class OrderDetail extends BaseEntity {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public void updateStatusToPreparation() {
-        this.orderStatusIndi = OrderStatus.PREPARATION;
+    public void updateStatusToPreparing() {
+        this.orderStatusIndi = OrderStatus.PREPARING;
     }
 
-    public void updateStatusToShipment() {
-        this.orderStatusIndi = OrderStatus.SHIPMENT;
+    public void updateStatusToShipped() {
+        this.orderStatusIndi = OrderStatus.SHIPPED;
     }
 
-    public void updateStatusToComplete() {
-        this.orderStatusIndi = OrderStatus.COMPLETE;
+    public void updateStatusToDelivered() {
+        this.orderStatusIndi = OrderStatus.DELIVERED;
     }
 }
