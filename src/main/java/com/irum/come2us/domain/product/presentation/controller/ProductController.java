@@ -1,10 +1,7 @@
 package com.irum.come2us.domain.product.presentation.controller;
 
 import com.irum.come2us.domain.product.application.service.ProductService;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
@@ -73,5 +70,13 @@ public class ProductController {
         log.info("상품 삭제 요청: productId={}", productId);
         productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{productId}/options")
+    public ResponseEntity<Void> createProductOptionGroup(
+            @PathVariable UUID productId, @Valid @RequestBody ProductOptionGroupRequest request) {
+        log.info("상품 옵션 그룹 추가 요청: productId={}, groupName={}", productId, request.name());
+        productService.createOptionGroup(productId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
