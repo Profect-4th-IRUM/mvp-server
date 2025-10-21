@@ -2,6 +2,7 @@ package com.irum.come2us.domain.store.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.constants.RegexConstants;
+import com.irum.come2us.global.domain.BaseTimeEntity;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import jakarta.persistence.*;
@@ -20,7 +21,7 @@ import org.hibernate.annotations.Where;
 @Table(name = "p_store")
 @SQLDelete(sql = "UPDATE p_store SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class Store {
+public class Store extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
