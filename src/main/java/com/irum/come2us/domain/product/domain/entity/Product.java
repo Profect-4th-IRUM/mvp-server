@@ -2,6 +2,8 @@ package com.irum.come2us.domain.product.domain.entity;
 
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,8 +37,6 @@ public class Product extends BaseEntity {
     @Column(name = "is_public", nullable = false)
     private boolean isPublic;
 
-    // enum 생성
-
     @Column(name = "avg_rating")
     private Double avgRating;
 
@@ -45,6 +45,9 @@ public class Product extends BaseEntity {
 
     @Column(name = "price", nullable = false)
     private int price;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductOptionGroup> optionGroups = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
     private Product(
@@ -93,5 +96,9 @@ public class Product extends BaseEntity {
         this.reviewCount = reviewCount;
     }
 
-    // TODO: Store, Category, 이미지, 옵션 매핑
+    public void addOptionGroup(ProductOptionGroup group) {
+        optionGroups.add(group);
+    }
+
+    // TODO: Store, Category, 이미지 매핑
 }
