@@ -42,7 +42,7 @@ public class DeliveryAddressRepositoryImpl implements DeliveryAddressRepositoryC
                 .where(
                         belongsToMember(memberId, deliveryAddress),
                         ltCursor(cursor, deliveryAddress))
-                .orderBy(deliveryAddress.createdAt.desc(), deliveryAddress.deliveryAddressId.desc())
+                .orderBy(deliveryAddress.deliveryAddressId.desc())
                 .limit(pageSize)
                 .fetch();
     }
