@@ -5,6 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AppliedCouponRepository extends JpaRepository<AppliedCoupon, Long> {
+public interface AppliedCouponRepository extends JpaRepository<AppliedCoupon, UUID> {
     List<AppliedCoupon> findByCouponId(UUID couponId);
 }
