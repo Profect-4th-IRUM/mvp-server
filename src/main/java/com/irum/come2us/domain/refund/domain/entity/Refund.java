@@ -23,7 +23,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "p_refund")
 public class Refund extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "refund_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID refundId;
 
