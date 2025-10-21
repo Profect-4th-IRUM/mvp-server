@@ -23,8 +23,9 @@ public class Coupon {
     @Column(name = "name", length = 20) // 쿠폰명
     private String name;
 
-    @Column(name = "discount_amount", columnDefinition = "MONEY") // 할인 금액
-    private Integer discountAmount;
+    @Column(name = "discount_amount") // 할인 금액
+    @Min(0)
+    private Int discountAmount;
 
     @Column(name = "expiration") // 유효기간
     private LocalDateTime expiration;
