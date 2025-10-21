@@ -23,7 +23,7 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    @PostMapping("/store-create")
+    @PostMapping
     public ResponseEntity<StoreCreateResponse> createStore(
             @Valid @RequestBody StoreCreateRequest request) {
         log.info("상점 생성 요청: {}", request);
