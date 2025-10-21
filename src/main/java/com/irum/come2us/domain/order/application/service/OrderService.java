@@ -33,35 +33,50 @@ public class OrderService {
 
 
     @Transactional(readOnly = true)
-    public OwnerOrderListResponse getPreparingOrderList(UUID storeId, UUID cursor, Integer size) {
+    public OwnerOrderListResponse getPreparingOrderList(UUID cursor, Integer size) {
         // 1. size validation
         if (size == null || !(size == 10 || size == 30 || size == 50)) {
             log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
             size = 10;
         }
+        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
 
         return getOwnerOrderList(storeId, OrderStatus.PREPARING, cursor, size);
 
     }
 
     @Transactional(readOnly = true)
-    public OwnerOrderListResponse getPartiallyShippedOrderList(UUID storeId, UUID cursor, Integer size) {
+    public OwnerOrderListResponse getPartiallyShippedOrderList(UUID cursor, Integer size) {
         if (size == null || !(size == 10 || size == 30 || size == 50)) {
             log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
             size = 10;
         }
+        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
 
         return getOwnerOrderList(storeId, OrderStatus.PARTIALLY_SHIPPED, cursor, size);
     }
 
     @Transactional(readOnly = true)
-    public OwnerOrderListResponse getPartiallyDeliveredOrderList(UUID storeId, UUID cursor, Integer size) {
+    public OwnerOrderListResponse getPartiallyDeliveredOrderList(UUID cursor, Integer size) {
         if (size == null || !(size == 10 || size == 30 || size == 50)) {
             log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
             size = 10;
         }
+        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
 
         return getOwnerOrderList(storeId, OrderStatus.PARTIALLY_DELIVERED, cursor, size);
+    }
+
+
+    @Transactional(readOnly = true)
+    public OwnerOrderListResponse getDeliveredOrderList(UUID cursor, Integer size) {
+        if (size == null || !(size == 10 || size == 30 || size == 50)) {
+            log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
+            size = 10;
+        }
+        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
+
+        return getOwnerOrderList(storeId, OrderStatus.DELIVERED, cursor, size);
     }
 
 

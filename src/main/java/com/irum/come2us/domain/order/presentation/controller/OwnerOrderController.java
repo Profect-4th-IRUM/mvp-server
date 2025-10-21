@@ -22,8 +22,7 @@ public class OwnerOrderController {
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size
     ) {
-        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
-        OwnerOrderListResponse response = orderService.getPreparingOrderList(storeId, cursor, size);
+        OwnerOrderListResponse response = orderService.getPreparingOrderList(cursor, size);
         return ResponseEntity.ok(response);
     }
 
@@ -33,8 +32,7 @@ public class OwnerOrderController {
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size
     ) {
-        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
-        OwnerOrderListResponse response = orderService.getPartiallyShippedOrderList(storeId, cursor, size);
+        OwnerOrderListResponse response = orderService.getPartiallyShippedOrderList(cursor, size);
         return ResponseEntity.ok(response);
     }
 
@@ -44,8 +42,17 @@ public class OwnerOrderController {
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size
     ) {
-        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
-        OwnerOrderListResponse response = orderService.getPartiallyDeliveredOrderList(storeId, cursor, size);
+        OwnerOrderListResponse response = orderService.getPartiallyDeliveredOrderList(cursor, size);
+        return ResponseEntity.ok(response);
+    }
+
+    /** [상점] 배송 완료 목록 조회 **/
+    @GetMapping("/partially-delivered")
+    public ResponseEntity<OwnerOrderListResponse> deliveredOrderListGet(
+            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) Integer size
+    ) {
+        OwnerOrderListResponse response = orderService.getDeliveredOrderList(cursor, size);
         return ResponseEntity.ok(response);
     }
 
