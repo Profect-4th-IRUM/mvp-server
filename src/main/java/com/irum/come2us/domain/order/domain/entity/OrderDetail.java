@@ -19,7 +19,7 @@ import org.hibernate.annotations.*;
 @Table(name = "p_order_detail")
 public class OrderDetail extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(
             name = "order_detail_id",
             columnDefinition = "uuid",

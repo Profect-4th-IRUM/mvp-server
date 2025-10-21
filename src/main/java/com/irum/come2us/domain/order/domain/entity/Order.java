@@ -24,7 +24,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "p_order")
 public class Order extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "order_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID orderId;
 

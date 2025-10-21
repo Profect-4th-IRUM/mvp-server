@@ -22,7 +22,7 @@ import java.util.UUID;
 @Table(name = "p_payment")
 public class Payment extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "payment_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID paymentId;
 
