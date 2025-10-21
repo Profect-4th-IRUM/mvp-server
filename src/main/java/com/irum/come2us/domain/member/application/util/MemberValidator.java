@@ -33,7 +33,7 @@ public class MemberValidator {
         }
         try {
             MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
-            return Long.parseLong(memberDetails.getUsername());
+            return memberDetails.getUserId();
         } catch (ClassCastException e) {
             throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
         } catch (Exception e) {
