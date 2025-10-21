@@ -25,12 +25,9 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final MemberValidator memberValidator;
 
-    // TODO : Member id 맵핑. 시큐리티 적용?
     public UUID createStore(StoreCreateRequest request) {
-        // 더미 (변경 해야함)
         Member member = memberValidator.getCurrentMember();
 
-        //        validateMemberRole(member); // 권한 체크
         validateMemberHasNoStore(member); // 1인 1상점 제한
         validateBusinessNumber(request.businessRegistrationNumber()); // 사업자번호 중복 체크
         validateTelemarketingNumber(request.telemarketingRegistrationNumber()); // 통신판매번호 중복 체크
@@ -47,16 +44,23 @@ public class StoreService {
 
         storeRepository.save(store);
         return store.getId();
-    }
+    } // owner 권한.
 
     public void updateStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
-        // TODO: 권한 체크 (현재는 dummy이므로 나중에 다시 만들기)?
+        Member currentMember = memberValidator.getCurrentMember();
+
+        validateStoreOwner(store, currentMember);
+
         store.updateBasicInfo(request.name(), request.contact(), request.address());
     }
 
     public void changeDeliveryFee(UUID storeId, StoreDeliveryFeeUpdateRequest request) {
         Store store = getStoreById(storeId);
+        Member currentMember = memberValidator.getCurrentMember();
+
+        validateStoreOwner(store, currentMember);
+
         store.changeDeliveryFee(request.deliveryFee());
     }
 
@@ -81,14 +85,12 @@ public class StoreService {
         return StoreInfoResponse.from(store);
     }
 
-    // 권한 체크
-
-    //    private void validateMemberRole(Member member) {
-    //        Role role = member.getRole();
-    //        if (!(Role.OWNER.equals(role) || Role.MANAGER.equals(role))) {
-    //            throw new CommonException(StoreErrorCode.INVALID_MEMBER_ROLE);
-    //        }
-    //    }
+    // 본인 소유 상점 검증
+    private void validateStoreOwner(Store store, Member currentMember) {
+        if (!store.getMember().getMemberId().equals(currentMember.getMemberId())) {
+            throw new CommonException(StoreErrorCode.UNAUTHORIZED_STORE_ACCESS);
+        }
+    }
 
     // 1인 1상점 제한
     private void validateMemberHasNoStore(Member member) {
