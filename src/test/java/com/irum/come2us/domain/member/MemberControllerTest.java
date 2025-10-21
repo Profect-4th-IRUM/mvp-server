@@ -38,7 +38,6 @@ public class MemberControllerTest {
     @TestConfiguration
     static class TestConfig {
 
-        // MemberService 타입의 Bean을 Mockito로 직접 생성하여 반환
         @Bean
         public MemberService memberService() {
             return Mockito.mock(MemberService.class);
@@ -52,7 +51,7 @@ public class MemberControllerTest {
         // Given
         MemberCreateRequest request =
                 new MemberCreateRequest(
-                        "customer@example.com", "password123!", "회원1", "010-1234-5678");
+                        "customer@example.com", "password123!", "고객1", "010-1234-5678");
         String requestJson = objectMapper.writeValueAsString(request);
 
         doNothing().when(memberService).createCustomer(any(MemberCreateRequest.class));
@@ -67,6 +66,36 @@ public class MemberControllerTest {
                 .andDo(
                         document(
                                 "member-signup",
+                                requestFields(
+                                        fieldWithPath("email").description("가입할 이메일 (아이디)"),
+                                        fieldWithPath("password").description("가입할 비밀번호"),
+                                        fieldWithPath("name").description("회원 이름"),
+                                        fieldWithPath("contact")
+                                                .description("회원 연락처 ex) 010-1234-5678"))));
+    }
+
+    @Test
+    @DisplayName("판매자 회원가입 API")
+    void ownerSignupApiTest() throws Exception {
+
+        // Given
+        MemberCreateRequest request =
+                new MemberCreateRequest(
+                        "owner@example.com", "password123!", "판매자1", "010-1234-5678");
+        String requestJson = objectMapper.writeValueAsString(request);
+
+        doNothing().when(memberService).createCustomer(any(MemberCreateRequest.class));
+
+        // When & Then
+        mockMvc.perform(
+                        post("/members/owner-signup")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestJson))
+                .andExpect(status().isCreated())
+                .andDo(
+                        document(
+                                "owner-signup",
                                 requestFields(
                                         fieldWithPath("email").description("가입할 이메일 (아이디)"),
                                         fieldWithPath("password").description("가입할 비밀번호"),

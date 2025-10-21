@@ -23,3 +23,19 @@ include::{snippets}/member-signup/httpie-request.adoc[]
 
 ==== 응답 (Response)
 include::{snippets}/member-signup/http-response.adoc[]
+
+=== 2. 판매자 회원가입
+
+`POST /members/signup`
+
+==== 요청 본문 (Request Body)
+include::{snippets}/member-signup/request-fields.adoc[]
+
+==== 예시 요청 (cURL)
+include::{snippets}/member-signup/curl-request.adoc[]
+
+==== 예시 요청 (HTTPie)
+include::{snippets}/member-signup/httpie-request.adoc[]
+
+==== 응답 (Response)
+include::{snippets}/member-signup/http-response.adoc[]
