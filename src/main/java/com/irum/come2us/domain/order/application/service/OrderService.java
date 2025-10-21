@@ -67,7 +67,7 @@ public class OrderService {
                 .filter(order -> detailMap.containsKey(order.orderId()))
                 .map(order -> orderMapper.toOrderSummary(
                         order,
-                        detailMap.getOrDefault(order.orderId(), List.of()) //orderdetail없다면 빈 리스트
+                        detailMap.getOrDefault(order.orderId(), List.of()) //order detail 없다면 빈 리스트
                 ))
                 .toList();
 
