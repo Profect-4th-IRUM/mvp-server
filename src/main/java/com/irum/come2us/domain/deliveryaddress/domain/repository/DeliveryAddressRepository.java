@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, UUID> {
+public interface DeliveryAddressRepository
+        extends JpaRepository<DeliveryAddress, UUID>, DeliveryAddressRepositoryCustom {
     Optional<Member> findByMember(Member member);
 }
