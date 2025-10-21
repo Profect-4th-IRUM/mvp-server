@@ -45,7 +45,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.reviewCount))
                 .from(product)
                 .where(product.isPublic.isTrue(), ltCursor(cursor, product))
-                .orderBy(product.createdAt.desc())
+                .orderBy(product.id.desc())
                 .limit(size)
                 .fetch();
     }
@@ -71,7 +71,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.isPublic.isTrue(),
                         ltCursor(cursor, product),
                         containsKeyword(keyword, product))
-                .orderBy(product.createdAt.desc())
+                .orderBy(product.id.desc())
                 .limit(size)
                 .fetch();
     }

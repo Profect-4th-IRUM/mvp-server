@@ -19,7 +19,7 @@ import org.hibernate.annotations.Where;
 @Where(clause = "deleted_at IS NULL")
 public class Product extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "product_id", updatable = false, nullable = false)
     private UUID id;
 
