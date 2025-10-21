@@ -24,7 +24,7 @@ public class Store {
 
     @Id
     @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "store_id", updatable = false, nullable = false)
     private UUID id;
 
@@ -47,7 +47,7 @@ public class Store {
     private String telemarketingRegistrationNumber;
 
     @Column(name = "delivery_fee", nullable = false)
-    private Integer deliveryFee;
+    private int deliveryFee;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id", nullable = false, unique = true)
@@ -60,7 +60,7 @@ public class Store {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            Integer deliveryFee,
+            int deliveryFee,
             Member member) {
         this.name = name;
         this.contact = contact;
@@ -77,7 +77,7 @@ public class Store {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            Integer deliveryFee,
+            int deliveryFee,
             Member member) {
         return Store.builder()
                 .name(name)
@@ -96,7 +96,7 @@ public class Store {
         this.address = address;
     }
 
-    public void changeDeliveryFee(Integer deliveryFee) {
+    public void changeDeliveryFee(int deliveryFee) {
         this.deliveryFee = validDeliveryFee(deliveryFee);
     }
 
@@ -108,13 +108,6 @@ public class Store {
 
     private static final Pattern BUSINESS_REGISTRATION_NUMBER_PATTERN =
             Pattern.compile(RegexConstants.BUSINESS_REGISTRATION_NUMBER);
-
-    private String validContact(String contact) {
-        if (!PHONE_NUMBER_PATTERN.matcher(contact).matches()) {
-            throw new CommonException(StoreErrorCode.INVALID_CONTACT);
-        }
-        return contact;
-    }
 
     private String validTelemarketingRegistrationNumber(String telemarketingRegistrationNumber) {
         if (!TELEMARKETING_REGISTRATION_NUMBER_PATTERN
@@ -132,7 +125,7 @@ public class Store {
         return businessRegistrationNumber;
     }
 
-    private static Integer validDeliveryFee(Integer deliveryFee) {
+    private static int validDeliveryFee(int deliveryFee) {
         if (deliveryFee < 0) {
             throw new CommonException(StoreErrorCode.INVALID_DELIVERY_FEE);
         }

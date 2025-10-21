@@ -1,7 +1,7 @@
 package com.irum.come2us.domain.store.application.service;
 
+import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
@@ -23,13 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final MemberValidator memberValidator;
 
     // TODO : Member id 맵핑. 시큐리티 적용?
     public UUID createStore(StoreCreateRequest request) {
         // 더미 (변경 해야함)
-        Member member = createDummyMember();
+        Member member = memberValidator.getCurrentMember();
 
-        validateMemberRole(member); // 권한 체크
+        //        validateMemberRole(member); // 권한 체크
         validateMemberHasNoStore(member); // 1인 1상점 제한
         validateBusinessNumber(request.businessRegistrationNumber()); // 사업자번호 중복 체크
         validateTelemarketingNumber(request.telemarketingRegistrationNumber()); // 통신판매번호 중복 체크
@@ -50,7 +51,7 @@ public class StoreService {
 
     public void updateStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
-        // TODO: 권한 체크 (현재는 dummy이므로 나중에 다시 만들기)
+        // TODO: 권한 체크 (현재는 dummy이므로 나중에 다시 만들기)?
         store.updateBasicInfo(request.name(), request.contact(), request.address());
     }
 
@@ -61,7 +62,7 @@ public class StoreService {
 
     public void deleteStore(UUID storeId) {
         Store store = getStoreById(storeId);
-        // TODO: 권한 체크
+        // TODO: 권한 체크>?
         storeRepository.delete(store);
     }
 
@@ -81,17 +82,13 @@ public class StoreService {
     }
 
     // 권한 체크
-    //    더미 (변경 해야함)
-    private Member createDummyMember() {
-        return Member.createOwner("dummy@email.com", "password", "테스트사용자", "010-0000-0000");
-    }
 
-    private void validateMemberRole(Member member) {
-        Role role = member.getRole();
-        if (!(Role.OWNER.equals(role) || Role.MANAGER.equals(role))) {
-            throw new CommonException(StoreErrorCode.INVALID_MEMBER_ROLE);
-        }
-    }
+    //    private void validateMemberRole(Member member) {
+    //        Role role = member.getRole();
+    //        if (!(Role.OWNER.equals(role) || Role.MANAGER.equals(role))) {
+    //            throw new CommonException(StoreErrorCode.INVALID_MEMBER_ROLE);
+    //        }
+    //    }
 
     // 1인 1상점 제한
     private void validateMemberHasNoStore(Member member) {

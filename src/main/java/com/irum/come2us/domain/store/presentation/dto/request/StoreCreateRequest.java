@@ -8,4 +8,4 @@ public record StoreCreateRequest(
         @NotBlank(message = "주소는 필수 입력값입니다.") String address,
         @NotBlank(message = "사업자등록번호는 필수 입력값입니다.") String businessRegistrationNumber,
         @NotBlank(message = "통신판매업번호는 필수 입력값입니다.") String telemarketingRegistrationNumber,
-        @Min(value = 0, message = "배달비는 0원 이상이어야 합니다.") Integer deliveryFee) {}
+        @Min(value = 0, message = "배달비는 0원 이상이어야 합니다.") int deliveryFee) {}
