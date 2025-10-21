@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import jakarta.validation.constraints.Min;
 
 // 1. 엔티티
 
@@ -25,7 +26,7 @@ public class Coupon {
 
     @Column(name = "discount_amount") // 할인 금액
     @Min(0)
-    private Int discountAmount;
+    private int discountAmount;
 
     @Column(name = "expiration") // 유효기간
     private LocalDateTime expiration;
