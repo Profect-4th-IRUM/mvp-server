@@ -16,6 +16,7 @@ import java.util.UUID;
 public class OwnerOrderController {
     private final OrderService orderService;
 
+    /** [상점] 배송 준비 중 목록 조회 **/
     @GetMapping("/preparing")
     public ResponseEntity<PaymentOrderResponse> preparingOrderListGet(
             @RequestParam(required = false) UUID cursor,
@@ -26,6 +27,9 @@ public class OwnerOrderController {
         return ResponseEntity.ok(response);
     }
 
+
+
+    /** [상점] 주문 상태 변경 (배송준비중) **/
     @PatchMapping("/order-details/{orderDetailId}/preparing")
     public ResponseEntity<String> orderStatusToPreparingUpdate(
             @PathVariable UUID orderDetailId
@@ -34,7 +38,7 @@ public class OwnerOrderController {
         return ResponseEntity.ok( "주문 상태 준비중으로 업데이트 완료");
     }
 
-
+    /** [상점] 주문 상태 변경 (배송중) **/
     @PatchMapping("/order-details/{orderDetailId}/shipped")
     public ResponseEntity<String> orderStatusToShippedUpdate(
             @PathVariable UUID orderDetailId
@@ -43,6 +47,7 @@ public class OwnerOrderController {
         return ResponseEntity.ok( "주문 상태 배송 중으로 업데이트 완료");
     }
 
+    /** [상점] 주문 상태 변경 (배송완료) **/
     @PatchMapping("/order-details/{orderDetailId}/delivered")
     public ResponseEntity<String> orderStatusToDeliveredUpdate(
             @PathVariable UUID orderDetailId

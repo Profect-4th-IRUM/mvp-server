@@ -44,7 +44,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                                 o.deliveryAddress.address,
                                 o.createdAt,
                                 o.totalPrice,
-//                        o.payment. //할인금액
+                                o.payment.totalDiscountAmount,
                                 o.payment.amount,
                                 o.deliveryFee
                         )
