@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record PaymentOrderResponse(
+public record OwnerOrderListResponse(
         List<OrderSummary> orderList,
         String nextCursor,
         boolean hasNext

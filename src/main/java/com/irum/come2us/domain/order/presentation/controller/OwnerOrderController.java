@@ -1,7 +1,7 @@
 package com.irum.come2us.domain.order.presentation.controller;
 
 import com.irum.come2us.domain.order.application.service.OrderService;
-import com.irum.come2us.domain.order.presentation.dto.response.PaymentOrderResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +18,25 @@ public class OwnerOrderController {
 
     /** [상점] 배송 준비 중 목록 조회 **/
     @GetMapping("/preparing")
-    public ResponseEntity<PaymentOrderResponse> preparingOrderListGet(
+    public ResponseEntity<OwnerOrderListResponse> preparingOrderListGet(
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size
     ) {
         UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
-        PaymentOrderResponse response = orderService.getPreparingOrderList(storeId, cursor, size);
+        OwnerOrderListResponse response = orderService.getPreparingOrderList(storeId, cursor, size);
         return ResponseEntity.ok(response);
     }
 
+    /** [상점] 배송 준비 중 목록 조회 **/
+    @GetMapping("/preparing")
+    public ResponseEntity<OwnerOrderListResponse> partiallyShippedOrderListGet(
+            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) Integer size
+    ) {
+        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
+        OwnerOrderListResponse response = orderService.getPartiallyShippedOrderList(storeId, cursor, size);
+        return ResponseEntity.ok(response);
+    }
 
 
     /** [상점] 주문 상태 변경 (배송준비중) **/
