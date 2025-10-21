@@ -8,7 +8,6 @@ import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateReq
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
