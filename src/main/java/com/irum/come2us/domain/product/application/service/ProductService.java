@@ -179,4 +179,24 @@ public class ProductService {
         productRepository.delete(product);
         log.info("상품 삭제 완료: productId={}", productId);
     }
+
+    public void createOptionGroup(UUID productId, ProductOptionGroupRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        ProductOptionGroup group = ProductOptionGroup.createOptionGroup(product, request.name());
+        product.addOptionGroup(group);
+
+        if (request.optionValues() != null && !request.optionValues().isEmpty()) {
+            for (ProductOptionValueRequest valueReq : request.optionValues()) {
+                ProductOptionValue.createOptionValue(
+                        group, valueReq.name(), valueReq.stockQuantity(), valueReq.extraPrice());
+            }
+        }
+
+        productRepository.save(product);
+        log.info("상품 옵션 그룹 추가 완료: productId={}, groupName={}", productId, request.name());
+    }
 }
