@@ -46,7 +46,7 @@ public class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("고객 회원가입 API 문서 생성")
+    @DisplayName("고객 회원가입 API")
     void customerSignupApiTest() throws Exception {
 
         // Given
@@ -55,7 +55,6 @@ public class MemberControllerTest {
                         "customer@example.com", "password123!", "회원1", "010-1234-5678");
         String requestJson = objectMapper.writeValueAsString(request);
 
-        // 5. [동일] 주입받은 memberService(Mock 객체)를 사용해 Mocking합니다.
         doNothing().when(memberService).createCustomer(any(MemberCreateRequest.class));
 
         // When & Then
@@ -71,8 +70,8 @@ public class MemberControllerTest {
                                 requestFields(
                                         fieldWithPath("email").description("가입할 이메일 (아이디)"),
                                         fieldWithPath("password").description("가입할 비밀번호"),
-                                        fieldWithPath("name").description("사용자 이름"),
+                                        fieldWithPath("name").description("회원 이름"),
                                         fieldWithPath("contact")
-                                                .description("사용자 연락처 (e.g., 010-1234-5678)"))));
+                                                .description("회원 연락처 ex) 010-1234-5678"))));
     }
 }
