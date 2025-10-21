@@ -9,7 +9,6 @@ import lombok.Getter;
 @Builder
 public class CategoryResponse {
 
-    public static Object fromEntity;
     private UUID categoryId;
     private String name;
     private int depth;

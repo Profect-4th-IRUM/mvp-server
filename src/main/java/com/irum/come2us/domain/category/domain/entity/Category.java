@@ -13,10 +13,10 @@ import org.hibernate.annotations.UuidGenerator;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
-public class Category { // 외부 패키지에서 직접 접근할 필요 없으므로 default(=package-private)
+public class Category {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "category_id", updatable = false, nullable = false)
     private UUID categoryId;
 

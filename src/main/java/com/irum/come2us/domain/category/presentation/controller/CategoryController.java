@@ -1,17 +1,16 @@
 package com.irum.come2us.domain.category.presentation.controller;
 
 import com.irum.come2us.domain.category.application.service.CategoryService;
-import com.irum.come2us.domain.category.domain.entity.Category;
-import com.irum.come2us.domain.category.presentation.dto.request.CategoryCreateRequest;
 import com.irum.come2us.domain.category.presentation.dto.response.CategoryResponse;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -20,18 +19,17 @@ public class CategoryController {
     // 전체 카테고리 조회
     @GetMapping
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> responses =
-                categoryService.findAll().stream()
-                        .map(CategoryResponse::fromEntity)
-                        .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(categoryService.findAllCategories());
     }
 
     // 카테고리 생성
-    @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(
-            @RequestBody CategoryCreateRequest request) {
-        Category category = categoryService.create(request);
-        return ResponseEntity.ok(CategoryResponse.fromEntity(category));
-    }
+    //    @PostMapping
+    //    public ResponseEntity<CategoryResponse> createCategory(
+    //            @RequestBody CategoryCreateRequest request) {
+    //        var category = categoryService.create(request);
+    //        return ResponseEntity.status(HttpStatus.CREATED)
+    //                .body(CategoryResponse.fromEntity(category));
+    //    }
+
+    // TODO: exeption 카테고리 도메인 pr 승인 후 재개발
 }
