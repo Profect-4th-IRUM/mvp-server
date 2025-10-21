@@ -54,6 +54,16 @@ public class OrderService {
         return getOwnerOrderList(storeId, OrderStatus.PARTIALLY_SHIPPED, cursor, size);
     }
 
+    @Transactional(readOnly = true)
+    public OwnerOrderListResponse getPartiallyDeliveredOrderList(UUID storeId, UUID cursor, Integer size) {
+        if (size == null || !(size == 10 || size == 30 || size == 50)) {
+            log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
+            size = 10;
+        }
+
+        return getOwnerOrderList(storeId, OrderStatus.PARTIALLY_DELIVERED, cursor, size);
+    }
+
 
 
     private OwnerOrderListResponse getOwnerOrderList(UUID storeId, OrderStatus orderStatus, UUID cursor, Integer size) {

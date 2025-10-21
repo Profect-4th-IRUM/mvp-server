@@ -27,14 +27,25 @@ public class OwnerOrderController {
         return ResponseEntity.ok(response);
     }
 
-    /** [상점] 배송 준비 중 목록 조회 **/
-    @GetMapping("/preparing")
+    /** [상점] 부분 배송 중 목록 조회 **/
+    @GetMapping("/partially-shipped")
     public ResponseEntity<OwnerOrderListResponse> partiallyShippedOrderListGet(
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size
     ) {
         UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
         OwnerOrderListResponse response = orderService.getPartiallyShippedOrderList(storeId, cursor, size);
+        return ResponseEntity.ok(response);
+    }
+
+    /** [상점] 부분 배송 완료 목록 조회 **/
+    @GetMapping("/partially-delivered")
+    public ResponseEntity<OwnerOrderListResponse> partiallyDeliveredOrderListGet(
+            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) Integer size
+    ) {
+        UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
+        OwnerOrderListResponse response = orderService.getPartiallyDeliveredOrderList(storeId, cursor, size);
         return ResponseEntity.ok(response);
     }
 
