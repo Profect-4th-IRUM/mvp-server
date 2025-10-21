@@ -1,20 +1,25 @@
 package com.irum.come2us.domain.product.domain.entity;
 
+import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @Table(name = "p_product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product {
+@SQLDelete(sql = "UPDATE p_product SET deleted_at = NOW() WHERE product_id = ?")
+@Where(clause = "deleted_at IS NULL")
+public class Product extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "product_id", updatable = false, nullable = false)
     private UUID id;
 

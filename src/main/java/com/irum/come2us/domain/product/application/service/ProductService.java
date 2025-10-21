@@ -3,18 +3,19 @@ package com.irum.come2us.domain.product.application.service;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -121,7 +122,8 @@ public class ProductService {
         return ProductResponse.from(product);
     }
 
-    public List<ProductResponse> getProductList(UUID cursor, Integer size, String keyword) {
+    @Transactional(readOnly = true)
+    public ProductCursorResponse getProductList(UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -138,9 +140,10 @@ public class ProductService {
         }
 
         log.info("상품 목록 조회 완료: keyword={}, count={}", keyword, products.size());
-        return products;
+        return ProductCursorResponse.of(products);
     }
 
+    @Transactional(readOnly = true)
     public ProductDetailResponse getProductById(UUID productId) {
         Product product =
                 productRepository
@@ -148,5 +151,15 @@ public class ProductService {
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         return ProductDetailResponse.from(product);
+    }
+
+    public void deleteProduct(UUID productId) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        productRepository.delete(product);
+        log.info("상품 삭제 완료: productId={}", productId);
     }
 }
