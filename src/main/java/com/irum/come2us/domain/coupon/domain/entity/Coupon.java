@@ -2,11 +2,11 @@ package com.irum.come2us.domain.coupon.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
-import jakarta.validation.constraints.Min;
 
 // 1. 엔티티
 
