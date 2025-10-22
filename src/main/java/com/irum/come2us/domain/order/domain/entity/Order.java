@@ -17,6 +17,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_order SET deleted_at = NOW() WHERE order_id=?")
@@ -56,4 +57,8 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_address_id")
     private DeliveryAddress deliveryAddress;
+
+    public void updateOrderStatus(OrderStatus os ){
+        this.orderStatusAll = os;
+    }
 }

@@ -13,6 +13,7 @@ import org.hibernate.annotations.*;
 
 @Entity
 @Builder
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_order_detail SET deleted_at = NOW() WHERE order_detail_id=?")
 @SQLRestriction("deleted_at is null")
