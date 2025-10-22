@@ -63,12 +63,15 @@ public class Store extends BaseTimeEntity {
             String telemarketingRegistrationNumber,
             int deliveryFee,
             Member member) {
+
         this.name = name;
-        this.contact = contact;
+        this.contact = validContact(contact);
         this.address = address;
-        this.businessRegistrationNumber = businessRegistrationNumber;
-        this.telemarketingRegistrationNumber = telemarketingRegistrationNumber;
-        this.deliveryFee = deliveryFee;
+        this.businessRegistrationNumber =
+                validBusinessRegistrationNumber(businessRegistrationNumber);
+        this.telemarketingRegistrationNumber =
+                validTelemarketingRegistrationNumber(telemarketingRegistrationNumber);
+        this.deliveryFee = validDeliveryFee(deliveryFee);
         this.member = member;
     }
 
@@ -93,7 +96,7 @@ public class Store extends BaseTimeEntity {
 
     public void updateBasicInfo(String name, String contact, String address) {
         this.name = name;
-        this.contact = contact;
+        this.contact = validContact(contact);
         this.address = address;
     }
 
@@ -110,7 +113,15 @@ public class Store extends BaseTimeEntity {
     private static final Pattern BUSINESS_REGISTRATION_NUMBER_PATTERN =
             Pattern.compile(RegexConstants.BUSINESS_REGISTRATION_NUMBER);
 
-    private String validTelemarketingRegistrationNumber(String telemarketingRegistrationNumber) {
+    private String validContact(String contact) {
+        if (!PHONE_NUMBER_PATTERN.matcher(contact).matches()) {
+            throw new CommonException(StoreErrorCode.INVALID_CONTACT);
+        }
+        return contact;
+    }
+
+    private static String validTelemarketingRegistrationNumber(
+            String telemarketingRegistrationNumber) {
         if (!TELEMARKETING_REGISTRATION_NUMBER_PATTERN
                 .matcher(telemarketingRegistrationNumber)
                 .matches()) {
@@ -119,7 +130,7 @@ public class Store extends BaseTimeEntity {
         return telemarketingRegistrationNumber;
     }
 
-    private String validBusinessRegistrationNumber(String businessRegistrationNumber) {
+    private static String validBusinessRegistrationNumber(String businessRegistrationNumber) {
         if (!BUSINESS_REGISTRATION_NUMBER_PATTERN.matcher(businessRegistrationNumber).matches()) {
             throw new CommonException(StoreErrorCode.INVALID_BUSINESS_REGISTRATION_NUMBER);
         }

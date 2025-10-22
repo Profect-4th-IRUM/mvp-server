@@ -25,7 +25,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final MemberValidator memberValidator;
 
-    public UUID createStore(StoreCreateRequest request) {
+    public UUID registerStore(StoreCreateRequest request) {
         Member member = memberValidator.getCurrentMember();
 
         validateMemberHasNoStore(member); // 1인 1상점 제한
@@ -46,7 +46,7 @@ public class StoreService {
         return store.getId();
     } // owner 권한.
 
-    public void updateStore(UUID storeId, StoreUpdateRequest request) {
+    public void changeStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
         Member currentMember = memberValidator.getCurrentMember();
 
@@ -64,14 +64,14 @@ public class StoreService {
         store.changeDeliveryFee(request.deliveryFee());
     }
 
-    public void deleteStore(UUID storeId) {
+    public void withdrawStore(UUID storeId) {
         Store store = getStoreById(storeId);
         // TODO: 권한 체크>?
         storeRepository.delete(store);
     }
 
     @Transactional(readOnly = true)
-    public List<StoreListResponse> getStoreList(UUID cursor, Integer size) {
+    public List<StoreListResponse> findStoreList(UUID cursor, Integer size) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             size = 10;
         }
@@ -80,7 +80,7 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
-    public StoreInfoResponse getStoreInfo(UUID storeId) {
+    public StoreInfoResponse findStoreInfo(UUID storeId) {
         Store store = getStoreById(storeId);
         return StoreInfoResponse.from(store);
     }

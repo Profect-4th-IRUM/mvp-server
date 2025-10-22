@@ -27,7 +27,7 @@ public class StoreController {
     public ResponseEntity<StoreCreateResponse> createStore(
             @Valid @RequestBody StoreCreateRequest request) {
         log.info("상점 생성 요청: {}", request);
-        UUID storeId = storeService.createStore(request);
+        UUID storeId = storeService.registerStore(request);
         return ResponseEntity.ok(new StoreCreateResponse(storeId));
     }
 
@@ -37,12 +37,12 @@ public class StoreController {
     public ResponseEntity<Void> updateStore(
             @PathVariable UUID storeId, @Valid @RequestBody StoreUpdateRequest request) {
         log.info("상점 정보 수정 요청: storeId={}, request={}", storeId, request);
-        storeService.updateStore(storeId, request);
+        storeService.changeStore(storeId, request);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
     @PatchMapping("/delivery_fee/{storeId}")
-    public ResponseEntity<Void> changeDeliveryFee(
+    public ResponseEntity<Void> updateDeliveryFee(
             @PathVariable UUID storeId, @Valid @RequestBody StoreDeliveryFeeUpdateRequest request) {
         log.info("상점 배달비 수정 요청: storeId={}, request={}", storeId, request);
         storeService.changeDeliveryFee(storeId, request);
@@ -54,7 +54,7 @@ public class StoreController {
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(@PathVariable UUID storeId) {
         log.info("상점 삭제 요청 : storeId={}", storeId);
-        storeService.deleteStore(storeId);
+        storeService.withdrawStore(storeId);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
@@ -63,14 +63,14 @@ public class StoreController {
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size) {
         log.info("상점 목록 조회 요청: cursor={}, size={}", cursor, size);
-        List<StoreListResponse> response = storeService.getStoreList(cursor, size);
+        List<StoreListResponse> response = storeService.findStoreList(cursor, size);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreInfoResponse> getStoreDetail(@PathVariable UUID storeId) {
         log.info("상점 상세 조회 요청: storeId={}", storeId);
-        StoreInfoResponse response = storeService.getStoreInfo(storeId);
+        StoreInfoResponse response = storeService.findStoreInfo(storeId);
         return ResponseEntity.ok(response);
     }
 }
