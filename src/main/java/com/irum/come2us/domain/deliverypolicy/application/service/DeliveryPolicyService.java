@@ -52,6 +52,14 @@ public class DeliveryPolicyService {
         deliveryPolicy.updateAmount(request.minAmount());
     }
 
+    public void withdrawDeliveryPolicy(UUID deliveryPolicyId) {
+        Member member = memberValidator.getCurrentMember();
+        DeliveryPolicy deliveryPolicy = getDeliveryPolicyById(deliveryPolicyId);
+
+        validateStoreOwner(deliveryPolicy.getStore(), member);
+        deliveryPolicyRepository.delete(deliveryPolicy);
+    }
+
     // 상점 정책 존재하는지 확인
     private void ensureStoreHasNoExistingPolicy(Store store) {
         if (deliveryPolicyRepository.existsByStore(store)) {
