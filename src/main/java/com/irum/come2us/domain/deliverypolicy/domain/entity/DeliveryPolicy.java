@@ -30,11 +30,11 @@ public class DeliveryPolicy extends BaseEntity {
     @Min(0)
     private int defaultDeliveryFee;
 
-    @Column(name = "minimun_quantity", nullable = false)
+    @Column(name = "minimum_quantity", nullable = false)
     @Min(1)
     private int minQuantity;
 
-    @Column(name = "minimun_amount", nullable = false)
+    @Column(name = "minimum_amount", nullable = false)
     @Min(0)
     private int minAmount;
 
@@ -50,7 +50,7 @@ public class DeliveryPolicy extends BaseEntity {
         this.store = store;
     }
 
-    public DeliveryPolicy createPolicy(
+    public static DeliveryPolicy createPolicy(
             int defaultDeliveryFee, int minQuantity, int minAmount, Store store) {
         return DeliveryPolicy.builder()
                 .defaultDeliveryFee(defaultDeliveryFee)
