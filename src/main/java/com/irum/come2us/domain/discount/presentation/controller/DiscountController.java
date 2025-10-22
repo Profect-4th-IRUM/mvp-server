@@ -13,27 +13,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/discounts")
 @RequiredArgsConstructor
 @Slf4j
 public class DiscountController {
 
     private final DiscountService discountService;
 
-    @PostMapping
+    @PostMapping("/discounts")
     public ResponseEntity<Void> registerDiscount(
             @Valid @RequestBody DiscountRegisterRequest request) {
         discountService.createDiscount(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/info/{discountId}")
-    public DiscountInfoResponse getDiscountInfo(@PathVariable UUID discountId) {
-        return discountService.findDiscountInfoByProduct(discountId);
+    @GetMapping("/products/{productId}/discounts")
+    public DiscountInfoResponse getDiscountInfo(@PathVariable UUID productId) {
+        return discountService.findDiscountInfoByProduct(productId);
     }
 
-    @GetMapping("/{storeId}/info/")
-    public DiscountInfoListResponse getDiscountInfo(
+    @GetMapping("/stores/{storeId}/discounts")
+    public DiscountInfoListResponse getDiscountListInfoByStore(
             @PathVariable UUID storeId,
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer pageSize) {
