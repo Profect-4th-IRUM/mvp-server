@@ -36,18 +36,10 @@ public class ProductService {
     private final StoreRepository storeRepository;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
-        MemberDetails memberDetails =
-                (MemberDetails)
-                        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long memberId = Long.valueOf(memberDetails.getUsername());
-
-        Member member =
-                memberRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+        Member member = getCurrentUser();
 
         if (!member.getRole().equals(Role.OWNER)) {
-            log.warn("상품 등록 실패: 점주 권한이 없는 사용자 memberId={}", member.getMemberId());
+            log.warn("상품 등록 실패: 비인가 사용자 memberId={}", member.getMemberId());
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
         }
 
@@ -71,10 +63,17 @@ public class ProductService {
     }
 
     public ProductResponse updateProduct(UUID productId, ProductUpdateRequest request) {
+        Member member = getCurrentUser();
+
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!product.getStore().getMember().equals(member)) {
+            log.warn("상품 수정 실패: 비인가 사용자 memberId={}, storeOwnerId={}", member.getMemberId(), product.getStore().getMember().getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
 
         if (request.name() == null
                 && request.description() == null
@@ -130,10 +129,17 @@ public class ProductService {
 
     public ProductResponse updateProductPublicStatus(
             UUID productId, ProductPublicUpdateRequest request) {
+        Member member = getCurrentUser();
+
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!product.getStore().getMember().equals(member) && !member.getRole().equals(Role.MANAGER)) {
+            log.warn("상품 공개 상태 수정 실패: 비인가 사용자 memberId={}, storeOwnerId={}", member.getMemberId(), product.getStore().getMember().getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
 
         boolean newStatus = request.isPublic();
         boolean currentStatus = product.isPublic();
@@ -187,12 +193,30 @@ public class ProductService {
     }
 
     public void deleteProduct(UUID productId) {
+        Member member = getCurrentUser();
+
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
+        if (!product.getStore().getMember().equals(member)) {
+            log.warn("상품 삭제 실패: 비인가 사용자 memberId={}, storeOwnerId={}", member.getMemberId(), product.getStore().getMember().getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         productRepository.delete(product);
         log.info("상품 삭제 완료: productId={}", productId);
+    }
+
+    private Member getCurrentUser() {
+        MemberDetails memberDetails =
+                (MemberDetails)
+                        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = Long.valueOf(memberDetails.getUsername());
+
+        return memberRepository
+                .findById(memberId)
+                .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 }
