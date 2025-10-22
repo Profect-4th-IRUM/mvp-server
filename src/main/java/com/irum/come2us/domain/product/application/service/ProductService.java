@@ -38,15 +38,15 @@ public class ProductService {
     public ProductResponse createProduct(ProductCreateRequest request) {
         Member member = getCurrentUser();
 
-        if (!member.getRole().equals(Role.OWNER)) {
-            log.warn("상품 등록 실패: 비인가 사용자 memberId={}", member.getMemberId());
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
-
         Store store =
                 storeRepository
                         .findByMember(member)
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+
+        if (!member.getRole().equals(Role.OWNER)) {
+            log.warn("상품 등록 실패: 비인가 사용자 memberId={}", member.getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
 
         Product product =
                 Product.createProduct(
@@ -210,13 +210,19 @@ public class ProductService {
     }
 
     private Member getCurrentUser() {
-        MemberDetails memberDetails =
-                (MemberDetails)
-                        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long memberId = Long.valueOf(memberDetails.getUsername());
+        var authentication =
+                        SecurityContextHolder.getContext().getAuthentication();
 
-        return memberRepository
-                .findById(memberId)
-                .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+        if (authentication == null || !(authentication.getPrincipal() instanceof MemberDetails details)) {
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        try {
+            Long memberId = Long.parseLong(details.getUsername());
+            return memberRepository.findById(memberId)
+                    .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+        } catch (NumberFormatException e) {
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
     }
 }
