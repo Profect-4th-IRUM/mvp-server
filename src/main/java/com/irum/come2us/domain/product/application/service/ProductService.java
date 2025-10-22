@@ -4,9 +4,12 @@ import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.entity.ProductOptionGroup;
 import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
 import com.irum.come2us.domain.product.domain.repository.ProductOptionGroupRepository;
+import com.irum.come2us.domain.product.domain.repository.ProductOptionValueRepository;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionGroupResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionValueResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductOptionGroupRepository optionGroupRepository;
+    private final ProductOptionValueRepository optionValueRepository;
 
     // TODO: 상점 매핑 시, 같은 상점 내 같은 상품 중복 처리
     public ProductResponse createProduct(ProductCreateRequest request) {
@@ -215,7 +219,55 @@ public class ProductService {
                 request.stockQuantity(),
                 request.extraPrice() != null ? request.extraPrice() : 0);
 
-        optionGroupRepository.saveAndFlush(optionGroup);
+        optionGroupRepository.save(optionGroup);
         log.info("옵션 값 추가 완료: optionGroupId={}, valueName={}", optionGroupId, request.name());
+    }
+
+    public ProductOptionGroupResponse updateProductOptionGroup(
+            UUID optionGroupId, ProductOptionGroupRequest request) {
+        ProductOptionGroup optionGroup =
+                optionGroupRepository
+                        .findById(optionGroupId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+
+        optionGroup.updateOptionGroupName(request.name());
+
+        return ProductOptionGroupResponse.from(optionGroup);
+    }
+
+    public ProductOptionValueResponse updateProductOptionValue(
+            UUID optionValueId, ProductOptionValueUpdateRequest request) {
+        ProductOptionValue optionValue =
+                optionValueRepository
+                        .findById(optionValueId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
+
+        if ((request.name() == null || request.name().isBlank()) &&
+                request.stockQuantity() == null &&
+                request.extraPrice() == null) {
+            log.warn("옵션 값 수정 실패: 변경된 필드가 없습니다. optionValueId={}", optionValueId);
+            throw new CommonException(ProductErrorCode.PRODUCT_NOT_MODIFIED);
+        }
+
+        String updatedName = request.name() != null && !request.name().isBlank()
+                ? request.name().trim()
+                : optionValue.getName();
+
+        int updatedStockQuantity = request.stockQuantity() != null
+                ? request.stockQuantity()
+                : optionValue.getStockQuantity();
+
+        Integer updatedExtraPrice = request.extraPrice() != null
+                ? request.extraPrice()
+                : optionValue.getExtraPrice();
+
+        optionValue.updateOptionValue(updatedName, updatedStockQuantity, updatedExtraPrice);
+        optionValueRepository.save(optionValue);
+
+        log.info("상품 옵션 값 수정 완료: optionValueId={}", optionValueId);
+
+        return ProductOptionValueResponse.from(optionValue);
     }
 }
