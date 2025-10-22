@@ -35,8 +35,7 @@ public class DeliveryAddressService {
                         : request.recipientContact();
         DeliveryAddress deliveryAddress =
                 DeliveryAddress.create(member, request.address(), recipientName, recipientContact);
-        if (!deliveryAddressRepository.findByMember(member).isPresent())
-            deliveryAddress.markAsDefault();
+        if (!deliveryAddressRepository.existsByMember(member)) deliveryAddress.markAsDefault();
         deliveryAddressRepository.save(deliveryAddress);
     }
 
