@@ -7,8 +7,6 @@ import com.irum.come2us.domain.product.domain.repository.ProductOptionGroupRepos
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionGroupResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionValueResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
@@ -205,15 +203,17 @@ public class ProductService {
     }
 
     public void createOptionValue(UUID optionGroupId, ProductOptionValueRequest request) {
-        ProductOptionGroup optionGroup = optionGroupRepository.findById(optionGroupId)
-                .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+        ProductOptionGroup optionGroup =
+                optionGroupRepository
+                        .findById(optionGroupId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
 
         ProductOptionValue.createOptionValue(
                 optionGroup,
                 request.name(),
                 request.stockQuantity(),
-                request.extraPrice() != null ? request.extraPrice() : 0
-        );
+                request.extraPrice() != null ? request.extraPrice() : 0);
 
         optionGroupRepository.saveAndFlush(optionGroup);
         log.info("옵션 값 추가 완료: optionGroupId={}, valueName={}", optionGroupId, request.name());

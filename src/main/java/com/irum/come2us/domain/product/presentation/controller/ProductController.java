@@ -3,8 +3,6 @@ package com.irum.come2us.domain.product.presentation.controller;
 import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionGroupResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionValueResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -85,8 +83,7 @@ public class ProductController {
     @PostMapping("/options/{optionGroupId}/values")
     public ResponseEntity<Void> createProductOptionValue(
             @PathVariable UUID optionGroupId,
-            @Valid @RequestBody ProductOptionValueRequest request
-    ) {
+            @Valid @RequestBody ProductOptionValueRequest request) {
         log.info("옵션 값 추가 요청: optionGroupId={}, valueName={}", optionGroupId, request.name());
         productService.createOptionValue(optionGroupId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
