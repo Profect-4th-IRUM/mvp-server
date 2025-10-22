@@ -94,20 +94,20 @@ public class ProductController {
     @PatchMapping("/options/{optionGroupId}")
     public ResponseEntity<ProductOptionGroupResponse> updateProductOptionGroup(
             @PathVariable UUID optionGroupId,
-            @Valid @RequestBody ProductOptionGroupRequest request
-    ) {
+            @Valid @RequestBody ProductOptionGroupRequest request) {
         log.info("상품 옵션 그룹 수정 요청: groupId={}", optionGroupId);
-        ProductOptionGroupResponse response = productService.updateProductOptionGroup(optionGroupId, request);
+        ProductOptionGroupResponse response =
+                productService.updateProductOptionGroup(optionGroupId, request);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/options/values/{optionValueId}")
     public ResponseEntity<ProductOptionValueResponse> updateProductOptionValue(
             @PathVariable UUID optionValueId,
-            @Valid @RequestBody ProductOptionValueUpdateRequest request
-    ) {
+            @Valid @RequestBody ProductOptionValueUpdateRequest request) {
         log.info("상품 옵션 값 수정 요청: valueId={}", optionValueId);
-        ProductOptionValueResponse response = productService.updateProductOptionValue(optionValueId, request);
+        ProductOptionValueResponse response =
+                productService.updateProductOptionValue(optionValueId, request);
         return ResponseEntity.ok(response);
     }
 }

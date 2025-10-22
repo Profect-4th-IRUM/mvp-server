@@ -244,24 +244,25 @@ public class ProductService {
                         .orElseThrow(
                                 () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
 
-        if ((request.name() == null || request.name().isBlank()) &&
-                request.stockQuantity() == null &&
-                request.extraPrice() == null) {
+        if ((request.name() == null || request.name().isBlank())
+                && request.stockQuantity() == null
+                && request.extraPrice() == null) {
             log.warn("옵션 값 수정 실패: 변경된 필드가 없습니다. optionValueId={}", optionValueId);
             throw new CommonException(ProductErrorCode.PRODUCT_NOT_MODIFIED);
         }
 
-        String updatedName = request.name() != null && !request.name().isBlank()
-                ? request.name().trim()
-                : optionValue.getName();
+        String updatedName =
+                request.name() != null && !request.name().isBlank()
+                        ? request.name().trim()
+                        : optionValue.getName();
 
-        int updatedStockQuantity = request.stockQuantity() != null
-                ? request.stockQuantity()
-                : optionValue.getStockQuantity();
+        int updatedStockQuantity =
+                request.stockQuantity() != null
+                        ? request.stockQuantity()
+                        : optionValue.getStockQuantity();
 
-        Integer updatedExtraPrice = request.extraPrice() != null
-                ? request.extraPrice()
-                : optionValue.getExtraPrice();
+        Integer updatedExtraPrice =
+                request.extraPrice() != null ? request.extraPrice() : optionValue.getExtraPrice();
 
         optionValue.updateOptionValue(updatedName, updatedStockQuantity, updatedExtraPrice);
         optionValueRepository.save(optionValue);
