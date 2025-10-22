@@ -21,7 +21,7 @@ public class DeliveryPolicyController {
     @PostMapping
     public ResponseEntity<DeliveryPolicyCreateResponse> registerDeliveryPolicy(
             @Valid @RequestBody DeliveryPolicyCreateRequest request) {
-        log.info("배달비 정책 등록: {}", request);
+        log.info("배송비 정책 등록: {}", request);
         UUID deliveryPolicyId = deliveryPolicyService.createDeliveryPolicy(request);
         return ResponseEntity.ok(new DeliveryPolicyCreateResponse(deliveryPolicyId));
     }
@@ -30,8 +30,15 @@ public class DeliveryPolicyController {
     public ResponseEntity<Void> updateDeliveryPolicy(
             @PathVariable UUID deliveryPolicyId,
             @Valid @RequestBody DeliveryPolicyInfoUpdateRequest request) {
-        log.info("배달비 정책 수정: deliveryPolicyId={}, request={}", deliveryPolicyId, request);
+        log.info("배송비 정책 수정: deliveryPolicyId={}, request={}", deliveryPolicyId, request);
         deliveryPolicyService.changeDeliveryPolicy(deliveryPolicyId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{deliveryPolicyId}")
+    public ResponseEntity<Void> deleteDeliveryPolicy(@PathVariable UUID deliveryPolicyId) {
+        log.info("배송비 정책 삭제 요청 : storeId={}", deliveryPolicyId);
+        deliveryPolicyService.withdrawDeliveryPolicy(deliveryPolicyId);
         return ResponseEntity.noContent().build();
     }
 }
