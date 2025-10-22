@@ -77,7 +77,7 @@ public class ReviewControllerTest {
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestJson))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andDo(
                         document(
                                 "review-create",
