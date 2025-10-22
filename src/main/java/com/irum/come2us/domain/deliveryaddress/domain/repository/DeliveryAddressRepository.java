@@ -18,5 +18,5 @@ public interface DeliveryAddressRepository
     @Query("SELECT d FROM DeliveryAddress d WHERE d.member = :member AND d.isDefault = true")
     Optional<DeliveryAddress> findDefaultAddressByMember(@Param("member") Member member);
 
-    Optional<DeliveryAddress> findLatestAddressByMember(Member member);
+    Optional<DeliveryAddress> findTopByMemberOrderByCreatedAtDesc(Member member);
 }

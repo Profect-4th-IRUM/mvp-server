@@ -91,7 +91,7 @@ public class DeliveryAddressService {
         if (address.isDefault()) {
             // DeliveryAddress 중 가장 최근 것 기본 배송지 설정
             deliveryAddressRepository
-                    .findLatestAddressByMember(member)
+                    .findTopByMemberOrderByCreatedAtDesc(member)
                     .ifPresent(DeliveryAddress::markAsDefault);
         }
         deliveryAddressRepository.delete(address);
