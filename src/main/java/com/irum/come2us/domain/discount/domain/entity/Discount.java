@@ -43,7 +43,7 @@ public class Discount extends BaseEntity {
         this.product = product;
     }
 
-    public static Discount createDiscount(String name, int amount, Product product) {
+    public static Discount create(String name, int amount, Product product) {
         return Discount.builder().name(name).amount(amount).product(product).build();
     }
 
