@@ -45,11 +45,7 @@ public class Cart extends BaseEntity {
     }
 
     public static Cart createCart(Member member, ProductOptionValue optionValue, int quantity) {
-        return Cart.builder()
-                .member(member)
-                .optionValue(optionValue)
-                .quantity(quantity)
-                .build();
+        return Cart.builder().member(member).optionValue(optionValue).quantity(quantity).build();
     }
 
     public void updateQuantity(int quantity) {
