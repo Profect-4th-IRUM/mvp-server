@@ -32,7 +32,7 @@ public class DiscountService {
         Member member = memberValidator.getCurrentMember();
         Product product =
                 productRepository
-                        .getProductById(productId)
+                        .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
         Member productOwner = product.getStore().getMemebr();
         if (!member.equals(productOwner))
