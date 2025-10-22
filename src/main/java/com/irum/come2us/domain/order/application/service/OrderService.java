@@ -1,6 +1,7 @@
 package com.irum.come2us.domain.order.application.service;
 
 import com.irum.come2us.domain.order.application.mapper.OrderMapper;
+import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
@@ -40,6 +41,7 @@ public class OrderService {
             size = 10;
         }
         UUID storeId = UUID.randomUUID(); //TODO : 실제 아이디로 변경
+
 
         return getOwnerOrderList(storeId, OrderStatus.PREPARING, cursor, size);
 
@@ -128,6 +130,13 @@ public class OrderService {
                 .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_DETAIL_NOT_FOUND));
 
         orderDetail.updateStatusToPreparing();
+
+        //Order 전체 상태 업데이트
+        Order order = orderRepository.findByOrderId(orderDetail.getOrder().getOrderId()).orElseThrow(
+            () -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND)
+        );
+        OrderStatus newOrderStatus = aggregateOrderStatus(orderDetail);
+        order.updateOrderStatus(newOrderStatus);
     }
 
     @Transactional
@@ -136,6 +145,13 @@ public class OrderService {
                 .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_DETAIL_NOT_FOUND));
 
         orderDetail.updateStatusToShipped();
+
+        //Order 전체 상태 업데이트
+        Order order = orderRepository.findByOrderId(orderDetail.getOrder().getOrderId()).orElseThrow(
+            () -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND)
+        );
+        OrderStatus newOrderStatus = aggregateOrderStatus(orderDetail);
+        order.updateOrderStatus(newOrderStatus);
     }
 
     @Transactional
@@ -144,5 +160,64 @@ public class OrderService {
                 .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_DETAIL_NOT_FOUND));
 
         orderDetail.updateStatusToDelivered();
+
+        //Order 전체 상태 업데이트
+        Order order = orderRepository.findByOrderId(orderDetail.getOrder().getOrderId()).orElseThrow(
+            () -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND)
+        );
+        OrderStatus newOrderStatus = aggregateOrderStatus(orderDetail);
+        order.updateOrderStatus(newOrderStatus);
     }
+
+    /**
+     * OrderDetail 상태 목록을 기반으로 집계된(Aggregated) Order의 상태를 결정
+     */
+    private OrderStatus aggregateOrderStatus(OrderDetail orderDetail){
+
+        Order order = orderRepository.findByOrderId(orderDetail.getOrder().getOrderId()).orElseThrow(
+            () -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND)
+        );
+        List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrder(order);
+        List<OrderStatus> orderStatusList = orderDetailList.stream()
+            .map(OrderDetail::getOrderStatusIndi)
+            .toList();
+
+        if (orderStatusList.isEmpty()) {
+            // 주문 상세가 없는 경우 : 준비중
+            return OrderStatus.PREPARING;
+        }
+
+        int totalCount = orderStatusList.size();
+
+        // 1. 각 상태별로 개수
+        long preparingCount = orderStatusList.stream().filter(s -> s == OrderStatus.PREPARING).count();
+        long shippingCount = orderStatusList.stream().filter(s -> s == OrderStatus.SHIPPED).count();
+        long deliveredCount = orderStatusList.stream().filter(s -> s == OrderStatus.DELIVERED).count();
+
+
+        // "배송 완료" (모든 상품이 '배송완료')
+        if (deliveredCount == totalCount) {
+            return OrderStatus.DELIVERED;
+        }
+        // "부분 배송완료" ('배송완료'가 1개 이상)
+        else if (deliveredCount > 0) {
+            return OrderStatus.PARTIALLY_DELIVERED;
+        }
+        // "부분 배송중" ('배송중'과 '준비중'이 혼재)
+        else if (shippingCount > 0 && preparingCount > 0) {
+            return OrderStatus.PARTIALLY_SHIPPED;
+        }
+        // "배송중" ('배송중'만 있음)
+        else if (shippingCount > 0) {
+            return OrderStatus.SHIPPED;
+        }
+        // "준비중" (모든 상품이 '준비중')
+        else if (preparingCount == totalCount) {
+            return OrderStatus.PREPARING;
+        }
+
+        // 모든 정책에 해당하지 않는 경우
+        return OrderStatus.PREPARING;
+    }
+
 }
