@@ -46,4 +46,10 @@ public class DiscountController {
         discountService.changeDiscountInfo(discountId, request);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/discounts/{discountId}")
+    public ResponseEntity<Void> deleteDiscount(@PathVariable UUID discountId) {
+        discountService.removeDiscount(discountId);
+        return ResponseEntity.noContent().build();
+    }
 }

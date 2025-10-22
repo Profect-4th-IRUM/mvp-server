@@ -68,6 +68,11 @@ public class DiscountService {
         discount.updateAmount(request.amount());
     }
 
+    public void removeDiscount(UUID discountId) {
+        Discount discount = getValidDiscount(discountId);
+        discountRepository.delete(discount);
+    }
+
     private void checkDuplicateDiscount(UUID productId) {
         if (discountRepository.existsByProductId(productId)) {
             throw new CommonException(DiscountErrorCode.DUPLICATE_DISCOUNT);
