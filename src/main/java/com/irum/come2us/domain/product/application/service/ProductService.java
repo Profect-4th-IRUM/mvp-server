@@ -1,5 +1,8 @@
 package com.irum.come2us.domain.product.application.service;
 
+import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.member.domain.entity.enums.Role;
+import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
@@ -8,12 +11,19 @@ import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpd
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
+import com.irum.come2us.domain.store.domain.entity.Store;
+import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import java.util.List;
 import java.util.UUID;
+
+import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
+import com.irum.come2us.global.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +33,36 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
+    private final MemberRepository memberRepository;
+    private final StoreRepository storeRepository;
 
-    // TODO: 상점 매핑 시, 같은 상점 내 같은 상품 중복 처리
     public ProductResponse createProduct(ProductCreateRequest request) {
+        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long memberId = Long.valueOf(memberDetails.getUsername());
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        if (!member.getRole().equals(Role.OWNER)) {
+            log.warn("상품 등록 실패: 점주 권한이 없는 사용자 memberId={}", member.getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        Store store = storeRepository.findByMember(member)
+                .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+
         Product product =
                 Product.createProduct(
+                        store,
                         request.name(),
                         request.description(),
                         request.detailDescription(),
                         request.price(),
                         request.isPublic());
 
-        return ProductResponse.from(productRepository.save(product));
+        productRepository.save(product);
+        log.info("상품 등록 완료: storeId={}, productName={}", store.getId(), product.getName());
+        return ProductResponse.from(product);
     }
 
     public ProductResponse updateProduct(UUID productId, ProductUpdateRequest request) {
