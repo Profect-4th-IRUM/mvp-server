@@ -36,14 +36,14 @@ public class Discount extends BaseEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     private Discount(String name, int amount, Product product) {
         this.name = name;
         this.amount = amount;
         this.product = product;
     }
 
-    public Discount createDiscount(String name, int amount, Product product) {
+    public static Discount createDiscount(String name, int amount, Product product) {
         return Discount.builder().name(name).amount(amount).product(product).build();
     }
 
