@@ -15,6 +15,7 @@ import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DiscountErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
