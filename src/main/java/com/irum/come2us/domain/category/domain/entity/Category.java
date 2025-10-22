@@ -33,7 +33,7 @@ public class Category {
     @Column(name = "depth", nullable = false)
     private int depth;
 
-    // 정적 팩토리 메서드만 public (외부에서 객체 생성 시 사용)
+    // ------------------- 생성 메서드 -------------------
     public static Category createRootCategory(String name) {
         return Category.builder().name(name).depth(1).build();
     }
@@ -41,12 +41,16 @@ public class Category {
     public static Category createSubCategory(String name, Category parent) {
         Category child =
                 Category.builder().name(name).parent(parent).depth(parent.getDepth() + 1).build();
-
         parent.addChild(child);
         return child;
     }
 
     private void addChild(Category child) {
         this.children.add(child);
+    }
+
+    // ------------------- 수정 메서드 -------------------
+    public void updateName(String name) {
+        this.name = name;
     }
 }

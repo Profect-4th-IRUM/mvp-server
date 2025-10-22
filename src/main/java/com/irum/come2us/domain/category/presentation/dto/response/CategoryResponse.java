@@ -1,26 +1,35 @@
 package com.irum.come2us.domain.category.presentation.dto.response;
 
 import com.irum.come2us.domain.category.domain.entity.Category;
+import java.util.List;
 import java.util.UUID;
-import lombok.Builder;
-import lombok.Getter;
 
-@Getter
-@Builder
-public class CategoryResponse {
-
-    private UUID categoryId;
-    private String name;
-    private int depth;
-    private UUID parentId;
-
+public record CategoryResponse(
+        UUID categoryId,
+        String name,
+        int depth,
+        UUID parentId,
+        List<CategoryResponse> children // 트리 조회용
+        ) {
+    // ------------------- 단일 조회용 -------------------
     public static CategoryResponse fromEntity(Category category) {
-        return CategoryResponse.builder()
-                .categoryId(category.getCategoryId())
-                .name(category.getName())
-                .depth(category.getDepth())
-                .parentId(
-                        category.getParent() != null ? category.getParent().getCategoryId() : null)
-                .build();
+        return new CategoryResponse(
+                category.getCategoryId(),
+                category.getName(),
+                category.getDepth(),
+                category.getParent() != null ? category.getParent().getCategoryId() : null,
+                null);
+    }
+
+    // ------------------- 트리 조회용 -------------------
+    public static CategoryResponse fromEntityWithChildren(Category category) {
+        return new CategoryResponse(
+                category.getCategoryId(),
+                category.getName(),
+                category.getDepth(),
+                category.getParent() != null ? category.getParent().getCategoryId() : null,
+                category.getChildren().stream()
+                        .map(CategoryResponse::fromEntityWithChildren)
+                        .toList());
     }
 }
