@@ -2,6 +2,7 @@ package com.irum.come2us.domain.discount.application.service;
 
 import com.irum.come2us.domain.discount.domain.entity.Discount;
 import com.irum.come2us.domain.discount.domain.repository.DiscountRepository;
+import com.irum.come2us.domain.discount.presentation.dto.request.DiscountInfoUpdateRequest;
 import com.irum.come2us.domain.discount.presentation.dto.request.DiscountRegisterRequest;
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoListResponse;
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoResponse;
@@ -61,10 +62,26 @@ public class DiscountService {
         return new DiscountInfoListResponse(responseList, nextCursor, hasNext);
     }
 
+    public void changeDiscountInfo(UUID discountId, DiscountInfoUpdateRequest request) {
+        Discount discount = getValidDiscount(discountId);
+        discount.updateName(request.name());
+        discount.updateAmount(request.amount());
+    }
+
     private void checkDuplicateDiscount(UUID productId) {
         if (discountRepository.existsByProductId(productId)) {
             throw new CommonException(DiscountErrorCode.DUPLICATE_DISCOUNT);
         }
+    }
+
+    private Discount getValidDiscount(UUID discountId) {
+        Discount discount =
+                discountRepository
+                        .findById(discountId)
+                        .orElseThrow(
+                                () -> new CommonException(DiscountErrorCode.DISCOUNT_NOT_FOUND));
+        assertMember(discount.getProduct().getStore().getMember());
+        return discount;
     }
 
     private Discount getValidDiscountOfProduct(UUID productId) {
@@ -82,8 +99,7 @@ public class DiscountService {
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
-        Member productOwner = product.getStore().getMember();
-        assertMember(productOwner);
+        assertMember(product.getStore().getMember());
         return product;
     }
 
@@ -92,8 +108,7 @@ public class DiscountService {
                 storeRepository
                         .findById(storeId)
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
-        Member storeOwner = store.getMember();
-        assertMember(storeOwner);
+        assertMember(store.getMember());
         return store;
     }
 

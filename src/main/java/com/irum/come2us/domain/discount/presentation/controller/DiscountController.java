@@ -1,6 +1,7 @@
 package com.irum.come2us.domain.discount.presentation.controller;
 
 import com.irum.come2us.domain.discount.application.service.DiscountService;
+import com.irum.come2us.domain.discount.presentation.dto.request.DiscountInfoUpdateRequest;
 import com.irum.come2us.domain.discount.presentation.dto.request.DiscountRegisterRequest;
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoListResponse;
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoResponse;
@@ -37,5 +38,12 @@ public class DiscountController {
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer pageSize) {
         return discountService.findDiscountInfoListByStore(storeId, cursor, pageSize);
+    }
+
+    @PatchMapping("/discounts/{discountId}")
+    public ResponseEntity<Void> updateDiscountInfo(
+            @PathVariable UUID discountId, @Valid @RequestBody DiscountInfoUpdateRequest request) {
+        discountService.changeDiscountInfo(discountId, request);
+        return ResponseEntity.noContent().build();
     }
 }
