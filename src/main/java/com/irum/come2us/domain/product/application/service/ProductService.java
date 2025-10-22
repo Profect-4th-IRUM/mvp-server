@@ -16,11 +16,10 @@ import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
-import java.util.List;
-import java.util.UUID;
-
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import com.irum.come2us.global.security.MemberDetails;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,19 +36,25 @@ public class ProductService {
     private final StoreRepository storeRepository;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
-        MemberDetails memberDetails = (MemberDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MemberDetails memberDetails =
+                (MemberDetails)
+                        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long memberId = Long.valueOf(memberDetails.getUsername());
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+        Member member =
+                memberRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         if (!member.getRole().equals(Role.OWNER)) {
             log.warn("상품 등록 실패: 점주 권한이 없는 사용자 memberId={}", member.getMemberId());
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
         }
 
-        Store store = storeRepository.findByMember(member)
-                .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+        Store store =
+                storeRepository
+                        .findByMember(member)
+                        .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
 
         Product product =
                 Product.createProduct(
