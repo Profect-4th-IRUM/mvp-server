@@ -2,6 +2,7 @@ package com.irum.come2us.domain.product.domain.entity;
 
 import static lombok.AccessLevel.*;
 
+import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -14,11 +15,11 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_product_option_value")
 @SQLDelete(sql = "UPDATE p_product_option_value SET deleted_at = NOW() WHERE option_value_id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class ProductOptionValue {
+public class ProductOptionValue extends BaseEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "option_value_id", updatable = false, nullable = false)

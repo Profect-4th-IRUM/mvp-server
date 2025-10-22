@@ -1,12 +1,14 @@
 package com.irum.come2us.domain.product.application.service;
 
 import com.irum.come2us.domain.product.domain.entity.Product;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionGroup;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
+import com.irum.come2us.domain.product.domain.repository.ProductOptionGroupRepository;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionGroupResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionValueResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ProductOptionGroupRepository optionGroupRepository;
 
     // TODO: 상점 매핑 시, 같은 상점 내 같은 상품 중복 처리
     public ProductResponse createProduct(ProductCreateRequest request) {
@@ -33,6 +36,24 @@ public class ProductService {
                         request.detailDescription(),
                         request.price(),
                         request.isPublic());
+
+        if (request.optionGroups() != null && !request.optionGroups().isEmpty()) {
+            for (ProductOptionGroupRequest groupReq : request.optionGroups()) {
+                ProductOptionGroup group =
+                        ProductOptionGroup.createOptionGroup(product, groupReq.name());
+                product.addOptionGroup(group);
+
+                if (groupReq.optionValues() != null) {
+                    for (ProductOptionValueRequest valueReq : groupReq.optionValues()) {
+                        ProductOptionValue.createOptionValue(
+                                group,
+                                valueReq.name(),
+                                valueReq.stockQuantity(),
+                                valueReq.extraPrice());
+                    }
+                }
+            }
+        }
 
         return ProductResponse.from(productRepository.save(product));
     }
@@ -161,5 +182,40 @@ public class ProductService {
 
         productRepository.delete(product);
         log.info("상품 삭제 완료: productId={}", productId);
+    }
+
+    public void createOptionGroup(UUID productId, ProductOptionGroupRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        ProductOptionGroup group = ProductOptionGroup.createOptionGroup(product, request.name());
+        product.addOptionGroup(group);
+
+        if (request.optionValues() != null && !request.optionValues().isEmpty()) {
+            for (ProductOptionValueRequest valueReq : request.optionValues()) {
+                ProductOptionValue.createOptionValue(
+                        group, valueReq.name(), valueReq.stockQuantity(), valueReq.extraPrice());
+            }
+        }
+
+        productRepository.save(product);
+        log.info("상품 옵션 그룹 추가 완료: productId={}, groupName={}", productId, request.name());
+    }
+
+    public void createOptionValue(UUID optionGroupId, ProductOptionValueRequest request) {
+        ProductOptionGroup optionGroup = optionGroupRepository.findById(optionGroupId)
+                .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+
+        ProductOptionValue.createOptionValue(
+                optionGroup,
+                request.name(),
+                request.stockQuantity(),
+                request.extraPrice() != null ? request.extraPrice() : 0
+        );
+
+        optionGroupRepository.saveAndFlush(optionGroup);
+        log.info("옵션 값 추가 완료: optionGroupId={}, valueName={}", optionGroupId, request.name());
     }
 }
