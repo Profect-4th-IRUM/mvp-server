@@ -113,7 +113,7 @@ public class Store extends BaseTimeEntity {
     private static final Pattern BUSINESS_REGISTRATION_NUMBER_PATTERN =
             Pattern.compile(RegexConstants.BUSINESS_REGISTRATION_NUMBER);
 
-    private String validContact(String contact) {
+    private static String validContact(String contact) {
         if (!PHONE_NUMBER_PATTERN.matcher(contact).matches()) {
             throw new CommonException(StoreErrorCode.INVALID_CONTACT);
         }
