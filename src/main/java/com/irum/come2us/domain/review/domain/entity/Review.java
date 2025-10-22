@@ -1,11 +1,15 @@
 package com.irum.come2us.domain.review.domain.entity;
 
+import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.*;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Check;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
@@ -17,41 +21,43 @@ import org.hibernate.annotations.*;
 public class Review extends BaseEntity {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "review_id", updatable = false, nullable = false)
     private UUID id;
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "rate", nullable = false, columnDefinition = "SmallInt")
+    @Column(name = "rate", nullable = false, columnDefinition = "SMALLINT")
     private Short rate;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    @Column(name = "product_id", nullable = false)
-    private UUID productId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-    @Builder(access = AccessLevel.PRIVATE)
-    private Review(String content, Integer rate, Long memberId, UUID productId) {
+    @Builder
+    private Review(String content, Integer rate, Member member, Product product) {
         this.content = content;
-        this.rate = rate != null ? rate.shortValue() : null;
-        this.memberId = memberId;
-        this.productId = productId;
+        this.rate = rate == null ? null : rate.shortValue();
+        this.member = member;
+        this.product = product;
     }
 
-    public static Review createReview(String content, Integer rate, Long memberId, UUID productId) {
-        return Review.builder()
-                .content(content)
-                .rate(rate)
-                .memberId(memberId)
-                .productId(productId)
-                .build();
+    public static Review createReview(
+            String content, Integer rate, Member member, Product product) {
+        return Review.builder().content(content).rate(rate).member(member).product(product).build();
     }
 
     public void updateReview(String content, Integer rate) {
-        if (content != null) this.content = content;
-        if (rate != null) this.rate = rate.shortValue();
+        if (content != null) {
+            this.content = content;
+        }
+        if (rate != null) {
+            this.rate = rate.shortValue();
+        }
     }
 }

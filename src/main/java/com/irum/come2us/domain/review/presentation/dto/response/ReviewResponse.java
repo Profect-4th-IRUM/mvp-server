@@ -14,11 +14,12 @@ public record ReviewResponse(
         List<String> imageUrls,
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
+
     public static ReviewResponse from(Review review, List<String> imageUrls) {
         return new ReviewResponse(
                 review.getId(),
-                review.getProductId(),
-                review.getMemberId(),
+                review.getProduct().getId(),
+                review.getMember().getMemberId(),
                 review.getContent(),
                 review.getRate(),
                 imageUrls,
