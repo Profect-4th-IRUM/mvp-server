@@ -3,6 +3,8 @@ package com.irum.come2us.domain.product.presentation.controller;
 import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionGroupResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionValueResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -87,5 +89,25 @@ public class ProductController {
         log.info("옵션 값 추가 요청: optionGroupId={}, valueName={}", optionGroupId, request.name());
         productService.createOptionValue(optionGroupId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/options/{optionGroupId}")
+    public ResponseEntity<ProductOptionGroupResponse> updateProductOptionGroup(
+            @PathVariable UUID optionGroupId,
+            @Valid @RequestBody ProductOptionGroupRequest request) {
+        log.info("상품 옵션 그룹 수정 요청: groupId={}", optionGroupId);
+        ProductOptionGroupResponse response =
+                productService.updateProductOptionGroup(optionGroupId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/options/values/{optionValueId}")
+    public ResponseEntity<ProductOptionValueResponse> updateProductOptionValue(
+            @PathVariable UUID optionValueId,
+            @Valid @RequestBody ProductOptionValueUpdateRequest request) {
+        log.info("상품 옵션 값 수정 요청: valueId={}", optionValueId);
+        ProductOptionValueResponse response =
+                productService.updateProductOptionValue(optionValueId, request);
+        return ResponseEntity.ok(response);
     }
 }

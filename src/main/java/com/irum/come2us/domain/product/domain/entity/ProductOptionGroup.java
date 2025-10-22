@@ -49,4 +49,8 @@ public class ProductOptionGroup extends BaseEntity {
         optionValues.add(value);
         value.setOptionGroup(this);
     }
+
+    public void updateOptionGroupName(String name) {
+        this.name = name;
+    }
 }

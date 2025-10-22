@@ -10,7 +10,8 @@ public enum ProductErrorCode implements BaseErrorCode {
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 정보를 찾을 수 없습니다."),
     PRODUCT_NOT_MODIFIED(HttpStatus.BAD_REQUEST, "상품 수정에 대한 변경된 내용이 없습니다."),
     PRODUCT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 상품입니다."),
-    OPTION_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 옵션 그룹을 찾을 수 없습니다.");
+    OPTION_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 옵션 그룹을 찾을 수 없습니다."),
+    OPTION_VALUE_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 옵션 값을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
