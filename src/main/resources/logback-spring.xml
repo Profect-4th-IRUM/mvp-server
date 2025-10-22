@@ -24,7 +24,7 @@
         <append>false</append>
         -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/com2us.app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/come2us.app.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -63,7 +63,7 @@
         <appender-ref ref="CONSOLE" />
     </logger>
 
-    // PA Hibernate SQL 실제 타입 바인딩: TRACE
+    // JPA Hibernate SQL 실제 타입 바인딩: TRACE
     <logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
         <appender-ref ref="CONSOLE" />
     </logger>
