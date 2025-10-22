@@ -64,7 +64,7 @@ public class DiscountService {
 
     public void changeDiscountInfo(UUID discountId, DiscountInfoUpdateRequest request) {
         Discount discount = getValidDiscount(discountId);
-        discount.updateName(request.name());
+        if (request.name() != null) discount.updateName(request.name());
         discount.updateAmount(request.amount());
     }
 
