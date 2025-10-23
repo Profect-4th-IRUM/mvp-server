@@ -15,21 +15,24 @@ public interface CartRepository extends JpaRepository<Cart, UUID> {
     // 특정 회원이 같은 옵션 상품을 장바구니에 담은 내역 찾기
     @Query(
             """
-           SELECT c
-           FROM Cart c
-           WHERE c.member.memberId = :memberId
-           AND c.optionValue.id = :optionValueId
-           """)
+        SELECT c
+        FROM Cart c
+        WHERE c.member.memberId = :memberId
+        AND c.optionValue.id = :optionValueId
+    """)
     Cart findByMemberIdAndOptionValueId(
-            @Param("memberId") @NotNull(message = "회원 ID는 필수 입력값입니다.") Long memberId,
-            @Param("optionValueId") UUID optionValueId);
+            @Param("memberId") @NotNull Long memberId, @Param("optionValueId") UUID optionValueId);
 
-    // 특정 회원의 전체 장바구니 목록 조회
+    // 특정 회원의 장바구니 + 상품/옵션 통합 조회
+    // TODO: 이미지 조인 추후 추가 예정
     @Query(
             """
-           SELECT c
-           FROM Cart c
-           WHERE c.member.memberId = :memberId
-           """)
-    List<Cart> findAllByMemberId(@Param("memberId") Long memberId);
+        SELECT DISTINCT c
+        FROM Cart c
+        JOIN FETCH c.optionValue ov
+        JOIN FETCH ov.optionGroup og
+        JOIN FETCH og.product p
+        WHERE c.member.memberId = :memberId
+    """)
+    List<Cart> findAllWithProductByMemberId(@Param("memberId") Long memberId);
 }
