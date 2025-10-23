@@ -38,13 +38,12 @@ public class DeliveryPolicy extends BaseEntity {
     @Min(0)
     private int minAmount;
 
-
     @Builder(access = AccessLevel.PRIVATE)
     private DeliveryPolicy(int defaultDeliveryFee, int minQuantity, int minAmount, Store store) {
         this.defaultDeliveryFee = defaultDeliveryFee;
         this.minQuantity = minQuantity;
         this.minAmount = minAmount;
-//        this.store = store;
+        //        this.store = store;
     }
 
     public static DeliveryPolicy createPolicy(
