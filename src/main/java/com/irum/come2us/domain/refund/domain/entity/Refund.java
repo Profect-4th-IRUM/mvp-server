@@ -6,10 +6,7 @@ import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
@@ -20,22 +17,40 @@ import org.hibernate.annotations.UuidGenerator;
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Builder
+@Getter
 @Table(name = "p_refund")
 public class Refund extends BaseEntity {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(name = "refund_id", columnDefinition = "uuid", nullable = false, updatable = false)
-    private UUID refund_id;
+    private UUID refundId;
 
+    @Enumerated(EnumType.STRING)
     private RefundReason reason;
 
     private String description;
 
     private Integer price;
 
+    @Enumerated(EnumType.STRING)
     private RefundStatus refundStatus;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    public static Refund createRefund(
+            RefundReason reason, String description, Integer price, Order order) {
+        return Refund.builder()
+                .reason(reason)
+                .description(description)
+                .price(price)
+                .refundStatus(RefundStatus.REQUESTED)
+                .order(order)
+                .build();
+    }
+
+    public void updateStatus(RefundStatus newStatus) {
+        this.refundStatus = newStatus;
+    }
 }
