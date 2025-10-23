@@ -348,6 +348,8 @@ public class ProductService {
 
         optionValueRepository.delete(optionValue);
         log.info("상품 옵션 값 삭제 완료: valueId={}", optionValueId);
+    }
+
     private Member getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
