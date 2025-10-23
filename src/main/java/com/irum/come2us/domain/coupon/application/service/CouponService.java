@@ -1,10 +1,13 @@
 package com.irum.come2us.domain.coupon.application.service;
 
+import com.irum.come2us.domain.coupon.domain.entity.AppliedCoupon;
 import com.irum.come2us.domain.coupon.domain.entity.Coupon;
+import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.coupon.domain.repository.CouponRepository;
 import com.irum.come2us.domain.coupon.presentation.dto.request.CouponGenerateRequest;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
+import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CouponErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CouponService {
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
+    private final AppliedCouponRepository appliedCouponRepository;
 
     public void createCoupon(CouponGenerateRequest request, Long memberId) {
 
@@ -55,13 +59,13 @@ public class CouponService {
     }
 
     /**쿠폰 유효성 검증 및 할인 금액 계산*/
-    public int validAndCalCoupon(List<UUID> couponIds, int calculatedTotalPrice, Member member) {
-        if (couponIds.isEmpty()) {
+    public int validAndCalCoupon(List<UUID> couponIdList, int calculatedTotalPrice, Member member) {
+        if (couponIdList.isEmpty()) {
             return 0;
         }
 
         int totalDiscount = 0;
-        List<Coupon> couponList = couponRepository.findAllById(couponIds);
+        List<Coupon> couponList = couponRepository.findAllById(couponIdList);
 
         for (Coupon coupon: couponList){
             //권한 검사
@@ -72,6 +76,10 @@ public class CouponService {
             if (coupon.getExpiration().isBefore(LocalDateTime.now())){
                 throw new CommonException(CouponErrorCode.COUPON_EXPIRATION);
             }
+            // 사용 여부 검사
+            if (appliedCouponRepository.existsByCouponId(coupon.getId())){
+                throw new CommonException(CouponErrorCode.COUPON_ALREADY_USED);
+            }
             totalDiscount += coupon.getDiscountAmount();
         }
 
@@ -80,5 +88,19 @@ public class CouponService {
         }
 
         return totalDiscount;
+    }
+
+    /**쿠폰 사용 처리*/
+    public void createAppliedCouponList(Payment payment, List<UUID> couponIdList){
+        List<Coupon> couponList = couponRepository.findAllById(couponIdList);
+
+        List<AppliedCoupon> appliedCouponList = couponList.stream()
+            .map( coupon -> AppliedCoupon.builder()
+                .payment(payment)
+                .coupon(coupon)
+                .build())
+            .toList();
+
+        appliedCouponRepository.saveAll(appliedCouponList);
     }
 }

@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AppliedCouponRepository extends JpaRepository<AppliedCoupon, UUID> {
     List<AppliedCoupon> findByCouponId(UUID couponId);
+
+    boolean existsByCouponId(UUID couponId); //
 }
