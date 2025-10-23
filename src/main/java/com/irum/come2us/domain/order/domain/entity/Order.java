@@ -4,8 +4,6 @@ import com.irum.come2us.domain.deliveryaddress.domain.entity.DeliveryAddress;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.payment.domain.entity.Payment;
-import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
-import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
@@ -58,7 +56,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "delivery_address_id")
     private DeliveryAddress deliveryAddress;
 
-    public void updateOrderStatus(OrderStatus os ){
+    public void updateOrderStatus(OrderStatus os) {
         this.orderStatusAll = os;
     }
 }

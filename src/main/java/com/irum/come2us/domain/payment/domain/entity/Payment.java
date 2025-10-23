@@ -6,12 +6,11 @@ import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
-
-import java.util.UUID;
 
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
