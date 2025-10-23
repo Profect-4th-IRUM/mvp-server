@@ -8,6 +8,8 @@ import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CouponErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +52,33 @@ public class CouponService {
             throw new CommonException(CouponErrorCode.ONLY_OWNER_CAN_DELETE);
         }
         couponRepository.delete(coupon);
+    }
+
+    /**쿠폰 유효성 검증 및 할인 금액 계산*/
+    public int validAndCalCoupon(List<UUID> couponIds, int calculatedTotalPrice, Member member) {
+        if (couponIds.isEmpty()) {
+            return 0;
+        }
+
+        int totalDiscount = 0;
+        List<Coupon> couponList = couponRepository.findAllById(couponIds);
+
+        for (Coupon coupon: couponList){
+            //권한 검사
+            if (!coupon.getMember().getMemberId().equals(member.getMemberId())) {
+                throw new CommonException(CouponErrorCode.COUPON_NO_PERMISSION);
+            }
+            // 만료일 검사
+            if (coupon.getExpiration().isBefore(LocalDateTime.now())){
+                throw new CommonException(CouponErrorCode.COUPON_EXPIRATION);
+            }
+            totalDiscount += coupon.getDiscountAmount();
+        }
+
+        if (totalDiscount > calculatedTotalPrice){
+            totalDiscount = calculatedTotalPrice;
+        }
+
+        return totalDiscount;
     }
 }
