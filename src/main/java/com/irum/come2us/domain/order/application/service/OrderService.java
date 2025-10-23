@@ -9,6 +9,7 @@ import com.irum.come2us.domain.order.domain.repository.OrderRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
+import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
@@ -139,14 +140,14 @@ public class OrderService {
     }
 
 
-    public void updateOrderStatusToShipped(UUID orderDetailId) {
+    public void updateOrderStatusToShipped(UUID orderDetailId, OwnerOrderShippedRequest request) {
         OrderDetail orderDetail =
                 orderDetailRepository
                         .findByOrderDetailId(orderDetailId)
                         .orElseThrow(
                                 () -> new CommonException(OrderErrorCode.ORDER_DETAIL_NOT_FOUND));
 
-        orderDetail.updateStatusToShipped();
+        orderDetail.updateStatusToShipped(request.trackingNumber());
 
         // Order 전체 상태 업데이트
         Order order =
