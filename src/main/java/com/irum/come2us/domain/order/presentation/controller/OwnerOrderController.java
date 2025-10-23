@@ -62,9 +62,7 @@ public class OwnerOrderController {
     /** [상점] 주문 상태 변경 (배송중) * */
     @PatchMapping("/order-details/{orderDetailId}/shipped")
     public ResponseEntity<String> orderStatusToShippedUpdate(
-            @PathVariable UUID orderDetailId,
-            @RequestBody OwnerOrderShippedRequest request
-            ) {
+            @PathVariable UUID orderDetailId, @RequestBody OwnerOrderShippedRequest request) {
         orderService.updateOrderStatusToShipped(orderDetailId, request);
         return ResponseEntity.noContent().build();
     }
