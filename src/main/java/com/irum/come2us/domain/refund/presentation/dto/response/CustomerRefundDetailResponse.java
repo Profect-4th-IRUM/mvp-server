@@ -16,6 +16,7 @@ public record CustomerRefundDetailResponse(
         List<ProductInfoDto> productList,
         RecipientAddressDto recipientAddress,
         LocalDateTime cancelDate,
+        UUID refundId,
         RefundStatus refundStatus,
         int refundPrice,
         RefundReason refundReason) {
@@ -64,6 +65,7 @@ public record CustomerRefundDetailResponse(
                 order.getOrderNum(),
                 productList,
                 RecipientAddressDto.fromEntity(order.getDeliveryAddress()),
+                refund.getRefundId(),
                 refund.getCreatedAt(),
                 refund.getRefundStatus(),
                 refund.getPrice(),
