@@ -38,7 +38,7 @@ public class Refund extends BaseEntity {
     @Column(nullable = false)
     private RefundStatus refundStatus;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 }

@@ -45,7 +45,6 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                                 o.deliveryFee))
                 .from(o)
                 .where(
-                        o.deletedAt.isNull(),
                         ltCursor(cursor, o),
                         o.store.id.eq(storeId),
                         o.orderStatusAll.eq(orderStatus))
