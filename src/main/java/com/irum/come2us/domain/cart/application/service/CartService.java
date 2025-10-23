@@ -6,7 +6,6 @@ import com.irum.come2us.domain.cart.presentation.dto.request.CartCreateRequest;
 import com.irum.come2us.domain.cart.presentation.dto.request.CartUpdateRequest;
 import com.irum.come2us.domain.cart.presentation.dto.response.CartResponse;
 import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
 import com.irum.come2us.domain.product.domain.repository.ProductOptionValueRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -27,18 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final MemberRepository memberRepository;
     private final ProductOptionValueRepository productOptionValueRepository;
     private final MemberUtil memberUtil;
 
     public CartResponse createCart(CartCreateRequest request) {
-        // 현재 로그인한 사용자
         Member currentMember = memberUtil.getCurrentMember();
-
-        // 회원 검증 (요청된 memberId가 로그인 사용자와 일치하는지 확인)
-        if (!currentMember.getMemberId().equals(request.memberId())) {
-            throw new CommonException(CartErrorCode.UNAUTHORIZED_ACCESS);
-        }
 
         // 옵션값 검증
         ProductOptionValue optionValue =
@@ -47,14 +39,13 @@ public class CartService {
                         .orElseThrow(
                                 () -> new CommonException(CartErrorCode.OPTION_VALUE_NOT_FOUND));
 
-        // 기존 장바구니 내 동일 옵션 상품 존재 여부 확인
+        // 기존 동일 옵션 Cart 존재 시 수량 합산
         Cart existing =
                 cartRepository.findByMemberIdAndOptionValueId(
-                        request.memberId(), request.optionValueId());
+                        currentMember.getMemberId(), request.optionValueId());
 
         Cart saved;
         if (existing != null) {
-            // 기존 수량 + 요청 수량
             int oldQuantity = existing.getQuantity();
             int updatedQuantity = oldQuantity + request.quantity();
             existing.updateQuantity(updatedQuantity);
@@ -62,18 +53,17 @@ public class CartService {
 
             log.info(
                     "장바구니 수량 합산: memberId={}, optionValueId={}, oldQuantity={}, newQuantity={}",
-                    request.memberId(),
+                    currentMember.getMemberId(),
                     request.optionValueId(),
                     oldQuantity,
                     updatedQuantity);
         } else {
-            // 신규 장바구니 아이템 생성
             Cart newCart = Cart.createCart(currentMember, optionValue, request.quantity());
             saved = cartRepository.save(newCart);
 
             log.info(
                     "장바구니 신규 추가: memberId={}, optionValueId={}, quantity={}",
-                    request.memberId(),
+                    currentMember.getMemberId(),
                     request.optionValueId(),
                     request.quantity());
         }
@@ -90,7 +80,6 @@ public class CartService {
         memberUtil.assertMemberResourceAccess(cart.getMember());
 
         if (cart.getQuantity().equals(request.quantity())) {
-            log.warn("장바구니 수정 불필요: 동일 수량 요청 cartId={}, quantity={}", cartId, request.quantity());
             throw new CommonException(CartErrorCode.CART_NOT_MODIFIED);
         }
 
@@ -100,14 +89,12 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public List<CartResponse> getCartListByMember(Long memberId) {
+    public List<CartResponse> getCartListByMember() {
         Member currentMember = memberUtil.getCurrentMember();
-        if (!currentMember.getMemberId().equals(memberId)) {
-            throw new CommonException(CartErrorCode.UNAUTHORIZED_ACCESS);
-        }
 
-        List<Cart> carts = cartRepository.findAllWithProductByMemberId(memberId);
-        log.info("장바구니 조회 완료: memberId={}, count={}", memberId, carts.size());
+        List<Cart> carts = cartRepository.findAllWithProductByMemberId(currentMember.getMemberId());
+        log.info("장바구니 조회 완료: memberId={}, count={}", currentMember.getMemberId(), carts.size());
+
         return carts.stream().map(CartResponse::from).collect(Collectors.toList());
     }
 
@@ -118,8 +105,8 @@ public class CartService {
                         .orElseThrow(() -> new CommonException(CartErrorCode.CART_NOT_FOUND));
 
         memberUtil.assertMemberResourceAccess(cart.getMember());
-
         cartRepository.delete(cart);
+
         log.info("장바구니 삭제 완료: cartId={}", cartId);
     }
 }

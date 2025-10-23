@@ -22,8 +22,7 @@ public class CartController {
     @PostMapping
     public CartResponse createCart(@Valid @RequestBody CartCreateRequest request) {
         log.info(
-                "장바구니 추가 요청: memberId={}, optionValueId={}, quantity={}",
-                request.memberId(),
+                "장바구니 추가 요청: optionValueId={}, quantity={}",
                 request.optionValueId(),
                 request.quantity());
         return cartService.createCart(request);
@@ -36,10 +35,10 @@ public class CartController {
         return cartService.updateCart(cartId, request);
     }
 
-    @GetMapping("/members/{memberId}")
-    public List<CartResponse> getCartListByMember(@PathVariable Long memberId) {
-        log.info("회원 장바구니 조회 요청: memberId={}", memberId);
-        return cartService.getCartListByMember(memberId);
+    @GetMapping
+    public List<CartResponse> getMyCartList() {
+        log.info("본인 장바구니 조회 요청");
+        return cartService.getCartListByMember();
     }
 
     @DeleteMapping("/{cartId}")

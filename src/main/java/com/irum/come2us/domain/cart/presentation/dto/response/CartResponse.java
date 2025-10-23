@@ -7,7 +7,6 @@ import lombok.Builder;
 @Builder
 public record CartResponse(
         UUID cartId,
-        Long memberId,
         UUID optionValueId,
         String productName,
         String optionValueName,
@@ -34,7 +33,6 @@ public record CartResponse(
 
         return CartResponse.builder()
                 .cartId(cart.getId())
-                .memberId(cart.getMember().getMemberId())
                 .optionValueId(optionValue.getId())
                 .productName(product.getName())
                 .optionValueName(optionValue.getName())
