@@ -3,11 +3,12 @@ package com.irum.come2us.domain.order.presentation.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record OwnerOrderListResponse(
-        List<OrderSummary> orderList, String nextCursor, boolean hasNext) {
+        List<OrderSummary> orderList, UUID nextCursor, boolean hasNext) {
     public record OrderSummary(
-            String orderId,
+            UUID orderId,
             String recipientName,
             String recipientContact,
             String recipientAddress,
@@ -19,7 +20,7 @@ public record OwnerOrderListResponse(
             List<ProductSummary> productList) {}
 
     public record ProductSummary(
-            String orderDetailId,
+            UUID orderDetailId,
             String productName,
             int productCounts,
             int productPrice,

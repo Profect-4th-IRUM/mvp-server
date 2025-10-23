@@ -11,7 +11,7 @@ public class OrderMapper {
     /** Repository DTO -> Response DTO로 변환 */
     public OwnerOrderListResponse.ProductSummary toProductSummary(OrderDetailRow detail) {
         return new OwnerOrderListResponse.ProductSummary(
-                detail.orderDetailId().toString(),
+                detail.orderDetailId(),
                 detail.productName(),
                 detail.productCounts(),
                 detail.productPrice(),
@@ -22,7 +22,7 @@ public class OrderMapper {
     public OwnerOrderListResponse.OrderSummary toOrderSummary(
             OrderSummaryRow header, List<OwnerOrderListResponse.ProductSummary> products) {
         return new OwnerOrderListResponse.OrderSummary(
-                header.orderId().toString(),
+                header.orderId(),
                 header.recipientName(),
                 header.recipientContact(),
                 header.recipientAddress(),
