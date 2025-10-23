@@ -9,23 +9,41 @@ public record CartResponse(
         UUID cartId,
         Long memberId,
         UUID optionValueId,
+        String productName,
         String optionValueName,
-        Integer quantity,
-        Integer extraPrice,
-        Integer totalPrice) {
+        // String imageUrl,   // 상품 이미지 구현 후 주석 해제
+        int quantity,
+        int basePrice, // 상품 기본가
+        int extraPrice, // 옵션 추가금
+        int unitPrice, // 단가 (base + extra)
+        int lineTotal // 항목 총액 (unitPrice * quantity)
+        ) {
     public static CartResponse from(Cart cart) {
-        Integer extraPrice = cart.getOptionValue().getExtraPrice();
-        int basePrice = cart.getOptionValue().getOptionGroup().getProduct().getPrice();
-        int total = (basePrice + (extraPrice != null ? extraPrice : 0)) * cart.getQuantity();
+        var optionValue = cart.getOptionValue();
+        var product = optionValue.getOptionGroup().getProduct();
+
+        int base = product.getPrice();
+        int extra = optionValue.getExtraPrice() != null ? optionValue.getExtraPrice() : 0;
+        int unit = base + extra;
+        int total = unit * cart.getQuantity();
+
+        // String imageUrl = (product.getProductImages() != null &&
+        //         !product.getProductImages().isEmpty())
+        //         ? product.getProductImages().get(0).getImageUrl()
+        //         : null;
 
         return CartResponse.builder()
                 .cartId(cart.getId())
                 .memberId(cart.getMember().getMemberId())
-                .optionValueId(cart.getOptionValue().getId())
-                .optionValueName(cart.getOptionValue().getName())
+                .optionValueId(optionValue.getId())
+                .productName(product.getName())
+                .optionValueName(optionValue.getName())
+                // .imageUrl(imageUrl)
                 .quantity(cart.getQuantity())
-                .extraPrice(extraPrice)
-                .totalPrice(total)
+                .basePrice(base)
+                .extraPrice(extra)
+                .unitPrice(unit)
+                .lineTotal(total)
                 .build();
     }
 }
