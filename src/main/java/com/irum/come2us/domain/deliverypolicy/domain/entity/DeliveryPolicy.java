@@ -38,16 +38,13 @@ public class DeliveryPolicy extends BaseEntity {
     @Min(0)
     private int minAmount;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
 
     @Builder(access = AccessLevel.PRIVATE)
     private DeliveryPolicy(int defaultDeliveryFee, int minQuantity, int minAmount, Store store) {
         this.defaultDeliveryFee = defaultDeliveryFee;
         this.minQuantity = minQuantity;
         this.minAmount = minAmount;
-        this.store = store;
+//        this.store = store;
     }
 
     public static DeliveryPolicy createPolicy(
