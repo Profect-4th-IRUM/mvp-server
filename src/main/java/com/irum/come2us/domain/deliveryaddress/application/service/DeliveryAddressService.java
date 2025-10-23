@@ -11,7 +11,7 @@ import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DeliveryAddressErrorCode;
-import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DeliveryAddressService {
     private final MemberValidator memberValidator;
+    private final MemberUtil memberUtil;
     private final DeliveryAddressRepository deliveryAddressRepository;
 
     public void createDeliveryAddress(DeliveryAddressRegisterRequest request) {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         String recipientName =
                 request.recipientName() == null ? member.getName() : request.recipientName();
         String recipientContact =
@@ -55,7 +56,7 @@ public class DeliveryAddressService {
         int limit = pageSize + 1;
         List<DeliveryAddressInfoResponse> addressList =
                 deliveryAddressRepository.findDeliveryAddressByCursor(
-                        memberValidator.getCurrentMember().getMemberId(), cursor, limit);
+                        memberUtil.getCurrentMember().getMemberId(), cursor, limit);
         boolean hasNext = addressList.size() > pageSize;
         List<DeliveryAddressInfoResponse> resultList =
                 hasNext ? addressList.subList(0, pageSize) : addressList;
@@ -85,7 +86,7 @@ public class DeliveryAddressService {
     }
 
     public void removeDeliveryAddress(UUID deliveryAddressId) {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         DeliveryAddress address = validDeliveryAddress(deliveryAddressId);
         if (address.isDefault()) {
             // DeliveryAddress 중 가장 최근 것 기본 배송지 설정
@@ -105,13 +106,12 @@ public class DeliveryAddressService {
                                         new CommonException(
                                                 DeliveryAddressErrorCode
                                                         .DELIVERY_ADDRESS_NOT_FOUND));
-        if (!address.getMember().equals(memberValidator.getCurrentMember()))
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        memberUtil.assertMemberResourceAccess(address.getMember());
         return address;
     }
 
     private DeliveryAddress getCurrentDefaultAddress() {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         return deliveryAddressRepository
                 .findDefaultAddressByMember(member)
                 .orElseThrow(
