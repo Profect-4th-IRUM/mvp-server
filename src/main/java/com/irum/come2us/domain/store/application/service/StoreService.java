@@ -50,7 +50,7 @@ public class StoreService {
         Store store = getStoreById(storeId);
         Member currentMember = memberUtil.getCurrentMember();
 
-        validateStoreOwner(store, currentMember);
+        memberUtil.assertMemberResourceAccess(store.getMember());
 
         store.updateBasicInfo(request.name(), request.contact(), request.address());
     }
@@ -72,13 +72,6 @@ public class StoreService {
     public StoreInfoResponse findStoreInfo(UUID storeId) {
         Store store = getStoreById(storeId);
         return StoreInfoResponse.from(store);
-    }
-
-    // 본인 소유 상점 검증
-    private void validateStoreOwner(Store store, Member currentMember) {
-        if (!store.getMember().getMemberId().equals(currentMember.getMemberId())) {
-            throw new CommonException(StoreErrorCode.UNAUTHORIZED_STORE_ACCESS);
-        }
     }
 
     // 1인 1상점 제한
