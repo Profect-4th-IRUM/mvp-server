@@ -4,6 +4,7 @@ import com.irum.come2us.domain.deliverypolicy.domain.entity.DeliveryPolicy;
 import com.irum.come2us.domain.deliverypolicy.domain.repository.DeliveryPolicyRepository;
 import com.irum.come2us.domain.deliverypolicy.presentation.dto.request.DeliveryPolicyCreateRequest;
 import com.irum.come2us.domain.deliverypolicy.presentation.dto.request.DeliveryPolicyInfoUpdateRequest;
+import com.irum.come2us.domain.deliverypolicy.presentation.dto.response.DeliveryPolicyInfoResponse;
 import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.store.domain.entity.Store;
@@ -58,6 +59,12 @@ public class DeliveryPolicyService {
 
         validateStoreOwner(deliveryPolicy.getStore(), member);
         deliveryPolicyRepository.delete(deliveryPolicy);
+    }
+
+    @Transactional
+    public DeliveryPolicyInfoResponse findDeliveryPolicy(UUID deliveryPolicyId) {
+        DeliveryPolicy deliveryPolicy = getDeliveryPolicyById(deliveryPolicyId);
+        return DeliveryPolicyInfoResponse.from(deliveryPolicy);
     }
 
     // 상점 정책 존재하는지 확인

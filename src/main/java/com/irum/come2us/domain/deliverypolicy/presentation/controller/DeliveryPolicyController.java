@@ -4,6 +4,7 @@ import com.irum.come2us.domain.deliverypolicy.application.service.DeliveryPolicy
 import com.irum.come2us.domain.deliverypolicy.presentation.dto.request.DeliveryPolicyCreateRequest;
 import com.irum.come2us.domain.deliverypolicy.presentation.dto.request.DeliveryPolicyInfoUpdateRequest;
 import com.irum.come2us.domain.deliverypolicy.presentation.dto.response.DeliveryPolicyCreateResponse;
+import com.irum.come2us.domain.deliverypolicy.presentation.dto.response.DeliveryPolicyInfoResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,14 @@ public class DeliveryPolicyController {
         log.info("배송비 정책 삭제 요청 : storeId={}", deliveryPolicyId);
         deliveryPolicyService.withdrawDeliveryPolicy(deliveryPolicyId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("{deliveryPolicyId}")
+    public ResponseEntity<DeliveryPolicyInfoResponse> getDeliveryPolicy(
+            @PathVariable UUID deliveryPolicyId) {
+        log.info("배송비 정책 조회 요청: deliveryPolicyId={}", deliveryPolicyId);
+        DeliveryPolicyInfoResponse response =
+                deliveryPolicyService.findDeliveryPolicy(deliveryPolicyId);
+        return ResponseEntity.ok(response);
     }
 }
