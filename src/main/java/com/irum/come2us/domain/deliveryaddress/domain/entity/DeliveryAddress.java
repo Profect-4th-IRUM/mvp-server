@@ -20,7 +20,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DeliveryAddress extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "delivery_address_id", updatable = false, nullable = false)
     private UUID deliveryAddressId;
 

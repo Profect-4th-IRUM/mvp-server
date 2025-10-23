@@ -5,9 +5,7 @@ spring:
   profiles:
     active: local
     include:
-#?? redis, cloud ?? ??? ? ??
 
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
+
+logback:
+  log-path: ./logs

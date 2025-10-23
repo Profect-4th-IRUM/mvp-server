@@ -1,0 +1,122 @@
+package com.irum.come2us.domain.deliveryaddress.application.service;
+
+import com.irum.come2us.domain.deliveryaddress.domain.entity.DeliveryAddress;
+import com.irum.come2us.domain.deliveryaddress.domain.repository.DeliveryAddressRepository;
+import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.AddressDetailUpdateRequest;
+import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.DeliveryAddressRegisterRequest;
+import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.RecipientUpdateRequest;
+import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoListResponse;
+import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoResponse;
+import com.irum.come2us.domain.member.application.util.MemberValidator;
+import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.DeliveryAddressErrorCode;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class DeliveryAddressService {
+    private final MemberValidator memberValidator;
+    private final DeliveryAddressRepository deliveryAddressRepository;
+
+    public void createDeliveryAddress(DeliveryAddressRegisterRequest request) {
+        Member member = memberValidator.getCurrentMember();
+        String recipientName =
+                request.recipientName() == null ? member.getName() : request.recipientName();
+        String recipientContact =
+                request.recipientContact() == null
+                        ? member.getContact()
+                        : request.recipientContact();
+        DeliveryAddress deliveryAddress =
+                DeliveryAddress.create(member, request.address(), recipientName, recipientContact);
+        if (!deliveryAddressRepository.existsByMember(member)) deliveryAddress.markAsDefault();
+        deliveryAddressRepository.save(deliveryAddress);
+    }
+
+    @Transactional(readOnly = true)
+    public DeliveryAddressInfoResponse findDeliveryAddress(UUID deliveryAddressId) {
+        DeliveryAddress deliveryAddress = validDeliveryAddress(deliveryAddressId);
+        return DeliveryAddressInfoResponse.of(
+                deliveryAddress.getDeliveryAddressId(),
+                deliveryAddress.getAddress(),
+                deliveryAddress.getRecipientName(),
+                deliveryAddress.getRecipientContact(),
+                deliveryAddress.isDefault());
+    }
+
+    @Transactional(readOnly = true)
+    public DeliveryAddressInfoListResponse findDeliveryAddressList(UUID cursor, int pageSize) {
+        int limit = pageSize + 1;
+        List<DeliveryAddressInfoResponse> addressList =
+                deliveryAddressRepository.findDeliveryAddressByCursor(
+                        memberValidator.getCurrentMember().getMemberId(), cursor, limit);
+        boolean hasNext = addressList.size() > pageSize;
+        List<DeliveryAddressInfoResponse> resultList =
+                hasNext ? addressList.subList(0, pageSize) : addressList;
+        UUID nextCursor = null;
+        if (hasNext) {
+            DeliveryAddressInfoResponse lastItem = resultList.get(resultList.size() - 1);
+            nextCursor = lastItem.id();
+        }
+        return new DeliveryAddressInfoListResponse(resultList, nextCursor, hasNext);
+    }
+
+    public void changeRecipientInfo(RecipientUpdateRequest request) {
+        DeliveryAddress deliveryAddress = validDeliveryAddress(request.deliveryAddressId());
+        deliveryAddress.updateRecipientName(request.newRecipientName());
+        deliveryAddress.updateRecipientContact(request.newRecipientContact());
+    }
+
+    public void changeAddressDetail(AddressDetailUpdateRequest request) {
+        DeliveryAddress deliveryAddress = validDeliveryAddress(request.deliveryAddressId());
+        deliveryAddress.updateAddressDetail(request.newAddressDetail());
+    }
+
+    public void changeDefaultDeliveryAddress(UUID deliveryAddressId) {
+        getCurrentDefaultAddress().unmarkAsDefault();
+        DeliveryAddress deliveryAddress = validDeliveryAddress(deliveryAddressId);
+        deliveryAddress.markAsDefault();
+    }
+
+    public void removeDeliveryAddress(UUID deliveryAddressId) {
+        Member member = memberValidator.getCurrentMember();
+        DeliveryAddress address = validDeliveryAddress(deliveryAddressId);
+        if (address.isDefault()) {
+            // DeliveryAddress 중 가장 최근 것 기본 배송지 설정
+            deliveryAddressRepository
+                    .findTopByMemberOrderByCreatedAtDesc(member)
+                    .ifPresent(DeliveryAddress::markAsDefault);
+        }
+        deliveryAddressRepository.delete(address);
+    }
+
+    private DeliveryAddress validDeliveryAddress(UUID deliveryAddressId) {
+        DeliveryAddress address =
+                deliveryAddressRepository
+                        .findById(deliveryAddressId)
+                        .orElseThrow(
+                                () ->
+                                        new CommonException(
+                                                DeliveryAddressErrorCode
+                                                        .DELIVERY_ADDRESS_NOT_FOUND));
+        if (!address.getMember().equals(memberValidator.getCurrentMember()))
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        return address;
+    }
+
+    private DeliveryAddress getCurrentDefaultAddress() {
+        Member member = memberValidator.getCurrentMember();
+        return deliveryAddressRepository
+                .findDefaultAddressByMember(member)
+                .orElseThrow(
+                        () ->
+                                new CommonException(
+                                        DeliveryAddressErrorCode.DELIVERY_ADDRESS_NOT_FOUND));
+    }
+}
