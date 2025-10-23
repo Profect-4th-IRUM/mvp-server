@@ -66,7 +66,7 @@ public class PaymentService {
 		TossPaymentsRequest tossPaymentsRequest = new TossPaymentsRequest(request.tossPaymentKey(), request.tossOrderId(), payment.getAmount());
 		try {
 			TossPaymentsResponse tossPaymentsResponse = tosspaymentsClient.confirmPayment(authorizations, tossPaymentsRequest);
-			payment.updateToPaid(PaymentStatus.PAID, tossPaymentsResponse.paymentKey(), tossPaymentsResponse.orderId());
+			payment.updateToPaid(PaymentStatus.PAID, tossPaymentsResponse);
 
 			return new PaymentResponse(order.getOrderNum(), payment.getAmount());
 		} catch (FeignException e){
