@@ -32,7 +32,7 @@ public class Refund extends BaseEntity {
 
     private Integer price;
 
-    @Enumerated(EnumType.STRING) 
+    @Enumerated(EnumType.STRING)
     private RefundStatus refundStatus;
 
     @OneToOne(fetch = FetchType.LAZY)
