@@ -11,6 +11,7 @@ import com.irum.come2us.domain.order.application.service.CustomerOrderService;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailStatusResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.OrderListResponse;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,12 @@ public class CustomerOrderController {
 		@PathVariable(name="orderId") UUID orderId
 	) {
 		return customerOrderService.getOrderDetail(orderId);
+	}
+
+	/**주문 목록 조회*/
+	@GetMapping("")
+	public OrderListResponse orderListGet(){
+		return customerOrderService.getOrderList();
 	}
 
 }
