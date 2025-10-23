@@ -8,7 +8,7 @@ import com.irum.come2us.domain.cart.presentation.dto.response.CartResponse;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
-import com.irum.come2us.domain.product.domain.repository.ProductRepository;
+import com.irum.come2us.domain.product.domain.repository.ProductOptionValueRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CartErrorCode;
 import java.util.List;
@@ -27,20 +27,23 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final MemberRepository memberRepository;
-    private final ProductRepository productRepository;
+    private final ProductOptionValueRepository productOptionValueRepository;
 
     public CartResponse createCart(CartCreateRequest request) {
+        // 회원 검증
         Member member =
                 memberRepository
                         .findByMemberId(request.memberId())
                         .orElseThrow(() -> new CommonException(CartErrorCode.MEMBER_NOT_FOUND));
 
+        // 옵션값 검증
         ProductOptionValue optionValue =
-                productRepository
-                        .findOptionValueById(request.optionValueId())
+                productOptionValueRepository
+                        .findById(request.optionValueId())
                         .orElseThrow(
                                 () -> new CommonException(CartErrorCode.OPTION_VALUE_NOT_FOUND));
 
+        // 이미 같은 옵션이 담겨있으면 수량만 증가
         Cart existing =
                 cartRepository.findByMemberIdAndOptionValueId(
                         request.memberId(), request.optionValueId());
