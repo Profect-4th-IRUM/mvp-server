@@ -52,11 +52,12 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ProductCursorResponse> getProductList(
+            @RequestParam(required = false) UUID storeId,
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size,
             @RequestParam(required = false) String keyword) {
-        log.info("상품 목록 조회 요청: cursor={}, size={}, keyword={}", cursor, size, keyword);
-        ProductCursorResponse response = productService.getProductList(cursor, size, keyword);
+        log.info("상품 목록 조회 요청: storeId={}, cursor={}, size={}, keyword={}", storeId, cursor, size, keyword);
+        ProductCursorResponse response = productService.getProductList(storeId, cursor, size, keyword);
         return ResponseEntity.ok(response);
     }
 

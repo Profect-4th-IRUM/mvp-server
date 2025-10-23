@@ -169,7 +169,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductCursorResponse getProductList(UUID cursor, Integer size, String keyword) {
+    public ProductCursorResponse getProductList(UUID storeId, UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -177,7 +177,10 @@ public class ProductService {
 
         List<ProductResponse> products;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
+        if (storeId != null) {
+            log.info("상점 상품 요청: storeId={}, cursor={}, size={}", storeId, cursor, size);
+            products = productRepository.findProductsByStoreWithCursor(storeId, cursor, size);
+        } else if (keyword != null && !keyword.trim().isEmpty()) {
             log.info("상품 검색 요청: keyword={}, cursor={}, size={}", keyword, cursor, size);
             products = productRepository.findProductsByKeyword(cursor, size, keyword);
         } else {
@@ -185,7 +188,7 @@ public class ProductService {
             products = productRepository.findProductsByCursor(cursor, size);
         }
 
-        log.info("상품 목록 조회 완료: keyword={}, count={}", keyword, products.size());
+        log.info("상품 목록 조회 완료: storeId={}, keyword={}, count={}", storeId, keyword, products.size());
         return ProductCursorResponse.of(products);
     }
 
