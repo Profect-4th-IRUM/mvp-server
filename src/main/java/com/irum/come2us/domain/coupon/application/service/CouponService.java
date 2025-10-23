@@ -51,4 +51,9 @@ public class CouponService {
         }
         couponRepository.delete(coupon);
     }
+
+    /** 적용한 쿠폰 가격 반환 */
+    public int applyCoupons(List<UUID> couponIdList) {
+        return 0;
+    }
 }

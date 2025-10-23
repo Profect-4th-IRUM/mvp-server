@@ -7,9 +7,7 @@ import java.util.UUID;
 
 public record CustomerOrderRequest(
         List<ProductSummary> productList,
-        String address,
-        String phone,
-        String name,
+        UUID deliveryAddressId,
         String deliveryRequest,
         List<UUID> couponIdList,
         UUID storeId

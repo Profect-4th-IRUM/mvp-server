@@ -59,6 +59,10 @@ public class ProductOptionValue {
         return value;
     }
 
+    public void decreaseStock(Integer quantity) {
+        this.stockQuantity -= quantity;
+    }
+
     protected void setOptionGroup(ProductOptionGroup optionGroup) {
         this.optionGroup = optionGroup;
     }

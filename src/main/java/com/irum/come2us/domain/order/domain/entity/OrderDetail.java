@@ -73,4 +73,9 @@ public class OrderDetail extends BaseEntity {
     public void updateStatusToDelivered() {
         this.orderStatusIndi = OrderStatus.DELIVERED;
     }
+
+    public void initOrderDetail(Order order) {
+        this.order = order;
+        this.orderStatusIndi = OrderStatus.PREPARING;
+    }
 }
