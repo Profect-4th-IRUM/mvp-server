@@ -58,13 +58,18 @@ public record CustomerRefundDetailResponse(
 
     public static CustomerRefundDetailResponse of(
             Order order, List<OrderDetail> orderDetails, Refund refund) {
+
         List<ProductInfoDto> productList =
                 orderDetails.stream().map(ProductInfoDto::fromEntity).toList();
+
+        RecipientAddressDto recipientAddress =
+                RecipientAddressDto.fromEntity(order.getDeliveryAddress());
+
         return new CustomerRefundDetailResponse(
                 order.getOrderId(),
                 order.getOrderNum(),
                 productList,
-                RecipientAddressDto.fromEntity(order.getDeliveryAddress()),
+                recipientAddress,
                 refund.getRefundId(),
                 refund.getCreatedAt(),
                 refund.getRefundStatus(),
