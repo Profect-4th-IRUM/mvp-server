@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.store.domain.entity;
 
+import com.irum.come2us.domain.deliverypolicy.domain.entity.DeliveryPolicy;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.constants.RegexConstants;
 import com.irum.come2us.global.domain.BaseTimeEntity;
@@ -53,6 +54,10 @@ public class Store extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_policy_id")
+    private DeliveryPolicy deliveryPolicy;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Store(
