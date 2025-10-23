@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum OrderErrorCode implements BaseErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."),
+    INVALID_ORDER(HttpStatus.BAD_REQUEST, "유효하지 않은 주문입니다."),
 
     ORDER_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "주문 상세를 찾을 수 없습니다."),
     ;

@@ -11,11 +11,12 @@ public record CustomerOrderRequest(
         String phone,
         String name,
         String deliveryRequest,
-        List<UUID> couponIdList
+        List<UUID> couponIdList,
+        UUID storeId
 ) {
     public record ProductSummary(
             UUID productId,
             UUID optionValueId,
-            UUID quantity
+            int quantity
     ) {}
 }
