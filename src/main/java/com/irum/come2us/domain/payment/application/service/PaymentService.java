@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.irum.come2us.domain.order.domain.entity.Order;
+import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
 import com.irum.come2us.domain.payment.application.client.TosspaymentsClient;
 import com.irum.come2us.domain.payment.application.client.dto.TossPaymentsRequest;
@@ -15,8 +16,12 @@ import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import com.irum.come2us.domain.payment.presentation.dto.request.PaymentRequest;
 import com.irum.come2us.domain.payment.presentation.dto.response.PaymentResponse;
+import com.irum.come2us.domain.product.application.service.ProductOptionValueService;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.PaymentErrorCode;
+
+import feign.FeignException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +36,21 @@ public class PaymentService {
 
 	private final TosspaymentsClient tosspaymentsClient;
 	private final OrderRepository orderRepository;
-
+	private final ProductOptionValueService productOptionValueService;
 	public PaymentResponse createPayment(PaymentRequest request){
 		Order order = orderRepository.findById(request.orderId())
 			.orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));
 		Payment payment = order.getPayment();
+
+		// Payment payment = Payment.builder()
+		// 	.amount(50000)
+		// 	.paymentStatus(PaymentStatus.PENDING)
+		// 	.build();
+		// Order order = Order.builder()
+		// 	.orderId(UUID.randomUUID())
+		// 	.payment(payment)
+		// 	.orderNum("ddddddddddd")
+		// 	.build();
 
 		// 이미 처리된 결제인지 확인
 		if (!payment.getPaymentStatus().equals(PaymentStatus.PENDING)){
@@ -49,13 +64,21 @@ public class PaymentService {
 
 		// 토스 페이먼츠 승인 API호출
 		TossPaymentsRequest tossPaymentsRequest = new TossPaymentsRequest(request.tossPaymentKey(), request.tossOrderId(), payment.getAmount());
-		TossPaymentsResponse tossPaymentsResponse = tosspaymentsClient.confirmPayment(authorizations, tossPaymentsRequest);
-		//TODO: error처리
-		// error났을때 재고 롤백하고 payment와 order상태를 failed로 변경
+		try {
+			TossPaymentsResponse tossPaymentsResponse = tosspaymentsClient.confirmPayment(authorizations, tossPaymentsRequest);
+			payment.updateToPaid(PaymentStatus.PAID, tossPaymentsResponse.paymentKey(), tossPaymentsResponse.orderId());
 
-		payment.updateStatus(PaymentStatus.PAID);
+			return new PaymentResponse(order.getOrderNum(), payment.getAmount());
+		} catch (FeignException e){
+			//추후에 Feign client error decoder로 변환하면 좋을 듯
 
-		return new PaymentResponse(order.getOrderNum(), payment.getAmount());
+			payment.updateStatus(PaymentStatus.FAILED);
+			order.updateOrderStatus(OrderStatus.FAILED);
+
+			productOptionValueService.rollbackStockForOrder(order);
+
+			throw new CommonException(PaymentErrorCode.PAYMENT_ERROR);
+		}
 
 	}
 
