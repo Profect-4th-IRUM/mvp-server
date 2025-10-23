@@ -18,6 +18,7 @@ import org.hibernate.annotations.UuidGenerator;
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Entity
+@Getter
 @Table(name = "p_payment")
 public class Payment extends BaseEntity {
     @Id
@@ -44,4 +45,8 @@ public class Payment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void updateStatus(PaymentStatus paymentStatus){
+        this.paymentStatus = paymentStatus;
+    }
 }
