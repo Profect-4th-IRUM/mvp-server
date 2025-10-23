@@ -112,17 +112,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/options/{optionGroupId}")
-    public ResponseEntity<Void> deleteProductOptionGroup(
-            @PathVariable UUID optionGroupId){
+    public ResponseEntity<Void> deleteProductOptionGroup(@PathVariable UUID optionGroupId) {
         log.info("상품 옵션 그룹 삭제 요청: groupId={}", optionGroupId);
         productService.deleteProductOptionGroup(optionGroupId);
-
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/options/values/{optionValueId}")
-    public ResponseEntity<Void> deleteProductOptionValue(
-            @PathVariable UUID optionValueId) {
+    public ResponseEntity<Void> deleteProductOptionValue(@PathVariable UUID optionValueId) {
         log.info("상품 옵션 값 삭제 요청: valueId={}", optionValueId);
         productService.deleteProductOptionValue(optionValueId);
         return ResponseEntity.noContent().build();

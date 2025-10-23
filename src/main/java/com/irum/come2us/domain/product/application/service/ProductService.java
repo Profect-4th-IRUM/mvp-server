@@ -276,7 +276,8 @@ public class ProductService {
         ProductOptionGroup optionGroup =
                 optionGroupRepository
                         .findById(optionGroupId)
-                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
 
         optionGroupRepository.delete(optionGroup);
         log.info("상품 옵션 그룹 삭제 완료: groupId={}", optionGroupId);
@@ -286,7 +287,8 @@ public class ProductService {
         ProductOptionValue optionValue =
                 optionValueRepository
                         .findById(optionValueId)
-                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
 
         optionValueRepository.delete(optionValue);
         log.info("상품 옵션 값 삭제 완료: valueId={}", optionValueId);
