@@ -23,19 +23,22 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "p_refund")
 public class Refund extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "refund_id", columnDefinition = "uuid", nullable = false, updatable = false)
-    private UUID refund_id;
+    private UUID refundId;
 
+    @Enumerated(EnumType.STRING)
     private RefundReason reason;
 
     private String description;
 
-    private Integer price;
+    private int price;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RefundStatus refundStatus;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 }

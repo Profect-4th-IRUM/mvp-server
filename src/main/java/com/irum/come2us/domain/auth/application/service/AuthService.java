@@ -6,6 +6,7 @@ import com.irum.come2us.domain.auth.presentation.dto.response.MemberLoginRespons
 import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.util.CookieUtil;
+import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class AuthService {
     private final JwtTokenService jwtTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CookieUtil cookieUtil;
+    private final MemberUtil memberUtil;
 
     public MemberLoginResponse processMemberLogin(MemberLoginRequest request) {
         Member member = memberValidator.getMemberByEmail(request.email());
@@ -31,7 +33,7 @@ public class AuthService {
     }
 
     public HttpHeaders processMemberLogout() {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         refreshTokenRepository.deleteById(member.getMemberId());
         return cookieUtil.deleteRefreshTokenCookie();
     }

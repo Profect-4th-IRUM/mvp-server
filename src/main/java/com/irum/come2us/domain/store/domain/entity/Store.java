@@ -1,22 +1,31 @@
 package com.irum.come2us.domain.store.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.global.constants.RegexConstants;
+import com.irum.come2us.global.domain.BaseTimeEntity;
+import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_store")
-public class Store {
+@SQLDelete(sql = "UPDATE p_store SET deleted_at = NOW() WHERE store_id = ?")
+@Where(clause = "deleted_at IS NULL")
+public class Store extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "store_id", updatable = false, nullable = false)
     private UUID id;
 
@@ -52,12 +61,86 @@ public class Store {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee) {
+            int deliveryFee,
+            Member member) {
+
         this.name = name;
-        this.contact = contact;
+        this.contact = validContact(contact);
         this.address = address;
-        this.businessRegistrationNumber = businessRegistrationNumber;
-        this.telemarketingRegistrationNumber = telemarketingRegistrationNumber;
-        this.deliveryFee = deliveryFee;
+        this.businessRegistrationNumber =
+                validBusinessRegistrationNumber(businessRegistrationNumber);
+        this.telemarketingRegistrationNumber =
+                validTelemarketingRegistrationNumber(telemarketingRegistrationNumber);
+        this.deliveryFee = validDeliveryFee(deliveryFee);
+        this.member = member;
+    }
+
+    public static Store createStore(
+            String name,
+            String contact,
+            String address,
+            String businessRegistrationNumber,
+            String telemarketingRegistrationNumber,
+            int deliveryFee,
+            Member member) {
+        return Store.builder()
+                .name(name)
+                .contact(contact)
+                .address(address)
+                .businessRegistrationNumber(businessRegistrationNumber)
+                .telemarketingRegistrationNumber(telemarketingRegistrationNumber)
+                .deliveryFee(deliveryFee)
+                .member(member)
+                .build();
+    }
+
+    public void updateBasicInfo(String name, String contact, String address) {
+        this.name = name;
+        this.contact = validContact(contact);
+        this.address = address;
+    }
+
+    public void changeDeliveryFee(int deliveryFee) {
+        this.deliveryFee = validDeliveryFee(deliveryFee);
+    }
+
+    private static final Pattern PHONE_NUMBER_PATTERN =
+            Pattern.compile(RegexConstants.PHONE_NUMBER);
+
+    private static final Pattern TELEMARKETING_REGISTRATION_NUMBER_PATTERN =
+            Pattern.compile(RegexConstants.TELEMARKETING_REGISTRATION_NUMBER);
+
+    private static final Pattern BUSINESS_REGISTRATION_NUMBER_PATTERN =
+            Pattern.compile(RegexConstants.BUSINESS_REGISTRATION_NUMBER);
+
+    private static String validContact(String contact) {
+        if (!PHONE_NUMBER_PATTERN.matcher(contact).matches()) {
+            throw new CommonException(StoreErrorCode.INVALID_CONTACT);
+        }
+        return contact;
+    }
+
+    private static String validTelemarketingRegistrationNumber(
+            String telemarketingRegistrationNumber) {
+        if (!TELEMARKETING_REGISTRATION_NUMBER_PATTERN
+                .matcher(telemarketingRegistrationNumber)
+                .matches()) {
+            throw new CommonException(StoreErrorCode.INVALID_TELEMARKETING_REGISTRATION_NUMBER);
+        }
+        return telemarketingRegistrationNumber;
+    }
+
+    private static String validBusinessRegistrationNumber(String businessRegistrationNumber) {
+        if (!BUSINESS_REGISTRATION_NUMBER_PATTERN.matcher(businessRegistrationNumber).matches()) {
+            throw new CommonException(StoreErrorCode.INVALID_BUSINESS_REGISTRATION_NUMBER);
+        }
+        return businessRegistrationNumber;
+    }
+
+    private static int validDeliveryFee(int deliveryFee) {
+        if (deliveryFee < 0) {
+            throw new CommonException(StoreErrorCode.INVALID_DELIVERY_FEE);
+        }
+        return deliveryFee;
     }
 }
