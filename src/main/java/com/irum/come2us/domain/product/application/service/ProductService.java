@@ -271,4 +271,14 @@ public class ProductService {
 
         return ProductOptionValueResponse.from(optionValue);
     }
+
+    public void deleteProductOptionGroup(UUID optionGroupId) {
+        ProductOptionGroup optionGroup =
+                optionGroupRepository
+                        .findById(optionGroupId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+
+        optionGroupRepository.delete(optionGroup);
+        log.info("상품 옵션 그룹 완료: groupId={}", optionGroupId);
+    }
 }
