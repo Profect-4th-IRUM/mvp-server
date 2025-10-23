@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.irum.come2us.domain.order.application.service.CustomerOrderService;
+import com.irum.come2us.domain.order.domain.entity.OrderDetail;
+import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailStatusResponse;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -25,4 +28,13 @@ public class CustomerOrderController {
 	){
 		return customerOrderService.getOrderDetailStatus(orderDetailId);
 	}
+
+	/**주문 상세 조회*/
+	@GetMapping("/{orderId}")
+	public OrderDetailResponse orderDetailGet(
+		@PathVariable(name="orderId") UUID orderId
+	) {
+		return customerOrderService.getOrderDetail(orderId);
+	}
+
 }

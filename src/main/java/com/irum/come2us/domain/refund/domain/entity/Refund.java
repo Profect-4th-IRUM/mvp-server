@@ -9,6 +9,8 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -20,6 +22,7 @@ import org.hibernate.annotations.UuidGenerator;
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Builder
+@Getter
 @Table(name = "p_refund")
 public class Refund extends BaseEntity {
     @Id

@@ -14,23 +14,6 @@ public record OrderDetailStatusResponse(
 	Integer trackingNumber,
 	String deliveryRequest
 ) {
-	public record AddressResponse(
-		String postalCode,
-		String city,
-		String sigungu,
-		String roadname,
-		String addressDetail
-	){
-		public static AddressResponse from(Address address){
-			return new AddressResponse(
-				address.getPostalCode(),
-				address.getCity(),
-				address.getSigungu(),
-				address.getRoadName(),
-				address.getAddressDetail()
-			);
-		}
-	}
 	public static OrderDetailStatusResponse from(OrderDetail orderDetail){
 		return new OrderDetailStatusResponse(
 			orderDetail.getProductName(),
