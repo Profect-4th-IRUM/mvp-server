@@ -57,7 +57,7 @@ public class CartService {
             saved = existing;
 
             log.info(
-                    "장바구니 수량 합산: memberId={}, optionValueId={}, oldQuantity={}, newQuantity={}",
+                    "장바구니 수량 합산 완료: memberId={}, optionValueId={}, oldQuantity={}, newQuantity={}",
                     request.memberId(),
                     request.optionValueId(),
                     oldQuantity,
@@ -89,7 +89,7 @@ public class CartService {
         }
 
         cart.updateQuantity(request.quantity());
-        log.info("장바구니 수정 완료: cartId={}, updatedQuantity={}", cartId, request.quantity());
+        log.info("장바구니 수량 수정 완료: cartId={}, updatedQuantity={}", cartId, request.quantity());
         return CartResponse.from(cart);
     }
 
