@@ -44,7 +44,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OwnerOrderListResponse getPartiallyShippedOrderList(UUID storeId, UUID cursor, Integer size) {
+    public OwnerOrderListResponse getPartiallyShippedOrderList(
+            UUID storeId, UUID cursor, Integer size) {
         if (size == null || !(size == 10 || size == 30 || size == 50)) {
             log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -54,7 +55,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OwnerOrderListResponse getPartiallyDeliveredOrderList(UUID storeId, UUID cursor, Integer size) {
+    public OwnerOrderListResponse getPartiallyDeliveredOrderList(
+            UUID storeId, UUID cursor, Integer size) {
         if (size == null || !(size == 10 || size == 30 || size == 50)) {
             log.warn("허용 되지 않은 size 요청 : {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -114,12 +116,10 @@ public class OrderService {
                         .toList();
 
         // 6. next cursor계산
-        UUID nextCursor =
-                orderSummaryList.isEmpty() ? null : headerList.getLast().orderId();
+        UUID nextCursor = orderSummaryList.isEmpty() ? null : headerList.getLast().orderId();
 
         return new OwnerOrderListResponse(orderSummaryList, nextCursor, hasNext);
     }
-
 
     public void updateOrderStatusToPreparing(UUID orderDetailId) {
         OrderDetail orderDetail =
@@ -139,7 +139,6 @@ public class OrderService {
         order.updateOrderStatus(newOrderStatus);
     }
 
-
     public void updateOrderStatusToShipped(UUID orderDetailId, OwnerOrderShippedRequest request) {
         OrderDetail orderDetail =
                 orderDetailRepository
@@ -157,7 +156,6 @@ public class OrderService {
         OrderStatus newOrderStatus = aggregateOrderStatus(orderDetail);
         order.updateOrderStatus(newOrderStatus);
     }
-
 
     public void updateOrderStatusToDelivered(UUID orderDetailId) {
         OrderDetail orderDetail =
