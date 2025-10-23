@@ -2,6 +2,10 @@ package com.irum.come2us.domain.store.application.service;
 
 import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.product.domain.entity.Product;
+import com.irum.come2us.domain.product.domain.repository.ProductRepository;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
@@ -13,6 +17,8 @@ import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import java.util.List;
 import java.util.UUID;
+
+import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final ProductRepository productRepository;
     private final MemberValidator memberValidator;
+    private final MemberUtil memberUtil;
 
     public UUID registerStore(StoreCreateRequest request) {
         Member member = memberValidator.getCurrentMember();
@@ -83,6 +91,19 @@ public class StoreService {
     public StoreInfoResponse findStoreInfo(UUID storeId) {
         Store store = getStoreById(storeId);
         return StoreInfoResponse.from(store);
+    }
+
+    public ProductCursorResponse getMyStoreProducts(UUID cursor, Integer size) {
+        Member member = memberUtil.getCurrentMember();
+        Store store = storeRepository.findByMember(member).orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+
+        if (size == null || (size != 10 && size != 30 && size != 50)) {
+            size = 10;
+        }
+
+        List<ProductResponse> products = productRepository.findProductsByStoreWithCursor(store.getId(), cursor, size);
+
+        return ProductCursorResponse.of(products);
     }
 
     // 본인 소유 상점 검증

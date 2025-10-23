@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.store.presentation.controller;
 
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
 import com.irum.come2us.domain.store.application.service.StoreService;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreDeliveryFeeUpdateRequest;
@@ -71,6 +72,16 @@ public class StoreController {
     public ResponseEntity<StoreInfoResponse> getStoreDetail(@PathVariable UUID storeId) {
         log.info("상점 상세 조회 요청: storeId={}", storeId);
         StoreInfoResponse response = storeService.findStoreInfo(storeId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<ProductCursorResponse> getMyStoreProducts(
+            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) Integer size
+    ) {
+        log.info("내 스토어 상품 목록 조회 요청: cursor={}, size={}", cursor, size);
+        ProductCursorResponse response = storeService.getMyStoreProducts(cursor, size);
         return ResponseEntity.ok(response);
     }
 }
