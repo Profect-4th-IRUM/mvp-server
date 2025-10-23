@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.product.domain.entity;
 
+import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -49,13 +50,19 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductOptionGroup> optionGroups = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
+
     @Builder(access = AccessLevel.PRIVATE)
     private Product(
+            Store store,
             String name,
             String description,
             boolean isPublic,
             String detailDescription,
             int price) {
+        this.store = store;
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
@@ -64,12 +71,14 @@ public class Product extends BaseEntity {
     }
 
     public static Product createProduct(
+            Store store,
             String name,
             String description,
             String detailDescription,
             int price,
             boolean isPublic) {
         return Product.builder()
+                .store(store)
                 .name(name)
                 .description(description)
                 .detailDescription(detailDescription)
@@ -100,5 +109,5 @@ public class Product extends BaseEntity {
         optionGroups.add(group);
     }
 
-    // TODO: Store, Category, 이미지 매핑
+    // TODO: Category, 이미지 매핑
 }
