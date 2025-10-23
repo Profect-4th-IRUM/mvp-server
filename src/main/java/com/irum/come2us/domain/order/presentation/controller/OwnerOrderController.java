@@ -47,7 +47,7 @@ public class OwnerOrderController {
     }
 
     /** [상점] 배송 완료 목록 조회 **/
-    @GetMapping("/partially-delivered")
+    @GetMapping("/delivered")
     public ResponseEntity<OwnerOrderListResponse> deliveredOrderListGet(
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size
