@@ -6,16 +6,13 @@ import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
-import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,11 +24,10 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         return cursor != null ? qOrder.orderId.lt(cursor) : null;
     }
 
-    /**
-     * [상점] 주문 목록 조회
-     */
+    /** [상점] 주문 목록 조회 */
     @Override
-    public List<OrderSummaryRow> fetchOrderHeaderList(UUID storeId, OrderStatus orderStatus, UUID cursor, int size) {
+    public List<OrderSummaryRow> fetchOrderHeaderList(
+            UUID storeId, OrderStatus orderStatus, UUID cursor, int size) {
         QOrder o = QOrder.order;
 
         return queryFactory
@@ -46,43 +42,37 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                                 o.totalPrice,
                                 o.payment.totalDiscountAmount,
                                 o.payment.amount,
-                                o.deliveryFee
-                        )
-                )
+                                o.deliveryFee))
                 .from(o)
                 .where(
                         o.deletedAt.isNull(),
                         ltCursor(cursor, o),
                         o.store.id.eq(storeId),
-                        o.orderStatusAll.eq(orderStatus)
-                )
+                        o.orderStatusAll.eq(orderStatus))
                 .orderBy(o.orderId.desc())
-                .limit(size+1) //hasnext 판별을 위해
+                .limit(size + 1) // hasnext 판별을 위해
                 .fetch();
     }
 
-    /**
-     * [상점] 주문 상세 조회
-     */
+    /** [상점] 주문 상세 조회 */
     public List<OrderDetailRow> fetchOrderDetailList(List<UUID> orderIdList) {
-        if (orderIdList.isEmpty()) {return List.of();}
+        if (orderIdList.isEmpty()) {
+            return List.of();
+        }
 
         QOrderDetail od = QOrderDetail.orderDetail;
 
         return queryFactory
-                .select(Projections.constructor(
-                        OrderDetailRow.class,
-                        od.orderDetailId,
-                        od.productName,
-                        od.quantity,
-                        od.price,
-                        od.optionName
-                        ))
+                .select(
+                        Projections.constructor(
+                                OrderDetailRow.class,
+                                od.orderDetailId,
+                                od.productName,
+                                od.quantity,
+                                od.price,
+                                od.optionName))
                 .from(od)
                 .where(od.order.orderId.in(orderIdList))
                 .fetch();
     }
-
-
-
 }
