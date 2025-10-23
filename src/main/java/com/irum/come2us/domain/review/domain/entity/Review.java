@@ -26,7 +26,7 @@ public class Review extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "rate", nullable = false, columnDefinition = "TINYINT")
+    @Column(name = "rate", nullable = false, columnDefinition = "SMALLINT")
     private Integer rate;
 
     @ManyToOne(fetch = FetchType.LAZY)
