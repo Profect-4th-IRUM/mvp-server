@@ -119,4 +119,12 @@ public class ProductController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/options/values/{optionValueId}")
+    public ResponseEntity<Void> deleteProductOptionValue(
+            @PathVariable UUID optionValueId) {
+        log.info("상품 옵션 값 삭제 요청: valueId={}", optionValueId);
+        productService.deleteProductOptionValue(optionValueId);
+        return ResponseEntity.noContent().build();
+    }
 }
