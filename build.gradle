@@ -50,9 +50,10 @@ tasks.withType(JavaCompile) {
 clean {
     delete querydslDirProperty
 }
-//feign client를 위한
+
+//feign client를 위한 springcloud
 ext {
-    set('springCloudVersion', "2022.0.3")
+    set('springCloudVersion', "2025.0.0")
 }
 
 dependencyManagement {

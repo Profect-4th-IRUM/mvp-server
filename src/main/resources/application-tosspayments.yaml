@@ -1,3 +1,0 @@
-payment:
-  toss:
-    secret-key: ${TOSSPAYMENTS_SECRET_KEY}
