@@ -1,9 +1,8 @@
 package com.irum.come2us.global.presentation.advice.exception.errorcode;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor

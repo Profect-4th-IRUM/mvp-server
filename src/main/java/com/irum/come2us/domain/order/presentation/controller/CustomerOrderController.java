@@ -1,7 +1,6 @@
 package com.irum.come2us.domain.order.presentation.controller;
 
 import com.irum.come2us.domain.order.application.service.CustomerOrderService;
-import com.irum.come2us.domain.order.application.service.OwnerOrderService;
 import com.irum.come2us.domain.order.presentation.dto.request.CustomerOrderRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +18,7 @@ public class CustomerOrderController {
     private final CustomerOrderService customerOrderService;
 
     @PostMapping("")
-    public CustomerOrderResponse orderCreate(
-            @RequestBody CustomerOrderRequest request
-    ){
+    public CustomerOrderResponse orderCreate(@RequestBody CustomerOrderRequest request) {
         return customerOrderService.prepareOrder(request);
     }
 }

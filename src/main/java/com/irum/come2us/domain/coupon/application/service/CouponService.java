@@ -1,23 +1,19 @@
 package com.irum.come2us.domain.coupon.application.service;
 
-import com.irum.come2us.domain.coupon.domain.entity.AppliedCoupon;
 import com.irum.come2us.domain.coupon.domain.entity.Coupon;
 import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.coupon.domain.repository.CouponRepository;
 import com.irum.come2us.domain.coupon.presentation.dto.request.CouponGenerateRequest;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
-import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CouponErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -59,9 +55,7 @@ public class CouponService {
         couponRepository.delete(coupon);
     }
 
-    /**
-     * 쿠폰 유효성 검증 및 할인 금액 계산
-     */
+    /** 쿠폰 유효성 검증 및 할인 금액 계산 */
     public int validAndCalCoupon(List<UUID> couponIdList, int calculatedTotalPrice, Member member) {
         if (couponIdList.isEmpty()) {
             return 0;
@@ -71,7 +65,7 @@ public class CouponService {
         List<Coupon> couponList = couponRepository.findAllById(couponIdList);
 
         for (Coupon coupon : couponList) {
-            //권한 검사
+            // 권한 검사
             if (!coupon.getMember().getMemberId().equals(member.getMemberId())) {
                 throw new CommonException(CouponErrorCode.COUPON_NO_PERMISSION);
             }
@@ -92,5 +86,4 @@ public class CouponService {
 
         return totalDiscount;
     }
-
 }

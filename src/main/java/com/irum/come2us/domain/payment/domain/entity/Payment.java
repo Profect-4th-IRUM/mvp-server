@@ -46,12 +46,12 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public void updateStatus(PaymentStatus paymentStatus){
+    public void updateStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
     }
-    public void updateToPaid(PaymentStatus ps, TossPaymentsResponse res){
-        this.paymentStatus = ps;
-        //TODO:toss paymentkey, orderId추가
-    }
 
+    public void updateToPaid(PaymentStatus ps, TossPaymentsResponse res) {
+        this.paymentStatus = ps;
+        // TODO:toss paymentkey, orderId추가
+    }
 }

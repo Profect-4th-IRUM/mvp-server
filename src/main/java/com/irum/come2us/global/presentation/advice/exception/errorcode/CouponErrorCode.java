@@ -11,9 +11,7 @@ public enum CouponErrorCode implements BaseErrorCode {
     ONLY_OWNER_CAN_DELETE(HttpStatus.FORBIDDEN, "본인의 쿠폰만 삭제할 수 있습니다."),
     COUPON_NO_PERMISSION(HttpStatus.FORBIDDEN, "쿠폰 사용 권한이 없습니다"),
     COUPON_EXPIRATION(HttpStatus.FORBIDDEN, "만료된 쿠폰입니다."),
-    COUPON_ALREADY_USED(HttpStatus.FORBIDDEN, "이미 사용한 쿠폰입니다.")
-
-    ;
+    COUPON_ALREADY_USED(HttpStatus.FORBIDDEN, "이미 사용한 쿠폰입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

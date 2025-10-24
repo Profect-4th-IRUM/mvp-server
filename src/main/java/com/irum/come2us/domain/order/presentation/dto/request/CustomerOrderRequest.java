@@ -1,7 +1,5 @@
 package com.irum.come2us.domain.order.presentation.dto.request;
 
-import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -10,11 +8,6 @@ public record CustomerOrderRequest(
         UUID deliveryAddressId,
         String deliveryRequest,
         List<UUID> couponIdList,
-        UUID storeId
-) {
-    public record ProductSummary(
-            UUID productId,
-            UUID optionValueId,
-            int quantity
-    ) {}
+        UUID storeId) {
+    public record ProductSummary(UUID productId, UUID optionValueId, int quantity) {}
 }

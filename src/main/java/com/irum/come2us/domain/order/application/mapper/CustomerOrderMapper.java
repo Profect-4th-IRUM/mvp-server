@@ -2,21 +2,18 @@ package com.irum.come2us.domain.order.application.mapper;
 
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
-import com.irum.come2us.domain.order.presentation.dto.request.CustomerOrderRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.AddressResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
-import java.util.UUID;
+import org.springframework.stereotype.Component;
 
 @Component
 public class CustomerOrderMapper {
 
-    public static CustomerOrderResponse toCustomerOrderResponse(Order order, List<OrderDetail> orderDetailList) {
-        List<CustomerOrderResponse.ProductSummary> productSummaryList = orderDetailList.stream()
-                .map(CustomerOrderMapper::toProductSummary)
-                .toList();
+    public static CustomerOrderResponse toCustomerOrderResponse(
+            Order order, List<OrderDetail> orderDetailList) {
+        List<CustomerOrderResponse.ProductSummary> productSummaryList =
+                orderDetailList.stream().map(CustomerOrderMapper::toProductSummary).toList();
 
         return CustomerOrderResponse.builder()
                 .orderId(order.getOrderId())
