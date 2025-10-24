@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.store.domain.entity;
 
+import com.irum.come2us.domain.deliverypolicy.domain.entity.DeliveryPolicy;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.constants.RegexConstants;
 import com.irum.come2us.global.domain.BaseTimeEntity;
@@ -47,12 +48,13 @@ public class Store extends BaseTimeEntity {
             columnDefinition = "char(10)")
     private String telemarketingRegistrationNumber;
 
-    @Column(name = "delivery_fee", nullable = false)
-    private int deliveryFee;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_policy_id")
+    private DeliveryPolicy deliveryPolicy;
 
     @Builder(access = AccessLevel.PRIVATE)
     private Store(
@@ -61,8 +63,8 @@ public class Store extends BaseTimeEntity {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee,
-            Member member) {
+            Member member,
+            DeliveryPolicy deliveryPolicy) {
 
         this.name = name;
         this.contact = validContact(contact);
@@ -71,8 +73,8 @@ public class Store extends BaseTimeEntity {
                 validBusinessRegistrationNumber(businessRegistrationNumber);
         this.telemarketingRegistrationNumber =
                 validTelemarketingRegistrationNumber(telemarketingRegistrationNumber);
-        this.deliveryFee = validDeliveryFee(deliveryFee);
         this.member = member;
+        this.deliveryPolicy = null;
     }
 
     public static Store createStore(
@@ -81,7 +83,6 @@ public class Store extends BaseTimeEntity {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee,
             Member member) {
         return Store.builder()
                 .name(name)
@@ -89,7 +90,6 @@ public class Store extends BaseTimeEntity {
                 .address(address)
                 .businessRegistrationNumber(businessRegistrationNumber)
                 .telemarketingRegistrationNumber(telemarketingRegistrationNumber)
-                .deliveryFee(deliveryFee)
                 .member(member)
                 .build();
     }
@@ -98,10 +98,6 @@ public class Store extends BaseTimeEntity {
         this.name = name;
         this.contact = validContact(contact);
         this.address = address;
-    }
-
-    public void changeDeliveryFee(int deliveryFee) {
-        this.deliveryFee = validDeliveryFee(deliveryFee);
     }
 
     private static final Pattern PHONE_NUMBER_PATTERN =
@@ -135,12 +131,5 @@ public class Store extends BaseTimeEntity {
             throw new CommonException(StoreErrorCode.INVALID_BUSINESS_REGISTRATION_NUMBER);
         }
         return businessRegistrationNumber;
-    }
-
-    private static int validDeliveryFee(int deliveryFee) {
-        if (deliveryFee < 0) {
-            throw new CommonException(StoreErrorCode.INVALID_DELIVERY_FEE);
-        }
-        return deliveryFee;
     }
 }

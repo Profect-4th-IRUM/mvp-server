@@ -8,7 +8,6 @@ import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
-import com.irum.come2us.domain.store.presentation.dto.request.StoreDeliveryFeeUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
@@ -31,8 +30,8 @@ public class StoreService {
     private final MemberValidator memberValidator;
     private final MemberUtil memberUtil;
 
-    public UUID registerStore(StoreCreateRequest request) {
-        Member member = memberValidator.getCurrentMember();
+    public UUID createStore(StoreCreateRequest request) {
+        Member member = memberUtil.getCurrentMember();
 
         validateMemberHasNoStore(member); // 1인 1상점 제한
         validateBusinessNumber(request.businessRegistrationNumber()); // 사업자번호 중복 체크
@@ -45,34 +44,23 @@ public class StoreService {
                         request.address(),
                         request.businessRegistrationNumber(),
                         request.telemarketingRegistrationNumber(),
-                        request.deliveryFee(),
                         member);
 
         storeRepository.save(store);
         return store.getId();
-    } // owner 권한.
+    }
 
     public void changeStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
-        Member currentMember = memberValidator.getCurrentMember();
+        Member currentMember = memberUtil.getCurrentMember();
 
-        validateStoreOwner(store, currentMember);
+        memberUtil.assertMemberResourceAccess(store.getMember());
 
         store.updateBasicInfo(request.name(), request.contact(), request.address());
     }
 
-    public void changeDeliveryFee(UUID storeId, StoreDeliveryFeeUpdateRequest request) {
-        Store store = getStoreById(storeId);
-        Member currentMember = memberValidator.getCurrentMember();
-
-        validateStoreOwner(store, currentMember);
-
-        store.changeDeliveryFee(request.deliveryFee());
-    }
-
     public void withdrawStore(UUID storeId) {
         Store store = getStoreById(storeId);
-        // TODO: 권한 체크>?
         storeRepository.delete(store);
     }
 
@@ -81,7 +69,6 @@ public class StoreService {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             size = 10;
         }
-
         return storeRepository.findStoresByCursor(cursor, size);
     }
 

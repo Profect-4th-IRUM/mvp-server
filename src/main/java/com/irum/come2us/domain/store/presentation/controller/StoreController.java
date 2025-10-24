@@ -3,7 +3,6 @@ package com.irum.come2us.domain.store.presentation.controller;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
 import com.irum.come2us.domain.store.application.service.StoreService;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
-import com.irum.come2us.domain.store.presentation.dto.request.StoreDeliveryFeeUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreCreateResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
@@ -25,14 +24,12 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping
-    public ResponseEntity<StoreCreateResponse> createStore(
+    public ResponseEntity<StoreCreateResponse> registerStore(
             @Valid @RequestBody StoreCreateRequest request) {
         log.info("상점 생성 요청: {}", request);
-        UUID storeId = storeService.registerStore(request);
+        UUID storeId = storeService.createStore(request);
         return ResponseEntity.ok(new StoreCreateResponse(storeId));
     }
-
-    // TODO: Security 적용
 
     @PatchMapping("/{storeId}")
     public ResponseEntity<Void> updateStore(
@@ -41,16 +38,6 @@ public class StoreController {
         storeService.changeStore(storeId, request);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
-
-    @PatchMapping("/delivery_fee/{storeId}")
-    public ResponseEntity<Void> updateDeliveryFee(
-            @PathVariable UUID storeId, @Valid @RequestBody StoreDeliveryFeeUpdateRequest request) {
-        log.info("상점 배달비 수정 요청: storeId={}, request={}", storeId, request);
-        storeService.changeDeliveryFee(storeId, request);
-        return ResponseEntity.noContent().build();
-    }
-
-    // TODO: Security 적용
 
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(@PathVariable UUID storeId) {
