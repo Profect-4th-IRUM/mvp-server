@@ -42,13 +42,9 @@ public class Ai {
     //        // Ai → Product 단방향
     //        product.getAiList().add(this);
     //    }
-    //
-    //    public static Ai of(String question, String answer, Product product) {
-    //        Ai ai = Ai.builder()
-    //                .question(question)
-    //                .answer(answer)
-    //                .build();
-    //        ai.setProduct(product); // 연관관계 편의 메서드 사용
-    //        return ai;
-    //    }
+
+    // 정적 팩토리 매서드
+    public static Ai create(String question, String answer, Product product) {
+        return Ai.builder().question(question).answer(answer).product(product).build();
+    }
 }
