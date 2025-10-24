@@ -1,20 +1,30 @@
 package com.irum.come2us.domain.product.application.service;
 
+import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.member.domain.entity.enums.Role;
+import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
+import com.irum.come2us.domain.store.domain.entity.Store;
+import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
-import jakarta.transaction.Transactional;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
+import com.irum.come2us.global.security.MemberDetails;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,25 +32,51 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
+    private final MemberRepository memberRepository;
+    private final StoreRepository storeRepository;
 
-    // TODO: 상점 매핑 시, 같은 상점 내 같은 상품 중복 처리
     public ProductResponse createProduct(ProductCreateRequest request) {
+        Member member = getCurrentUser();
+
+        Store store =
+                storeRepository
+                        .findByMember(member)
+                        .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+
+        if (!member.getRole().equals(Role.OWNER)) {
+            log.warn("상품 등록 실패: 비인가 사용자 memberId={}", member.getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Product product =
                 Product.createProduct(
+                        store,
                         request.name(),
                         request.description(),
                         request.detailDescription(),
                         request.price(),
                         request.isPublic());
 
-        return ProductResponse.from(productRepository.save(product));
+        productRepository.save(product);
+        log.info("상품 등록 완료: storeId={}, productName={}", store.getId(), product.getName());
+        return ProductResponse.from(product);
     }
 
     public ProductResponse updateProduct(UUID productId, ProductUpdateRequest request) {
+        Member member = getCurrentUser();
+
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!product.getStore().getMember().equals(member)) {
+            log.warn(
+                    "상품 수정 실패: 비인가 사용자 memberId={}, storeOwnerId={}",
+                    member.getMemberId(),
+                    product.getStore().getMember().getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
 
         if (request.name() == null
                 && request.description() == null
@@ -96,10 +132,21 @@ public class ProductService {
 
     public ProductResponse updateProductPublicStatus(
             UUID productId, ProductPublicUpdateRequest request) {
+        Member member = getCurrentUser();
+
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!product.getStore().getMember().equals(member)
+                && !member.getRole().equals(Role.MANAGER)) {
+            log.warn(
+                    "상품 공개 상태 수정 실패: 비인가 사용자 memberId={}, storeOwnerId={}",
+                    member.getMemberId(),
+                    product.getStore().getMember().getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
 
         boolean newStatus = request.isPublic();
         boolean currentStatus = product.isPublic();
@@ -121,7 +168,8 @@ public class ProductService {
         return ProductResponse.from(product);
     }
 
-    public List<ProductResponse> getProductList(UUID cursor, Integer size, String keyword) {
+    @Transactional(readOnly = true)
+    public ProductCursorResponse getProductList(UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -138,9 +186,10 @@ public class ProductService {
         }
 
         log.info("상품 목록 조회 완료: keyword={}, count={}", keyword, products.size());
-        return products;
+        return ProductCursorResponse.of(products);
     }
 
+    @Transactional(readOnly = true)
     public ProductDetailResponse getProductById(UUID productId) {
         Product product =
                 productRepository
@@ -148,5 +197,43 @@ public class ProductService {
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         return ProductDetailResponse.from(product);
+    }
+
+    public void deleteProduct(UUID productId) {
+        Member member = getCurrentUser();
+
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!product.getStore().getMember().equals(member)) {
+            log.warn(
+                    "상품 삭제 실패: 비인가 사용자 memberId={}, storeOwnerId={}",
+                    member.getMemberId(),
+                    product.getStore().getMember().getMemberId());
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        productRepository.delete(product);
+        log.info("상품 삭제 완료: productId={}", productId);
+    }
+
+    private Member getCurrentUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !(authentication.getPrincipal() instanceof MemberDetails details)) {
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        try {
+            Long memberId = Long.parseLong(details.getUsername());
+            return memberRepository
+                    .findById(memberId)
+                    .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
+        } catch (NumberFormatException e) {
+            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        }
     }
 }

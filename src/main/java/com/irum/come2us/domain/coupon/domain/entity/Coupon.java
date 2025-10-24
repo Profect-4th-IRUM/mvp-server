@@ -2,6 +2,7 @@ package com.irum.come2us.domain.coupon.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
@@ -17,13 +18,14 @@ public class Coupon {
 
     @Id // 쿠폰 아이디
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
-    @Column(name = "coupon_id", nullable = false)
+    @Column(name = "coupon_id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "name", length = 20) // 쿠폰명
     private String name;
 
     @Column(name = "discount_amount") // 할인 금액
+    @Min(0)
     private int discountAmount;
 
     @Column(name = "expiration") // 유효기간

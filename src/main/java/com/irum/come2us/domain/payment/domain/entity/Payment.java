@@ -6,12 +6,12 @@ import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
 
-@Setter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_payment SET deleted_at = NOW() WHERE payment_id=?")
@@ -21,15 +21,17 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "p_payment")
 public class Payment extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "payment_id", columnDefinition = "uuid", nullable = false, updatable = false)
-    private String paymentId;
+    private UUID paymentId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
-    private Integer amount;
+    private int amount;
+
+    private int totalDiscountAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

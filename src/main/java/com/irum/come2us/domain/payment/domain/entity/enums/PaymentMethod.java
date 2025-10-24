@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.payment.domain.entity.enums;
 
 public enum PaymentMethod {
-    TOSS,
+    CARD,
+    TRANSFER, // 계좌이체
 }

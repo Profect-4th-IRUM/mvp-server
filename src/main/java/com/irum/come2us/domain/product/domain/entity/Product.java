@@ -1,20 +1,28 @@
 package com.irum.come2us.domain.product.domain.entity;
 
+import com.irum.come2us.domain.store.domain.entity.Store;
+import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @Table(name = "p_product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product {
+@SQLDelete(sql = "UPDATE p_product SET deleted_at = NOW() WHERE product_id = ?")
+@Where(clause = "deleted_at IS NULL")
+public class Product extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "product_id", updatable = false, nullable = false)
     private UUID id;
 
@@ -30,8 +38,6 @@ public class Product {
     @Column(name = "is_public", nullable = false)
     private boolean isPublic;
 
-    // enum 생성
-
     @Column(name = "avg_rating")
     private Double avgRating;
 
@@ -41,13 +47,22 @@ public class Product {
     @Column(name = "price", nullable = false)
     private int price;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductOptionGroup> optionGroups = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
+
     @Builder(access = AccessLevel.PRIVATE)
     private Product(
+            Store store,
             String name,
             String description,
             boolean isPublic,
             String detailDescription,
             int price) {
+        this.store = store;
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
@@ -56,12 +71,14 @@ public class Product {
     }
 
     public static Product createProduct(
+            Store store,
             String name,
             String description,
             String detailDescription,
             int price,
             boolean isPublic) {
         return Product.builder()
+                .store(store)
                 .name(name)
                 .description(description)
                 .detailDescription(detailDescription)
@@ -88,5 +105,9 @@ public class Product {
         this.reviewCount = reviewCount;
     }
 
-    // TODO: Store, Category, 이미지, 옵션 매핑
+    public void addOptionGroup(ProductOptionGroup group) {
+        optionGroups.add(group);
+    }
+
+    // TODO: Category, 이미지 매핑
 }

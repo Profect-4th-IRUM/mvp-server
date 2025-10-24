@@ -45,7 +45,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.reviewCount))
                 .from(product)
                 .where(product.isPublic.isTrue(), ltCursor(cursor, product))
-                .orderBy(product.id.desc()) // createdAt 기준 정렬로 변경 예정
+                .orderBy(product.id.desc())
                 .limit(size)
                 .fetch();
     }
@@ -71,7 +71,31 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.isPublic.isTrue(),
                         ltCursor(cursor, product),
                         containsKeyword(keyword, product))
-                .orderBy(product.id.desc()) // createdAt 기준 정렬로 변경 예정
+                .orderBy(product.id.desc())
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public List<ProductResponse> findProductsByStoreWithCursor(
+            UUID storeId, UUID cursor, int size) {
+        QProduct product = QProduct.product;
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                ProductResponse.class,
+                                product.id,
+                                product.name,
+                                product.description,
+                                product.detailDescription,
+                                product.price,
+                                product.isPublic,
+                                product.avgRating,
+                                product.reviewCount))
+                .from(product)
+                .where(product.store.id.eq(storeId), ltCursor(cursor, product))
+                .orderBy(product.id.desc())
                 .limit(size)
                 .fetch();
     }
