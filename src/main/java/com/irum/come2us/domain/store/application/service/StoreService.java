@@ -97,11 +97,19 @@ public class StoreService {
         Member member = memberUtil.getCurrentMember();
         Store store = storeRepository.findByMember(member).orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
 
+        return getProductsByStore(store.getId(), cursor, size);
+    }
+
+    public ProductCursorResponse getStoreProducts(UUID storeId, UUID cursor, Integer size) {
+        return getProductsByStore(storeId, cursor, size);
+    }
+
+    private ProductCursorResponse getProductsByStore(UUID storeId, UUID cursor, Integer size) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             size = 10;
         }
 
-        List<ProductResponse> products = productRepository.findProductsByStoreWithCursor(store.getId(), cursor, size);
+        List<ProductResponse> products = productRepository.findProductsByStoreWithCursor(storeId, cursor, size);
 
         return ProductCursorResponse.of(products);
     }

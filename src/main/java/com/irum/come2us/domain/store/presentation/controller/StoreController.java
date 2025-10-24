@@ -84,4 +84,14 @@ public class StoreController {
         ProductCursorResponse response = storeService.getMyStoreProducts(cursor, size);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{storeId}/products")
+    public ResponseEntity<ProductCursorResponse> getStoreProducts(
+            @PathVariable UUID storeId,
+            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) Integer size) {
+        log.info("상점 상품 목록 조회 요청: storeId={}", storeId);
+        ProductCursorResponse response = storeService.getStoreProducts(storeId, cursor, size);
+        return ResponseEntity.ok(response);
+    }
 }
