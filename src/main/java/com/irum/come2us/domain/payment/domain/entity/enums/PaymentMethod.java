@@ -1,10 +1,9 @@
 package com.irum.come2us.domain.payment.domain.entity.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
@@ -24,9 +23,7 @@ public enum PaymentMethod {
     @JsonCreator
     public static PaymentMethod from(String value) {
         return Arrays.stream(values())
-                .filter(e ->
-                                e.getDescription().equalsIgnoreCase(value)
-                )
+                .filter(e -> e.getDescription().equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 결제수단입니다: " + value));
     }

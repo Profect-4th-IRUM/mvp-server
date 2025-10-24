@@ -4,7 +4,6 @@ import com.irum.come2us.domain.coupon.application.service.AppliedCouponService;
 import com.irum.come2us.domain.coupon.application.service.CouponService;
 import com.irum.come2us.domain.deliveryaddress.domain.entity.DeliveryAddress;
 import com.irum.come2us.domain.deliveryaddress.domain.repository.DeliveryAddressRepository;
-import com.irum.come2us.domain.deliverypolicy.domain.entity.DeliveryPolicy;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.order.application.mapper.CustomerOrderMapper;
 import com.irum.come2us.domain.order.domain.entity.Order;
@@ -121,15 +120,12 @@ public class CustomerOrderService {
         log.info("상품 확인, 재고 확인, 재고 차감, 가격 계산 완료");
 
         /** 배송비 적용* */
-        int deliveryFee = store.getDeliveryFee();
-        DeliveryPolicy policy = store.getDeliveryPolicy();
-        if (policy != null) {
-            int deliveryMinAmount = store.getDeliveryPolicy().getMinAmount();
-            int deliveryMinQuantity = store.getDeliveryPolicy().getMinQuantity();
-            if (calculatedTotalPrice > deliveryMinAmount || productCount > deliveryMinQuantity) {
-                deliveryFee = 0;
-            }
-        } // 배송비 정책이 없다면 원래 가격
+        int deliveryFee = store.getDeliveryPolicy().getDefaultDeliveryFee();
+        int deliveryMinAmount = store.getDeliveryPolicy().getMinAmount();
+        int deliveryMinQuantity = store.getDeliveryPolicy().getMinQuantity();
+        if (calculatedTotalPrice > deliveryMinAmount || productCount > deliveryMinQuantity) {
+            deliveryFee = 0;
+        }
         log.info("배송비 {}", deliveryFee);
 
         /** 할인 적용 */

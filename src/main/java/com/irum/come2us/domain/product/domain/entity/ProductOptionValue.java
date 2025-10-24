@@ -68,9 +68,10 @@ public class ProductOptionValue extends BaseEntity {
         this.optionGroup = optionGroup;
     }
 
-    public void increaseStock(Integer quantity){
+    public void increaseStock(Integer quantity) {
         this.stockQuantity += quantity;
     }
+
     public void updateOptionValue(String name, int stockQuantity, Integer extraPrice) {
         this.name = name;
         this.stockQuantity = stockQuantity;
