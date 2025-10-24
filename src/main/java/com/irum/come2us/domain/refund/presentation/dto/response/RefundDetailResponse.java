@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record CustomerRefundDetailResponse(
+public record RefundDetailResponse(
         UUID orderId,
         String orderNum,
         List<ProductInfoDto> productList,
         RecipientAddressDto recipientAddress,
-        LocalDateTime cancelDate,
         UUID refundId,
+        LocalDateTime cancelDate,
         RefundStatus refundStatus,
         int refundPrice,
         RefundReason refundReason) {
@@ -56,7 +56,7 @@ public record CustomerRefundDetailResponse(
         }
     }
 
-    public static CustomerRefundDetailResponse of(
+    public static RefundDetailResponse of(
             Order order, List<OrderDetail> orderDetails, Refund refund) {
 
         List<ProductInfoDto> productList =
@@ -65,9 +65,9 @@ public record CustomerRefundDetailResponse(
         RecipientAddressDto recipientAddress =
                 RecipientAddressDto.fromEntity(order.getDeliveryAddress());
 
-        return new CustomerRefundDetailResponse(
+        return new RefundDetailResponse(
                 order.getOrderId(),
-                order.getOrderNum(),
+                order.getOrderNum(), // Order 도메인의 orderNum 필드 타입 Integer -> String 변경 필요
                 productList,
                 recipientAddress,
                 refund.getRefundId(),
