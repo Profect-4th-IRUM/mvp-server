@@ -1,6 +1,7 @@
 package com.irum.come2us.domain.payment.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.payment.application.client.dto.TossPaymentsResponse;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentCorp;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
@@ -18,6 +19,7 @@ import org.hibernate.annotations.UuidGenerator;
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Entity
+@Getter
 @Table(name = "p_payment")
 public class Payment extends BaseEntity {
     @Id
@@ -44,4 +46,13 @@ public class Payment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void updateStatus(PaymentStatus paymentStatus){
+        this.paymentStatus = paymentStatus;
+    }
+    public void updateToPaid(PaymentStatus ps, TossPaymentsResponse res){
+        this.paymentStatus = ps;
+        //TODO:toss paymentkey, orderId추가
+    }
+
 }
