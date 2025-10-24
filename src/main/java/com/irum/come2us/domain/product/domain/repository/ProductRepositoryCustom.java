@@ -8,4 +8,6 @@ public interface ProductRepositoryCustom {
     List<ProductResponse> findProductsByCursor(UUID cursor, int size);
 
     List<ProductResponse> findProductsByKeyword(UUID cursor, int size, String keyword);
+
+    List<ProductResponse> findProductsByStoreWithCursor(UUID storeId, UUID cursor, int size);
 }

@@ -2,6 +2,9 @@ package com.irum.come2us.domain.store.application.service;
 
 import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.product.domain.repository.ProductRepository;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final ProductRepository productRepository;
     private final MemberValidator memberValidator;
     private final MemberUtil memberUtil;
 
@@ -72,6 +76,38 @@ public class StoreService {
     public StoreInfoResponse findStoreInfo(UUID storeId) {
         Store store = getStoreById(storeId);
         return StoreInfoResponse.from(store);
+    }
+
+    public ProductCursorResponse getMyStoreProducts(UUID cursor, Integer size) {
+        Member member = memberUtil.getCurrentMember();
+        Store store =
+                storeRepository
+                        .findByMember(member)
+                        .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+
+        return getProductsByStore(store.getId(), cursor, size);
+    }
+
+    public ProductCursorResponse getStoreProducts(UUID storeId, UUID cursor, Integer size) {
+        return getProductsByStore(storeId, cursor, size);
+    }
+
+    private ProductCursorResponse getProductsByStore(UUID storeId, UUID cursor, Integer size) {
+        if (size == null || (size != 10 && size != 30 && size != 50)) {
+            size = 10;
+        }
+
+        List<ProductResponse> products =
+                productRepository.findProductsByStoreWithCursor(storeId, cursor, size);
+
+        return ProductCursorResponse.of(products);
+    }
+
+    // 본인 소유 상점 검증
+    private void validateStoreOwner(Store store, Member currentMember) {
+        if (!store.getMember().getMemberId().equals(currentMember.getMemberId())) {
+            throw new CommonException(StoreErrorCode.UNAUTHORIZED_STORE_ACCESS);
+        }
     }
 
     // 1인 1상점 제한
