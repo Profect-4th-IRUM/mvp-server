@@ -8,7 +8,6 @@ public record StoreInfoResponse(
         String name,
         String contact,
         String address,
-        int deliveryFee,
         String businessRegistrationNumber,
         String telemarketingRegistrationNumber) {
     public static StoreInfoResponse from(Store store) {
@@ -17,7 +16,6 @@ public record StoreInfoResponse(
                 store.getName(),
                 store.getContact(),
                 store.getAddress(),
-                store.getDeliveryFee(),
                 store.getBusinessRegistrationNumber(),
                 store.getTelemarketingRegistrationNumber());
     }

@@ -13,7 +13,9 @@ public enum ProductErrorCode implements BaseErrorCode {
     PRODUCT_OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "재고가 부족합니다"),
 
     PRODUCT_OPTION_VALUE_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 옵션 정보를 찾을 수 없습니다."),
-    ;
+ 
+    OPTION_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 옵션 그룹을 찾을 수 없습니다."),
+    OPTION_VALUE_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 옵션 값을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
