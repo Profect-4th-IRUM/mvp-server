@@ -1,11 +1,9 @@
 package com.irum.come2us.domain.order.presentation.controller;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.irum.come2us.domain.order.application.service.CustomerOrderService;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
@@ -40,8 +38,13 @@ public class CustomerOrderController {
 
 	/**주문 목록 조회*/
 	@GetMapping("")
-	public OrderListResponse orderListGet(){
-		return customerOrderService.getOrderList();
+	public OrderListResponse orderListGet(
+            @RequestParam UUID cursor,
+            @RequestParam int size,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
+    ){
+		return customerOrderService.getOrderList(cursor, size, startDate, endDate);
 	}
 
 }

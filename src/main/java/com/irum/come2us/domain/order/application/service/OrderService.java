@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
-    private final OrderRepositoryCustom orderRepositoryCustom;
     private final OrderMapper orderMapper;
 
     @Transactional(readOnly = true)
@@ -80,7 +79,7 @@ public class OrderService {
 
         // 2. order list 검색
         var headerList =
-                orderRepositoryCustom.fetchOrderHeaderList(storeId, orderStatus, cursor, size);
+                orderRepository.fetchOrderHeaderList(storeId, orderStatus, cursor, size);
 
         boolean hasNext = headerList.size() > size;
         if (hasNext) {
@@ -89,7 +88,7 @@ public class OrderService {
 
         // 3. order detail 검색
         var orderIdList = headerList.stream().map(OrderSummaryRow::orderId).toList();
-        var orderDetailList = orderRepositoryCustom.fetchOrderDetailList(orderIdList);
+        var orderDetailList = orderRepository.fetchOrderDetailList(orderIdList);
 
         // 4. orderId로 그룹핑 : productSummary 제작
         Map<UUID, List<OwnerOrderListResponse.ProductSummary>> detailMap =

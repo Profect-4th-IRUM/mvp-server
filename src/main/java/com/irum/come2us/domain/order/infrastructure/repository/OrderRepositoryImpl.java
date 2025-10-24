@@ -1,15 +1,21 @@
 package com.irum.come2us.domain.order.infrastructure.repository;
 
+import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.QOrder;
 import com.irum.come2us.domain.order.domain.entity.QOrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
+import com.irum.come2us.domain.order.presentation.dto.response.OrderListResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -73,5 +79,60 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .from(od)
                 .where(od.order.orderId.in(orderIdList))
                 .fetch();
+    }
+
+    @Override
+    public List<Order> fetchOrderHeaderListByMember(Member member, LocalDate startDate, LocalDate endDate,  UUID cursor, int size) {
+
+        QOrder o = QOrder.order;
+
+        return queryFactory
+                .selectFrom(o)
+                .where(
+                        o.member.memberId.eq(member.getMemberId()),
+                        ltCursor(cursor, o),
+                        o.createdAt.after(startDate.atStartOfDay()),
+                        o.createdAt.before(endDate.atStartOfDay())
+                )
+                .orderBy(o.orderId.desc())
+                .limit(size+1)
+                .fetch();
+    }
+
+    @Override
+    public Map<UUID, List<OrderListResponse.OrderResponse>> fetchOrderDetailListByMember(List<UUID> orderIdList) {
+        if (orderIdList.isEmpty()) {
+            return Map.of();
+        }
+        QOrder o = QOrder.order;
+
+
+        return queryFactory
+                .from(o)
+                .join(o., orderDetail)
+                .where(order.orderId.in(orderIds))
+                .transform(
+                        GroupBy.groupBy(order.orderId).as(
+                                Projections.constructor(
+                                        OrderListResponse.OrderResponse.class,
+                                        order.createdAt, // orderAt
+                                        GroupBy.list(
+                                                Projections.constructor(
+                                                        OrderListResponse.OrderResponse.ProductResponse.class,
+                                                        orderDetail.orderDetailId,
+                                                        orderDetail.optionName,
+                                                        orderDetail.quantity,
+                                                        orderDetail.orderStatusIndi, // 개별 상태
+                                                        // RefundStatus 없으면 null 주입
+                                                        Expressions.nullExpression(RefundStatus.class),
+                                                        orderDetail.price
+                                                )
+                                        )
+                                )
+                        )
+                );
+
+
+        return Map.of();
     }
 }

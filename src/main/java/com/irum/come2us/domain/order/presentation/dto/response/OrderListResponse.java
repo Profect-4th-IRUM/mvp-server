@@ -14,6 +14,7 @@ public record OrderListResponse (
 ){
 	public record OrderResponse(
 		LocalDateTime orderAt,
+        RefundStatus refundStatus,
 		List<ProductResponse> productResponseList
 	){
 		public record ProductResponse(

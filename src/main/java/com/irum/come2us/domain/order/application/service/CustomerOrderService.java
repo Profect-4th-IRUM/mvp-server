@@ -1,8 +1,14 @@
 package com.irum.come2us.domain.order.application.service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
+import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
+import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,9 +64,51 @@ public class CustomerOrderService {
 	}
 
 	@Transactional
-	public OrderListResponse getOrderList(){
+	public OrderListResponse getOrderList(UUID cursor, int size, LocalDate startDate, LocalDate endDate){
 		Member member = memberUtil.getCurrentMember();
 		List<Order> orderList = orderRepository.findAllByMember(member);
+
+        // 2. order list 검색
+        var headerList =
+                orderRepository.fetchOrderHeaderListByMember(member, startDate, endDate, cursor, size);
+
+        boolean hasNext = headerList.size() > size;
+        if (hasNext) {
+            headerList = headerList.subList(0, size);
+        }
+
+        // 3. order detail 검색
+        List<UUID> orderIdList = headerList.stream().map(Order::getOrderId).toList();
+
+
+        var orderDetailList = orderRepository.fetchOrderDetailList(orderIdList);
+
+        // 4. orderId로 그룹핑 : productSummary 제작
+        Map<UUID, List<OwnerOrderListResponse.ProductSummary>> detailMap =
+                orderDetailList.stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        OrderDetailRow::orderId,
+                                        Collectors.mapping(
+                                                orderMapper::toProductSummary,
+                                                Collectors.toList())));
+
+        // 5. orderSummary 제작
+        List<OwnerOrderListResponse.OrderSummary> orderSummaryList =
+                headerList.stream()
+                        .filter(order -> detailMap.containsKey(order.orderId()))
+                        .map(
+                                order ->
+                                        orderMapper.toOrderSummary(
+                                                order,
+                                                detailMap.getOrDefault(
+                                                        order.orderId(),
+                                                        List.of()) // order detail 없다면 빈 리스트
+                                        ))
+                        .toList();
+
+        // 6. next cursor계산
+        UUID nextCursor = orderSummaryList.isEmpty() ? null : headerList.getLast().orderId();
 
 
 	}
