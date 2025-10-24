@@ -1,6 +1,5 @@
-package com.irum.come2us.domain.product.presentation.dto.request;
+package com.irum.come2us.domain.product.presentation.dto.response;
 
-import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import java.util.List;
 import java.util.UUID;
 

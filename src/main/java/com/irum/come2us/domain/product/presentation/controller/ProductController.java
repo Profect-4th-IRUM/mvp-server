@@ -2,10 +2,7 @@ package com.irum.come2us.domain.product.presentation.controller;
 
 import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.*;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionGroupResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionValueResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.*;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
