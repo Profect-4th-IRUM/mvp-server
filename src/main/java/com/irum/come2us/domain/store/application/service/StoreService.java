@@ -2,7 +2,6 @@ package com.irum.come2us.domain.store.application.service;
 
 import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
@@ -15,10 +14,9 @@ import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
-
-import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +93,10 @@ public class StoreService {
 
     public ProductCursorResponse getMyStoreProducts(UUID cursor, Integer size) {
         Member member = memberUtil.getCurrentMember();
-        Store store = storeRepository.findByMember(member).orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+        Store store =
+                storeRepository
+                        .findByMember(member)
+                        .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
 
         return getProductsByStore(store.getId(), cursor, size);
     }
@@ -109,7 +110,8 @@ public class StoreService {
             size = 10;
         }
 
-        List<ProductResponse> products = productRepository.findProductsByStoreWithCursor(storeId, cursor, size);
+        List<ProductResponse> products =
+                productRepository.findProductsByStoreWithCursor(storeId, cursor, size);
 
         return ProductCursorResponse.of(products);
     }

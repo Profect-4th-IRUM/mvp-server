@@ -77,7 +77,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<ProductResponse> findProductsByStoreWithCursor(UUID storeId, UUID cursor, int size) {
+    public List<ProductResponse> findProductsByStoreWithCursor(
+            UUID storeId, UUID cursor, int size) {
         QProduct product = QProduct.product;
 
         return queryFactory
@@ -93,9 +94,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.avgRating,
                                 product.reviewCount))
                 .from(product)
-                .where(
-                        product.store.id.eq(storeId),
-                        ltCursor(cursor, product))
+                .where(product.store.id.eq(storeId), ltCursor(cursor, product))
                 .orderBy(product.id.desc())
                 .limit(size)
                 .fetch();
