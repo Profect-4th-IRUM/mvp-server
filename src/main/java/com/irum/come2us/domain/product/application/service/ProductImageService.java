@@ -1,7 +1,6 @@
 package com.irum.come2us.domain.product.application.service;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.entity.ProductImage;
 import com.irum.come2us.domain.product.domain.repository.ProductImageRepository;
@@ -11,12 +10,11 @@ import com.irum.come2us.domain.product.presentation.dto.response.ProductImageRes
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
-import com.irum.come2us.global.security.MemberDetails;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,24 +26,21 @@ public class ProductImageService {
 
     private final ProductImageRepository productImageRepository;
     private final ProductRepository productRepository;
-    private final MemberRepository memberRepository;
+    private final MemberUtil memberUtil;
 
     public ProductImageResponse addImage(UUID productId, ProductImageCreateRequest request) {
-        Member member = getCurrentUser();
+        Member member = memberUtil.getCurrentMember();
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        if (!product.getStore().getMember().equals(member)) {
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         ProductImage image = ProductImage.create(product, request.imageUrl(), request.isDefault());
         productImageRepository.save(image);
         log.info("상품 이미지 추가: productId={}, imageUrl={}", productId, request.imageUrl());
 
-        // 대표 이미지 중복 방지
         if (request.isDefault()) {
             productImageRepository.findByProductId(productId).stream()
                     .filter(img -> !img.getId().equals(image.getId()) && img.isDefault())
@@ -56,31 +51,30 @@ public class ProductImageService {
     }
 
     public void deleteImage(UUID productId, UUID imageId) {
-        Member member = getCurrentUser();
+        Member member = memberUtil.getCurrentMember();
         ProductImage image =
                 productImageRepository
                         .findById(imageId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        if (!image.getProduct().getId().equals(productId)
-                || !image.getProduct().getStore().getMember().equals(member)) {
+        memberUtil.assertMemberResourceAccess(image.getProduct().getStore().getMember());
+
+        if (!image.getProduct().getId().equals(productId)) {
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         productImageRepository.delete(image);
-        log.info("상품 이미지 삭제: imageId={}, productId={}", imageId, productId);
+        log.info("상품 이미지 삭제 완료: imageId={}, productId={}", imageId, productId);
     }
 
     public void setDefaultImage(UUID productId, UUID imageId) {
-        Member member = getCurrentUser();
+        Member member = memberUtil.getCurrentMember();
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        if (!product.getStore().getMember().equals(member)) {
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         List<ProductImage> images = productImageRepository.findByProductId(productId);
         images.forEach(img -> img.update(img.getImageUrl(), img.getId().equals(imageId)));
@@ -92,21 +86,5 @@ public class ProductImageService {
     public List<ProductImageResponse> getImages(UUID productId) {
         List<ProductImage> images = productImageRepository.findByProductId(productId);
         return images.stream().map(ProductImageResponse::from).toList();
-    }
-
-    private Member getCurrentUser() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null
-                || !(authentication.getPrincipal() instanceof MemberDetails details)) {
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
-        try {
-            Long memberId = Long.parseLong(details.getUsername());
-            return memberRepository
-                    .findById(memberId)
-                    .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-        } catch (NumberFormatException e) {
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
     }
 }
