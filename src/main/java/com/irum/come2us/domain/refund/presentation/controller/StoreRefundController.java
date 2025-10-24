@@ -9,12 +9,11 @@ import com.irum.come2us.domain.refund.presentation.dto.response.StoreRefundListR
 import com.irum.come2us.domain.refund.presentation.dto.response.StoreRefundResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/owner/refund")
+@RequestMapping("/refund/owner")
 @RequiredArgsConstructor
 public class StoreRefundController {
     private final StoreRefundService refundService;
@@ -24,23 +23,24 @@ public class StoreRefundController {
             @PathVariable("refund-id") UUID refundId,
             @RequestBody StoreRefundStatusRequest request) {
         refundService.patchRefundStatus(refundId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/list/requested") // 환불 요청 목록
-    public ResponseEntity<StoreRefundListResponse> getRefundRequestList() {
-        return ResponseEntity.ok(refundService.getRefundListByStatus(RefundStatus.REQUESTED));
+    @GetMapping("/list/{refundStatus}") // 환불 요청 목록
+    public ResponseEntity<StoreRefundListResponse> getRefundList(
+            @RequestParam(name = "status", required = false) RefundStatus status) {
+        return ResponseEntity.ok(refundService.getRefundListByStatus(status));
     }
 
-    @GetMapping("/list/processing") // 환불 진행중 목록
-    public ResponseEntity<StoreRefundListResponse> getRefundProcessingList() {
-        return ResponseEntity.ok(refundService.getRefundListByStatus(RefundStatus.PENDING));
-    }
-
-    @GetMapping("/list/complete") // 환불 완료 목록
-    public ResponseEntity<StoreRefundListResponse> getRefundCompleteList() {
-        return ResponseEntity.ok(refundService.getRefundListByStatus(RefundStatus.COMPLETED));
-    }
+    //    @GetMapping("/list/processing") // 환불 진행중 목록
+    //    public ResponseEntity<StoreRefundListResponse> getRefundProcessingList() {
+    //        return ResponseEntity.ok(refundService.getRefundListByStatus(RefundStatus.PENDING));
+    //    }
+    //
+    //    @GetMapping("/list/complete") // 환불 완료 목록
+    //    public ResponseEntity<StoreRefundListResponse> getRefundCompleteList() {
+    //        return ResponseEntity.ok(refundService.getRefundListByStatus(RefundStatus.COMPLETED));
+    //    }
 
     @PostMapping("/{order-id}") // 환불 요청
     public ResponseEntity<StoreRefundResponse> createRefund(

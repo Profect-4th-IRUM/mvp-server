@@ -92,7 +92,7 @@ public class StoreRefundService {
                 productList,
                 order.getDeliveryAddress().getRecipientName(),
                 order.getDeliveryAddress().getRecipientContact(),
-                order.getDeliveryAddress().getAddress(),
+                order.getDeliveryAddress(),
                 order.getCreatedAt().toString(),
                 refund.getCreatedAt().toString(),
                 refund.getRefundId().toString(),
