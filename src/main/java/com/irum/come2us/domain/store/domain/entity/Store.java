@@ -56,6 +56,13 @@ public class Store extends BaseTimeEntity {
     @JoinColumn(name = "delivery_policy_id")
     private DeliveryPolicy deliveryPolicy;
 
+    public void setDeliveryPolicy(DeliveryPolicy deliveryPolicy) {
+        this.deliveryPolicy = deliveryPolicy;
+        if (deliveryPolicy != null && deliveryPolicy.getStore() != this) {
+            deliveryPolicy.setStore(this);
+        }
+    }
+
     @Builder(access = AccessLevel.PRIVATE)
     private Store(
             String name,

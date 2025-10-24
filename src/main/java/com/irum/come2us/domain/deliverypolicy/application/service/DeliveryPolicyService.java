@@ -37,7 +37,12 @@ public class DeliveryPolicyService {
                         request.minQuantity(),
                         request.minAmount(),
                         store);
+
+        store.setDeliveryPolicy(deliveryPolicy);
+
+        storeRepository.save(store);
         deliveryPolicyRepository.save(deliveryPolicy);
+
         return deliveryPolicy.getId();
     }
 
@@ -52,8 +57,13 @@ public class DeliveryPolicyService {
 
     public void withdrawDeliveryPolicy(UUID deliveryPolicyId) {
         DeliveryPolicy deliveryPolicy = validDeliveryPolicy(deliveryPolicyId);
+        Store store = deliveryPolicy.getStore();
+
+        store.setDeliveryPolicy(null);
+        deliveryPolicy.setStore(null);
 
         deliveryPolicyRepository.delete(deliveryPolicy);
+        storeRepository.save(store);
     }
 
     @Transactional
