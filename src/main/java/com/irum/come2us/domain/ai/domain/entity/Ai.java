@@ -2,7 +2,9 @@ package com.irum.come2us.domain.ai.domain.entity;
 
 import com.irum.come2us.domain.product.domain.entity.Product;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 @Getter
 @Entity
@@ -13,14 +15,16 @@ import lombok.*;
 public class Ai {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ai_id")
-    private Long id;
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @Column(name = "ai_id", updatable = false, nullable = false)
+    private UUID aiId;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Lob
+    @Column(nullable = false)
     private String question;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Lob
+    @Column(nullable = false)
     private String answer;
 
     @ManyToOne(fetch = FetchType.LAZY)
