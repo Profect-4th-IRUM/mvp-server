@@ -34,6 +34,10 @@ public class Payment extends BaseEntity {
 
     private int totalDiscountAmount;
 
+    private String tossPaymentKey;
+
+    private String tossOrderId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
@@ -52,6 +56,7 @@ public class Payment extends BaseEntity {
 
     public void updateToPaid(PaymentStatus ps, TossPaymentsResponse res) {
         this.paymentStatus = ps;
-        // TODO:toss paymentkey, orderId추가
+        this.tossPaymentKey = res.paymentKey();
+        this.tossOrderId = res.orderId();
     }
 }
