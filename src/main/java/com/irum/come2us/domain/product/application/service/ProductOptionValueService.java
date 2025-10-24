@@ -33,7 +33,7 @@ public class ProductOptionValueService {
 
 		for (OrderDetail detail : orderDetailList) {
 			// 비관적락 걸기
-			ProductOptionValue option = productOptionValueRepository.findByIdWithPessimisticLock(detail.getProductOptionValue().getId())
+			ProductOptionValue option = productOptionValueRepository.findByIdWithLock(detail.getProductOptionValue().getId())
 				.orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
 			// 재고 되돌리기

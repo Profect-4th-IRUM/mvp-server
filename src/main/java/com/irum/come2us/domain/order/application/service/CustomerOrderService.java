@@ -51,97 +51,98 @@ public class CustomerOrderService {
     public CustomerOrderResponse createOrder(
             CustomerOrderRequest request
     ){
-        Member member = memberUtil.getCurrentMember();
-        Store store = storeRepository.findById(request.storeId())
-                .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
-        DeliveryAddress deliveryAddress = deliveryAddressRepository.findById(request.deliveryAddressId())
-                .orElseThrow(() -> new CommonException(DeliveryAddressErrorCode.DELIVERY_ADDRESS_NOT_FOUND));
+//        Member member = memberUtil.getCurrentMember();
+//        Store store = storeRepository.findById(request.storeId())
+//                .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+//        DeliveryAddress deliveryAddress = deliveryAddressRepository.findById(request.deliveryAddressId())
+//                .orElseThrow(() -> new CommonException(DeliveryAddressErrorCode.DELIVERY_ADDRESS_NOT_FOUND));
+//
+//
+//        // 상품 확인, 재고확인, 상품 정보 조회 , 가격 계산, 주문 상세 엔티티 생성 준비
+//        int calculatedTotalPrice = 0;
+//        int productCount = 0;
+//        List<OrderDetail> orderDetails = new ArrayList<>();
+//        for (CustomerOrderRequest.ProductSummary productReq:request.productList()){
+//            //상품이 해당 상점의 상품인지 확인
+//            Product product = productRepository.findById(productReq.productId())
+//                    .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+//            if (!product.getStore().getId().equals(store.getId())){
+//                throw new CommonException(OrderErrorCode.INVALID_ORDER);
+//            }
+//
+//            // 재고 확인
+//            ProductOptionValue productOptionValue = productOptionValueRepository.findByIdWithLock(productReq.optionValueId())
+//                    .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_OPTION_VALUE_NOT_FOUND));
+//            if (productOptionValue.getStockQuantity() < productReq.quantity()){
+//                throw new CommonException(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
+//            }
+//
+//
+//            // 제품 가격 계산
+//            int productPrice = (product.getPrice() + productOptionValue.getStockQuantity()) * productReq.quantity();
+//            calculatedTotalPrice += productPrice;
+//            productCount += productReq.quantity();
+//
+//            OrderDetail orderDetail = OrderDetail.builder()
+//                    .product(product)
+//                    .price(productPrice)
+//                    .quantity(productReq.quantity())
+//                    .orderStatusIndi(OrderStatus.PREPARING)
+//                    .optionName(productOptionValue.getName())
+//                    .productName(product.getName())
+//                    .productOptionValue(productOptionValue)
+//                    .build();
+//            orderDetails.add(orderDetail);
+//        }
+//
+//
+//        /**배송비 적용**/
+//        int deliveryFee = store.getDeliveryFee();
+//        int deliveryMinAmount = store.getDeliveryPolicy().getMinAmount();
+//        int deliveryMinQuantity = store.getDeliveryPolicy().getMinQuantity();
+//        if( calculatedTotalPrice > deliveryMinAmount || productCount > deliveryMinQuantity ){
+//            deliveryFee = 0;
+//        }
+//
+//        /** 할인 적용 */
+//        int discountAmount = couponService.applyCoupons(request.couponIdList());
+//        int finalPaymentAmount = calculatedTotalPrice - discountAmount;
+//
+//        /**결재 생성 및 PG사 호출**/
+//        Payment payment = paymentService.createPayment(finalPaymentAmount);
+//        // (실제 PG사 API 호출 - 예: I'mport, Toss Payments)
+//        // paymentService.requestPaymentToPG(payment, ...);
+//        // (결제가 실패하면 여기서 예외가 발생하고, @Transactional에 의해 롤백됨)
+//
+//        String orderId = "ORD-" + (int) ((Math.random() * 10000000));
+//
+//        //주문 엔티티 생성
+//        Order order = Order.builder()
+//                .orderNum(orderId)
+//                .totalPrice(calculatedTotalPrice)
+//                .deliveryFee(deliveryFee)
+//                .deliveryRequest(request.deliveryRequest())
+//                .orderStatusAll(OrderStatus.PREPARING)
+//                .member(member)
+//                .store(store)
+//                .payment(payment)
+//                .deliveryAddress(deliveryAddress)
+//                .build();
+//
+//        /**주문 상세 저장하고, 재고 차감**/
+//        for (OrderDetail orderDetail:orderDetails){
+//            orderDetail.initOrderDetail(order);
+//            orderDetailRepository.save(orderDetail);
+//
+//            //재고 감소
+//            ProductOptionValue pov = orderDetail.getProductOptionValue();
+//            pov.decreaseStock(orderDetail.getQuantity());
+//        }
+//
+//
+//        /**사용한 쿠폰 처리, 장바구니 비우기? */
 
-
-        // 상품 확인, 재고확인, 상품 정보 조회 , 가격 계산, 주문 상세 엔티티 생성 준비
-        int calculatedTotalPrice = 0;
-        int productCount = 0;
-        List<OrderDetail> orderDetails = new ArrayList<>();
-        for (CustomerOrderRequest.ProductSummary productReq:request.productList()){
-            //상품이 해당 상점의 상품인지 확인
-            Product product = productRepository.findById(productReq.productId())
-                    .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
-            if (!product.getStore().getId().equals(store.getId())){
-                throw new CommonException(OrderErrorCode.INVALID_ORDER);
-            }
-
-            // 재고 확인
-            ProductOptionValue productOptionValue = productOptionValueRepository.findByIdWithLock(productReq.optionValueId())
-                    .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_OPTION_VALUE_NOT_FOUND));
-            if (productOptionValue.getStockQuantity() < productReq.quantity()){
-                throw new CommonException(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
-
-
-            // 제품 가격 계산
-            int productPrice = (product.getPrice() + productOptionValue.getStockQuantity()) * productReq.quantity();
-            calculatedTotalPrice += productPrice;
-            productCount += productReq.quantity();
-
-            OrderDetail orderDetail = OrderDetail.builder()
-                    .product(product)
-                    .price(productPrice)
-                    .quantity(productReq.quantity())
-                    .orderStatusIndi(OrderStatus.PREPARING)
-                    .optionName(productOptionValue.getName())
-                    .productName(product.getName())
-                    .productOptionValue(productOptionValue)
-                    .build();
-            orderDetails.add(orderDetail);
-        }
-
-
-        /**배송비 적용**/
-        int deliveryFee = store.getDeliveryFee();
-        int deliveryMinAmount = store.getDeliveryPolicy().getMinAmount();
-        int deliveryMinQuantity = store.getDeliveryPolicy().getMinQuantity();
-        if( calculatedTotalPrice > deliveryMinAmount || productCount > deliveryMinQuantity ){
-            deliveryFee = 0;
-        }
-
-        /** 할인 적용 */
-        int discountAmount = couponService.applyCoupons(request.couponIdList());
-        int finalPaymentAmount = calculatedTotalPrice - discountAmount;
-
-        /**결재 생성 및 PG사 호출**/
-        Payment payment = paymentService.createPayment(finalPaymentAmount);
-        // (실제 PG사 API 호출 - 예: I'mport, Toss Payments)
-        // paymentService.requestPaymentToPG(payment, ...);
-        // (결제가 실패하면 여기서 예외가 발생하고, @Transactional에 의해 롤백됨)
-
-        String orderId = "ORD-" + (int) ((Math.random() * 10000000));
-
-        //주문 엔티티 생성
-        Order order = Order.builder()
-                .orderNum(orderId)
-                .totalPrice(calculatedTotalPrice)
-                .deliveryFee(deliveryFee)
-                .deliveryRequest(request.deliveryRequest())
-                .orderStatusAll(OrderStatus.PREPARING)
-                .member(member)
-                .store(store)
-                .payment(payment)
-                .deliveryAddress(deliveryAddress)
-                .build();
-
-        /**주문 상세 저장하고, 재고 차감**/
-        for (OrderDetail orderDetail:orderDetails){
-            orderDetail.initOrderDetail(order);
-            orderDetailRepository.save(orderDetail);
-
-            //재고 감소
-            ProductOptionValue pov = orderDetail.getProductOptionValue();
-            pov.decreaseStock(orderDetail.getQuantity());
-        }
-
-
-        /**사용한 쿠폰 처리, 장바구니 비우기? */
-
+        return new CustomerOrderResponse(null, null, null, 0);
     }
 
 }

@@ -2,6 +2,7 @@ package com.irum.come2us.domain.payment.application.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,15 +45,15 @@ public class PaymentService {
 			.orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));
 		Payment payment = order.getPayment();
 
-		// Payment payment = Payment.builder()
-		// 	.amount(50000)
-		// 	.paymentStatus(PaymentStatus.PENDING)
-		// 	.build();
-		// Order order = Order.builder()
-		// 	.orderId(UUID.randomUUID())
-		// 	.payment(payment)
-		// 	.orderNum("ddddddddddd")
-		// 	.build();
+//		 Payment payment = Payment.builder()
+//		 	.amount(50000)
+//		 	.paymentStatus(PaymentStatus.PENDING)
+//		 	.build();
+//		 Order order = Order.builder()
+//		 	.orderId(UUID.randomUUID())
+//		 	.payment(payment)
+//		 	.orderNum("ddddddddddd")
+//		 	.build();
 
 		// 이미 처리된 결제인지 확인
 		if (!payment.getPaymentStatus().equals(PaymentStatus.PENDING)){
@@ -83,6 +84,7 @@ public class PaymentService {
 		}
 
 	}
+
 
 
 }
