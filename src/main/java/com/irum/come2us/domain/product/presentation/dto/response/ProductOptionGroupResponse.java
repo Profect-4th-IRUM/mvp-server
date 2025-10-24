@@ -13,6 +13,6 @@ public record ProductOptionGroupResponse(
                 group.getName(),
                 group.getOptionValues().stream()
                         .map(ProductOptionValueResponse::from)
-                        .collect(Collectors.toList()));
+                        .toList());
     }
 }

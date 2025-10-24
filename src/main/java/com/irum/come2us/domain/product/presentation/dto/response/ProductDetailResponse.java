@@ -3,7 +3,6 @@ package com.irum.come2us.domain.product.presentation.dto.response;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 상품 상세 조회 DTO - 추후 Store, Category, Images, Options 확장 예정
@@ -40,8 +39,6 @@ public record ProductDetailResponse(
                 product.isPublic(),
                 product.getAvgRating(),
                 product.getReviewCount(),
-                product.getOptionGroups().stream()
-                        .map(ProductOptionGroupResponse::from)
-                        .collect(Collectors.toList()));
+                product.getOptionGroups().stream().map(ProductOptionGroupResponse::from).toList());
     }
 }
