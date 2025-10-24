@@ -17,6 +17,7 @@ import com.irum.come2us.domain.payment.domain.repository.PaymentRepository;
 import com.irum.come2us.domain.payment.presentation.dto.request.PaymentRequest;
 import com.irum.come2us.domain.payment.presentation.dto.response.PaymentResponse;
 import com.irum.come2us.domain.product.application.service.ProductOptionValueService;
+import com.irum.come2us.global.infrastructure.properties.TossProperties;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.PaymentErrorCode;
@@ -26,7 +27,6 @@ import java.util.Base64;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +38,7 @@ public class PaymentService {
 
     private final AppliedCouponService appliedCouponService;
 
-    @Value("${payment.toss.secret-key}")
-    String secreteKey;
+    private final TossProperties tossProperties;
 
     private final TosspaymentsClient tosspaymentsClient;
     private final OrderRepository orderRepository;
@@ -76,7 +75,8 @@ public class PaymentService {
 
         // 토스페이먼츠 authorization 제작
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secreteKey + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes =
+                encoder.encode((tossProperties.secretKey() + ":").getBytes(StandardCharsets.UTF_8));
         String authorizations = "Basic " + new String(encodedBytes);
 
         // 토스 페이먼츠 승인 API호출
