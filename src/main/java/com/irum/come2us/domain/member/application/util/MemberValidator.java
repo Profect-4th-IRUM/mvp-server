@@ -20,12 +20,16 @@ public class MemberValidator {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    /** MemberUtil 구현된 메서드 사용(25.10.23~) * */
+    @Deprecated
     public Member getCurrentMember() {
         return memberRepository
                 .findByMemberId(getCurrentMemberId())
                 .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-    } // 로그인 된 유저 정보 조회
+    }
 
+    /** MemberUtil 구현된 메서드 사용(25.10.23~) * */
+    @Deprecated
     private Long getCurrentMemberId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -33,7 +37,7 @@ public class MemberValidator {
         }
         try {
             MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
-            return Long.parseLong(memberDetails.getUsername());
+            return memberDetails.getUserId();
         } catch (ClassCastException e) {
             throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
         } catch (Exception e) {

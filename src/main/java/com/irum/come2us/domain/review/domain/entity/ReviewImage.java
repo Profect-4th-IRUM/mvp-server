@@ -17,7 +17,7 @@ import org.hibernate.annotations.Where;
 public class ReviewImage extends BaseEntity {
 
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "review_image_id", updatable = false, nullable = false)
     private UUID id;
 

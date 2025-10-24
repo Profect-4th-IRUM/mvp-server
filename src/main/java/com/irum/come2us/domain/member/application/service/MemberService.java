@@ -7,6 +7,7 @@ import com.irum.come2us.domain.member.presentation.dto.request.MemberCreateReque
 import com.irum.come2us.domain.member.presentation.dto.request.MemberInfoUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
+import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberValidator memberValidator;
+    private final MemberUtil memberUtil;
     private final BCryptPasswordEncoder passwordEncoder;
 
     public void createCustomer(MemberCreateRequest request) {
@@ -42,30 +44,30 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberInfoResponse findMemberInfo() {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         return MemberInfoResponse.createMemberInfoResponse(member);
     }
 
     public void changeMemberNameAndContact(MemberInfoUpdateRequest request) {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         member.updateName(request.name());
         member.updateContact(request.contact());
     }
 
     public void changeMemberPassword(MemberPasswordUpdateRequest request) {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         memberValidator.validatePassword(request.originalPassword(), request.newPassword(), member);
         member.updatePassword(passwordEncoder.encode(request.newPassword()));
     } // 추후 BCryptEncoder 사용한 암/복호화 검증 로직 적용 예정
 
     public void changeCustomerRoleToOwner() {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         memberValidator.assertMemberIsNotOwner(member);
         member.grantOwner();
     }
 
     public void withdrawCustomer() {
-        Member member = memberValidator.getCurrentMember();
+        Member member = memberUtil.getCurrentMember();
         memberValidator.assertMemberIsCustomer(member);
         memberRepository.delete(member);
     }

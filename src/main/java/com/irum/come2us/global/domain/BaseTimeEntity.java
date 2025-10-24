@@ -22,4 +22,8 @@ public class BaseTimeEntity {
     private LocalDateTime updatedAt;
 
     private LocalDateTime deletedAt;
+
+    protected void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }
