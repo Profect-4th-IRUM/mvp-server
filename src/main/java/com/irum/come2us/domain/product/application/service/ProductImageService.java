@@ -30,17 +30,19 @@ public class ProductImageService {
 
     public ProductImageResponse addImage(UUID productId, ProductImageCreateRequest request) {
         Member member = memberUtil.getCurrentMember();
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         // 상품 소유자 검증
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         // 대표 이미지 중복 등록 방지
         if (request.isDefault()) {
-            boolean alreadyHasDefault = productImageRepository.findByProductId(productId)
-                    .stream()
-                    .anyMatch(ProductImage::isDefault);
+            boolean alreadyHasDefault =
+                    productImageRepository.findByProductId(productId).stream()
+                            .anyMatch(ProductImage::isDefault);
             if (alreadyHasDefault) {
                 throw new CommonException(ProductImageErrorCode.DUPLICATE_DEFAULT_IMAGE);
             }
@@ -49,16 +51,24 @@ public class ProductImageService {
         ProductImage image = ProductImage.create(product, request.imageUrl(), request.isDefault());
         productImageRepository.save(image);
 
-        log.info("상품 이미지 추가 완료: productId={}, imageUrl={}, isDefault={}",
-                productId, request.imageUrl(), request.isDefault());
+        log.info(
+                "상품 이미지 추가 완료: productId={}, imageUrl={}, isDefault={}",
+                productId,
+                request.imageUrl(),
+                request.isDefault());
 
         return ProductImageResponse.from(image);
     }
 
     public void deleteImage(UUID productId, UUID imageId) {
         Member member = memberUtil.getCurrentMember();
-        ProductImage image = productImageRepository.findById(imageId)
-                .orElseThrow(() -> new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
+        ProductImage image =
+                productImageRepository
+                        .findById(imageId)
+                        .orElseThrow(
+                                () ->
+                                        new CommonException(
+                                                ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
 
         // 상품 소유자 검증
         memberUtil.assertMemberResourceAccess(image.getProduct().getStore().getMember());
@@ -78,8 +88,10 @@ public class ProductImageService {
 
     public void setDefaultImage(UUID productId, UUID imageId) {
         Member member = memberUtil.getCurrentMember();
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         // 상품 소유자 검증
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
