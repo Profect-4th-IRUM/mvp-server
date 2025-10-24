@@ -4,7 +4,10 @@ import com.irum.come2us.domain.coupon.application.service.AppliedCouponService;
 import com.irum.come2us.domain.coupon.application.service.CouponService;
 import com.irum.come2us.domain.deliveryaddress.domain.entity.DeliveryAddress;
 import com.irum.come2us.domain.deliveryaddress.domain.repository.DeliveryAddressRepository;
+import com.irum.come2us.domain.deliverypolicy.domain.entity.DeliveryPolicy;
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.order.application.mapper.CustomerOrderMapper;
+import com.irum.come2us.domain.order.application.mapper.OrderMapper;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
@@ -52,6 +55,7 @@ public class CustomerOrderService {
     private final PaymentService paymentService;
     private final OrderRepository orderRepository;
 
+
     public CustomerOrderResponse prepareOrder(
             CustomerOrderRequest request
     ){
@@ -60,7 +64,7 @@ public class CustomerOrderService {
                 .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
         DeliveryAddress deliveryAddress = deliveryAddressRepository.findById(request.deliveryAddressId())
                 .orElseThrow(() -> new CommonException(DeliveryAddressErrorCode.DELIVERY_ADDRESS_NOT_FOUND));
-
+        log.info("[주문준비] 멤버 {} {} , 상점, 주소 검색", member.getMemberId(), member.getName());
 
         // 상품 확인, 재고확인, 상품 정보 조회 , 가격 계산, 주문 상세 엔티티 생성 준비
         int calculatedTotalPrice = 0;
@@ -83,7 +87,7 @@ public class CustomerOrderService {
 
 
             // 제품 가격 계산
-            int productPrice = (product.getPrice() + productOptionValue.getStockQuantity()) * productReq.quantity();
+            int productPrice = (product.getPrice() + productOptionValue.getExtraPrice()) * productReq.quantity();
             calculatedTotalPrice += productPrice;
             productCount += productReq.quantity();
 
@@ -101,23 +105,28 @@ public class CustomerOrderService {
                     .build();
             orderDetails.add(orderDetail);
         }
+        log.info("상품 확인, 재고 확인, 재고 차감, 가격 계산 완료");
 
 
         /**배송비 적용**/
         int deliveryFee = store.getDeliveryFee();
-        int deliveryMinAmount = store.getDeliveryPolicy().getMinAmount();
-        int deliveryMinQuantity = store.getDeliveryPolicy().getMinQuantity();
-        if( calculatedTotalPrice > deliveryMinAmount || productCount > deliveryMinQuantity ){
-            deliveryFee = 0;
-        }
+        DeliveryPolicy policy = store.getDeliveryPolicy();
+        if (policy != null) {
+            int deliveryMinAmount = store.getDeliveryPolicy().getMinAmount();
+            int deliveryMinQuantity = store.getDeliveryPolicy().getMinQuantity();
+            if( calculatedTotalPrice > deliveryMinAmount || productCount > deliveryMinQuantity ){
+                deliveryFee = 0;
+            }
+        }//배송비 정책이 없다면 원래 가격
+        log.info("배송비 {}",deliveryFee);
 
         /** 할인 적용 */
         int discountAmount = couponService.validAndCalCoupon(request.couponIdList(), calculatedTotalPrice, member);
         int finalPaymentAmount = calculatedTotalPrice - discountAmount;
-
+        log.info("할인 {}, 할인 후 가격 {}", discountAmount, finalPaymentAmount);
 
         /**결재 생성 PENDING 상태**/
-        Payment payment = paymentService.preparePayment(member, finalPaymentAmount, PaymentCorp.TOSS);
+        Payment payment = paymentService.preparePayment(member, finalPaymentAmount, discountAmount, PaymentCorp.TOSS);
         //쿠폰 미리 차감
         appliedCouponService.createAppliedCouponList(payment, request.couponIdList());
 
@@ -138,9 +147,12 @@ public class CustomerOrderService {
         orderRepository.save(order);
 
         /**주문 상세 저장**/
-        orderDetailRepository.saveAll(orderDetails);
+        for (OrderDetail orderDetail:orderDetails){
+            orderDetail.updateOrder(order);
+            orderDetailRepository.save(orderDetail);
+        }
 
-        return new CustomerOrderResponse(null, null, null, 0);
+        return CustomerOrderMapper.toCustomerOrderResponse(order, orderDetails);
     }
 
 }

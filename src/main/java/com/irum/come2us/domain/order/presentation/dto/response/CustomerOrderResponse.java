@@ -11,7 +11,9 @@ public record CustomerOrderResponse (
         List<ProductSummary> prodcutList,
         UUID orderId,
         AddressResponse address,
-        int totalPrice
+        int totalProductPrice,
+        int totalPaymentAmount,
+        int totalDiscountAmount
         ){
     @Builder
     public record ProductSummary(

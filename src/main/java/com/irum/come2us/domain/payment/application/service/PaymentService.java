@@ -53,10 +53,11 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderDetailRepository orderDetailRepository;
 
-    public Payment preparePayment(Member member, int finalPaymentAmount, PaymentCorp paymentCorp) {
+    public Payment preparePayment(Member member, int finalPaymentAmount, int discountAmount, PaymentCorp paymentCorp) {
         Payment payment = Payment.builder()
                 .member(member)
                 .amount(finalPaymentAmount)
+                .totalDiscountAmount(discountAmount)
                 .paymentStatus(PaymentStatus.PENDING)
                 .paymentCorp(paymentCorp)
                 .build();

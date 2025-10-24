@@ -13,20 +13,22 @@ import java.util.UUID;
 @Component
 public class CustomerOrderMapper {
 
-    public CustomerOrderResponse toCustomerOrderResponse(Order order, List<OrderDetail> orderDetailList) {
+    public static CustomerOrderResponse toCustomerOrderResponse(Order order, List<OrderDetail> orderDetailList) {
         List<CustomerOrderResponse.ProductSummary> productSummaryList = orderDetailList.stream()
-                .map(this::toProductSummary)
+                .map(CustomerOrderMapper::toProductSummary)
                 .toList();
 
         return CustomerOrderResponse.builder()
                 .orderId(order.getOrderId())
                 .address(AddressResponse.from(order.getDeliveryAddress().getAddress()))
-                .totalPrice(order.getTotalPrice())
+                .totalProductPrice(order.getTotalPrice())
+                .totalDiscountAmount(order.getPayment().getTotalDiscountAmount())
+                .totalPaymentAmount(order.getPayment().getAmount())
                 .prodcutList(productSummaryList)
                 .build();
     }
 
-    private CustomerOrderResponse.ProductSummary toProductSummary(OrderDetail orderDetail) {
+    private static CustomerOrderResponse.ProductSummary toProductSummary(OrderDetail orderDetail) {
         return CustomerOrderResponse.ProductSummary.builder()
                 .orderDetailId(orderDetail.getOrderDetailId())
                 .productName(orderDetail.getProductName())

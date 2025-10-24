@@ -28,7 +28,6 @@ public class Payment extends BaseEntity {
     private UUID paymentId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
     private int amount;
