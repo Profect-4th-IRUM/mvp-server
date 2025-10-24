@@ -2,9 +2,15 @@ package com.irum.come2us.domain.payment.application.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
+import com.irum.come2us.domain.coupon.application.service.AppliedCouponService;
+import com.irum.come2us.domain.coupon.application.service.CouponService;
+import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.order.domain.entity.OrderDetail;
+import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentCorp;
 import com.irum.come2us.domain.payment.domain.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,13 +43,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PaymentService {
 
-	@Value("${payment.toss.secret-key}")
+    private final AppliedCouponService appliedCouponService;
+    @Value("${payment.toss.secret-key}")
 	String secreteKey;
 
 	private final TosspaymentsClient tosspaymentsClient;
 	private final OrderRepository orderRepository;
 	private final ProductOptionValueService productOptionValueService;
     private final PaymentRepository paymentRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     public Payment preparePayment(Member member, int finalPaymentAmount, PaymentCorp paymentCorp) {
         Payment payment = Payment.builder()
@@ -59,6 +67,7 @@ public class PaymentService {
 	public PaymentResponse createPayment(PaymentRequest request){
 		Order order = orderRepository.findById(request.orderId())
 			.orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));
+        List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrder(order);
 		Payment payment = order.getPayment();
 
 //		 Payment payment = Payment.builder()
@@ -85,16 +94,25 @@ public class PaymentService {
 		TossPaymentsRequest tossPaymentsRequest = new TossPaymentsRequest(request.tossPaymentKey(), request.tossOrderId(), payment.getAmount());
 		try {
 			TossPaymentsResponse tossPaymentsResponse = tosspaymentsClient.confirmPayment(authorizations, tossPaymentsRequest);
-			payment.updateToPaid(PaymentStatus.PAID, tossPaymentsResponse);
+
+            //상태 업데이트
+            payment.updateToPaid(PaymentStatus.PAID, tossPaymentsResponse);
+            order.updateOrderStatus(OrderStatus.PREPARING);
+            orderDetailList.forEach(orderDetail -> {orderDetail.updateStatus(OrderStatus.PREPARING);});
 
 			return new PaymentResponse(order.getOrderNum(), payment.getAmount());
 		} catch (FeignException e){
 			//추후에 Feign client error decoder로 변환하면 좋을 듯
 
+            //상태 업데이트
 			payment.updateStatus(PaymentStatus.FAILED);
 			order.updateOrderStatus(OrderStatus.FAILED);
+            orderDetailList.forEach(orderDetail -> {orderDetail.updateStatus(OrderStatus.FAILED);});
 
+            //재고 롤백
 			productOptionValueService.rollbackStockForOrder(order);
+            //쿠폰 롤백
+            appliedCouponService.rollbackAppliedCouponList(payment);
 
 			throw new CommonException(PaymentErrorCode.PAYMENT_ERROR);
 		}

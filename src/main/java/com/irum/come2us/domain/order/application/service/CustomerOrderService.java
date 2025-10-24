@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.order.application.service;
 
+import com.irum.come2us.domain.coupon.application.service.AppliedCouponService;
 import com.irum.come2us.domain.coupon.application.service.CouponService;
 import com.irum.come2us.domain.deliveryaddress.domain.entity.DeliveryAddress;
 import com.irum.come2us.domain.deliveryaddress.domain.repository.DeliveryAddressRepository;
@@ -47,6 +48,7 @@ public class CustomerOrderService {
     private final DeliveryAddressRepository deliveryAddressRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final CouponService couponService;
+    private final AppliedCouponService appliedCouponService;
     private final PaymentService paymentService;
     private final OrderRepository orderRepository;
 
@@ -110,12 +112,14 @@ public class CustomerOrderService {
         }
 
         /** 할인 적용 */
-        int discountAmount = couponService.calCoupons(request.couponIdList());
+        int discountAmount = couponService.validAndCalCoupon(request.couponIdList(), calculatedTotalPrice, member);
         int finalPaymentAmount = calculatedTotalPrice - discountAmount;
+
 
         /**결재 생성 PENDING 상태**/
         Payment payment = paymentService.preparePayment(member, finalPaymentAmount, PaymentCorp.TOSS);
-
+        //쿠폰 미리 차감
+        appliedCouponService.createAppliedCouponList(payment, request.couponIdList());
 
         // 주문 엔티티 생성 PENDING 상태
         String orderId = "ORD-" + (int) ((Math.random() * 10000000));
