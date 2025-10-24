@@ -31,8 +31,6 @@ public class AiService {
     private final ProductRepository productRepository;
     private final RestTemplate restTemplate;
 
-    //    @Value("${google.gemini.api.key}")
-    //    private String apiKey;
 
     @Value("${google.gemini.api.url}")
     private String geminiUrl;
@@ -75,10 +73,6 @@ public class AiService {
     /** Gemini API 호출 */
     private String callGeminiApi(String prompt) {
         try {
-            //            // URL 구성
-            //            String url = geminiUrl + "?key=" + apiKey;
-            // apiKey가 주석 처리되어 있으므로 url에 키 없이 호출
-            String url = geminiUrl; // + "?key=" + apiKey; // apiKey 주석 처리 상태
 
             // 요청 객체 생성
             GeminiRequest request = GeminiRequest.of(prompt);
