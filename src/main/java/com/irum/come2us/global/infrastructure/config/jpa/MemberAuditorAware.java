@@ -19,8 +19,8 @@ public class MemberAuditorAware implements AuditorAware<Long> {
         }
         if (authentication.getPrincipal() instanceof MemberDetails) {
             MemberDetails nowMember = (MemberDetails) authentication.getPrincipal();
-            Long memberId = Long.parseLong(nowMember.getUsername());
-            log.info("현재 유저: {}", nowMember.getUsername());
+            Long memberId = nowMember.getUserId();
+            log.info("현재 유저: {}", nowMember.getUserId());
             return Optional.of(memberId);
         }
         return Optional.empty();
