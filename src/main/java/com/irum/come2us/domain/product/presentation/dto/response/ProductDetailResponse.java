@@ -1,6 +1,7 @@
 package com.irum.come2us.domain.product.presentation.dto.response;
 
 import com.irum.come2us.domain.product.domain.entity.Product;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -23,12 +24,11 @@ public record ProductDetailResponse(
         int price,
         boolean isPublic,
         Double avgRating,
-        Integer reviewCount
+        Integer reviewCount,
         // TODO: StoreInfoResponse store,
         // TODO: CategoryInfoResponse category,
         // TODO: List<ImageResponse> images,
-        // TODO: List<OptionGroupResponse> optionGroups
-        ) {
+        List<ProductOptionGroupResponse> optionGroups) {
     public static ProductDetailResponse from(Product product) {
         return new ProductDetailResponse(
                 product.getId(),
@@ -38,6 +38,7 @@ public record ProductDetailResponse(
                 product.getPrice(),
                 product.isPublic(),
                 product.getAvgRating(),
-                product.getReviewCount());
+                product.getReviewCount(),
+                product.getOptionGroups().stream().map(ProductOptionGroupResponse::from).toList());
     }
 }

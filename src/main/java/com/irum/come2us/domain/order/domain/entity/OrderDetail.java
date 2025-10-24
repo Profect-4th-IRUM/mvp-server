@@ -2,6 +2,7 @@ package com.irum.come2us.domain.order.domain.entity;
 
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.product.domain.entity.Product;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -12,7 +13,7 @@ import org.hibernate.annotations.*;
 
 @Entity
 @Builder
-@Setter
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_order_detail SET deleted_at = NOW() WHERE order_detail_id=?")
 @SQLRestriction("deleted_at is null")
@@ -20,7 +21,7 @@ import org.hibernate.annotations.*;
 @Table(name = "p_order_detail")
 public class OrderDetail extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(
             name = "order_detail_id",
             columnDefinition = "uuid",
@@ -39,6 +40,7 @@ public class OrderDetail extends BaseEntity {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus orderStatusIndi;
 
@@ -51,13 +53,24 @@ public class OrderDetail extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Order order;
 
-    // TODO: 옵션 many to one
-
-    //    @ManyToOne(fetch = FetchType.LAZY)
-    //    @JoinColumn(name = "option_value_id")
-    //    private OptionValue optionValue;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "option_value_id")
+    private ProductOptionValue productOptionValue;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
+
+    public void updateStatusToPreparing() {
+        this.orderStatusIndi = OrderStatus.PREPARING;
+    }
+
+    public void updateStatusToShipped(Integer trackingNumber) {
+        this.orderStatusIndi = OrderStatus.SHIPPED;
+        this.trackingNumber = trackingNumber;
+    }
+
+    public void updateStatusToDelivered() {
+        this.orderStatusIndi = OrderStatus.DELIVERED;
+    }
 }

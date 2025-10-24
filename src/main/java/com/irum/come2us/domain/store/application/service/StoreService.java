@@ -2,15 +2,18 @@ package com.irum.come2us.domain.store.application.service;
 
 import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.product.domain.repository.ProductRepository;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
-import com.irum.come2us.domain.store.presentation.dto.request.StoreDeliveryFeeUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final ProductRepository productRepository;
     private final MemberValidator memberValidator;
+    private final MemberUtil memberUtil;
 
-    public UUID registerStore(StoreCreateRequest request) {
-        Member member = memberValidator.getCurrentMember();
+    public UUID createStore(StoreCreateRequest request) {
+        Member member = memberUtil.getCurrentMember();
 
         validateMemberHasNoStore(member); // 1인 1상점 제한
         validateBusinessNumber(request.businessRegistrationNumber()); // 사업자번호 중복 체크
@@ -39,34 +44,23 @@ public class StoreService {
                         request.address(),
                         request.businessRegistrationNumber(),
                         request.telemarketingRegistrationNumber(),
-                        request.deliveryFee(),
                         member);
 
         storeRepository.save(store);
         return store.getId();
-    } // owner 권한.
+    }
 
     public void changeStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
-        Member currentMember = memberValidator.getCurrentMember();
+        Member currentMember = memberUtil.getCurrentMember();
 
-        validateStoreOwner(store, currentMember);
+        memberUtil.assertMemberResourceAccess(store.getMember());
 
         store.updateBasicInfo(request.name(), request.contact(), request.address());
     }
 
-    public void changeDeliveryFee(UUID storeId, StoreDeliveryFeeUpdateRequest request) {
-        Store store = getStoreById(storeId);
-        Member currentMember = memberValidator.getCurrentMember();
-
-        validateStoreOwner(store, currentMember);
-
-        store.changeDeliveryFee(request.deliveryFee());
-    }
-
     public void withdrawStore(UUID storeId) {
         Store store = getStoreById(storeId);
-        // TODO: 권한 체크>?
         storeRepository.delete(store);
     }
 
@@ -75,7 +69,6 @@ public class StoreService {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             size = 10;
         }
-
         return storeRepository.findStoresByCursor(cursor, size);
     }
 
@@ -83,6 +76,31 @@ public class StoreService {
     public StoreInfoResponse findStoreInfo(UUID storeId) {
         Store store = getStoreById(storeId);
         return StoreInfoResponse.from(store);
+    }
+
+    public ProductCursorResponse getMyStoreProducts(UUID cursor, Integer size) {
+        Member member = memberUtil.getCurrentMember();
+        Store store =
+                storeRepository
+                        .findByMember(member)
+                        .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
+
+        return getProductsByStore(store.getId(), cursor, size);
+    }
+
+    public ProductCursorResponse getStoreProducts(UUID storeId, UUID cursor, Integer size) {
+        return getProductsByStore(storeId, cursor, size);
+    }
+
+    private ProductCursorResponse getProductsByStore(UUID storeId, UUID cursor, Integer size) {
+        if (size == null || (size != 10 && size != 30 && size != 50)) {
+            size = 10;
+        }
+
+        List<ProductResponse> products =
+                productRepository.findProductsByStoreWithCursor(storeId, cursor, size);
+
+        return ProductCursorResponse.of(products);
     }
 
     // 본인 소유 상점 검증

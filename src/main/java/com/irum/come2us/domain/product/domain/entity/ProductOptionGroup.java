@@ -21,7 +21,7 @@ import org.hibernate.annotations.Where;
 @Where(clause = "deleted_at IS NULL")
 public class ProductOptionGroup extends BaseEntity {
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     @Column(name = "option_group_id", updatable = false, nullable = false)
     private UUID id;
 
@@ -48,5 +48,9 @@ public class ProductOptionGroup extends BaseEntity {
     public void addOptionValue(ProductOptionValue value) {
         optionValues.add(value);
         value.setOptionGroup(this);
+    }
+
+    public void updateOptionGroupName(String name) {
+        this.name = name;
     }
 }
