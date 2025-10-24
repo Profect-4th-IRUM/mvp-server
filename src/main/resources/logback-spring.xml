@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <springProperty scope="context" name="LOG_DIR"
+                    source="logback.log-path"
+                    defaultValue="logs"/>
+    <property name="LOG_PATTERN" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+    //IDE 출력 설정
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <!--
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+
+    </appender>
+    -->
+
+    //로그파일 생성 설정
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/come2us.log</file>
+        <!--
+        <append>false</append>
+        -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/come2us.app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    //에러 로그 필터링 설정
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>  <onMismatch>DENY</onMismatch> </filter>
+
+        <file>${LOG_DIR}/error.log</file>
+        <!--
+        <append>false</append>
+        -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>60</maxHistory> </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    //logger 레벨 설정
+    // application: DEBUG
+    <logger name="com.irum.come2us" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </logger>
+
+    // JPA Hibernate SQL 쿼리: DEBUG
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    // JPA Hibernate SQL 실제 타입 바인딩: TRACE
+    <logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    // 기타 외부 의존성: INFO
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
+
+    //프로필 별 설정
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <!--
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+            -->
+        </root>
+        <logger name="com.irum.come2us" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE" />
+            <!--
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+            -->
+        </logger>
+    </springProfile>
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+        </root>
+        <logger name="com.irum.come2us" level="INFO" additivity="false">
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+        </logger>
+    </springProfile>
+
+
+</configuration>
