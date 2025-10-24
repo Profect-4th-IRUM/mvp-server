@@ -3,7 +3,6 @@ package com.irum.come2us.domain.product.presentation.controller;
 import com.irum.come2us.domain.product.application.service.ProductService;
 import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.*;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductCursorResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

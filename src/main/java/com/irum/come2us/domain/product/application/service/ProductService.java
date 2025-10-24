@@ -11,7 +11,6 @@ import com.irum.come2us.domain.product.domain.repository.ProductOptionValueRepos
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.*;
 import com.irum.come2us.domain.product.presentation.dto.response.*;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductCursorResponse;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
