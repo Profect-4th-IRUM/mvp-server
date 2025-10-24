@@ -7,12 +7,14 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.AuthError
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.security.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MemberUtil {
 
     private final MemberRepository memberRepository;
@@ -35,10 +37,12 @@ public class MemberUtil {
         }
         try {
             MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
-            return Long.parseLong(memberDetails.getUsername());
+            return memberDetails.getUserId();
         } catch (ClassCastException e) {
+            log.warn(e.getMessage());
             throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
         } catch (Exception e) {
+            log.warn(e.getMessage());
             throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
         }
     } // 로그인 된 아이디 반환

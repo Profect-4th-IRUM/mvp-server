@@ -8,7 +8,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class})
 @Getter
 @MappedSuperclass
 public class BaseEntity extends BaseTimeEntity {
@@ -19,4 +19,11 @@ public class BaseEntity extends BaseTimeEntity {
     @LastModifiedBy
     @Column(nullable = false)
     private Long updatedBy;
+
+    private Long deletedBy;
+
+    public void softDelete(Long deletedBy) {
+        super.updateDeletedAt();
+        this.deletedBy = deletedBy;
+    }
 }
