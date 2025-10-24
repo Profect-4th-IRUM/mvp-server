@@ -1,12 +1,8 @@
 package com.irum.come2us.domain.product.presentation.controller;
 
 import com.irum.come2us.domain.product.application.service.ProductService;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
+import com.irum.come2us.domain.product.presentation.dto.request.*;
+import com.irum.come2us.domain.product.presentation.dto.response.*;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +68,57 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
         log.info("상품 삭제 요청: productId={}", productId);
         productService.deleteProduct(productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{productId}/options")
+    public ResponseEntity<Void> createProductOptionGroup(
+            @PathVariable UUID productId, @Valid @RequestBody ProductOptionGroupRequest request) {
+        log.info("상품 옵션 그룹 추가 요청: productId={}, groupName={}", productId, request.name());
+        productService.createOptionGroup(productId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/options/{optionGroupId}/values")
+    public ResponseEntity<Void> createProductOptionValue(
+            @PathVariable UUID optionGroupId,
+            @Valid @RequestBody ProductOptionValueRequest request) {
+        log.info("옵션 값 추가 요청: optionGroupId={}, valueName={}", optionGroupId, request.name());
+        productService.createOptionValue(optionGroupId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/options/{optionGroupId}")
+    public ResponseEntity<ProductOptionGroupResponse> updateProductOptionGroup(
+            @PathVariable UUID optionGroupId,
+            @Valid @RequestBody ProductOptionGroupRequest request) {
+        log.info("상품 옵션 그룹 수정 요청: groupId={}", optionGroupId);
+        ProductOptionGroupResponse response =
+                productService.updateProductOptionGroup(optionGroupId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/options/values/{optionValueId}")
+    public ResponseEntity<ProductOptionValueResponse> updateProductOptionValue(
+            @PathVariable UUID optionValueId,
+            @Valid @RequestBody ProductOptionValueUpdateRequest request) {
+        log.info("상품 옵션 값 수정 요청: valueId={}", optionValueId);
+        ProductOptionValueResponse response =
+                productService.updateProductOptionValue(optionValueId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/options/{optionGroupId}")
+    public ResponseEntity<Void> deleteProductOptionGroup(@PathVariable UUID optionGroupId) {
+        log.info("상품 옵션 그룹 삭제 요청: groupId={}", optionGroupId);
+        productService.deleteProductOptionGroup(optionGroupId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/options/values/{optionValueId}")
+    public ResponseEntity<Void> deleteProductOptionValue(@PathVariable UUID optionValueId) {
+        log.info("상품 옵션 값 삭제 요청: valueId={}", optionValueId);
+        productService.deleteProductOptionValue(optionValueId);
         return ResponseEntity.noContent().build();
     }
 }
