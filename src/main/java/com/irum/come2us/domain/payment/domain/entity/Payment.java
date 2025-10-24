@@ -58,5 +58,6 @@ public class Payment extends BaseEntity {
         this.paymentStatus = ps;
         this.tossPaymentKey = res.paymentKey();
         this.tossOrderId = res.orderId();
+        this.paymentMethod = PaymentMethod.from(res.method());
     }
 }
