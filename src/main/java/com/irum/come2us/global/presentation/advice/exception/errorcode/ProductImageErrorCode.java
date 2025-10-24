@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ProductImageErrorCode implements BaseErrorCode {
-
     PRODUCT_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "상품 이미지를 찾을 수 없습니다."),
     INVALID_PRODUCT_IMAGE_RELATION(HttpStatus.BAD_REQUEST, "요청한 상품과 이미지가 일치하지 않습니다."),
     DUPLICATE_DEFAULT_IMAGE(HttpStatus.CONFLICT, "이미 대표 이미지가 존재합니다."),
