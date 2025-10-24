@@ -37,7 +37,7 @@ public class ProductOptionValueService {
 				.orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
 			// 재고 되돌리기
-			option.increaseStockQuantity(detail.getQuantity());
+			option.increaseStock(detail.getQuantity());
 		}
 	}
 }

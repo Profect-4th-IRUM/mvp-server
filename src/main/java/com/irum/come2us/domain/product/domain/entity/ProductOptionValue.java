@@ -67,7 +67,7 @@ public class ProductOptionValue {
         this.optionGroup = optionGroup;
     }
 
-    public void increaseStockQuantity(int q){
-        this.stockQuantity += q;
+    public void increaseStock(Integer quantity){
+        this.stockQuantity += quantity;
     }
 }

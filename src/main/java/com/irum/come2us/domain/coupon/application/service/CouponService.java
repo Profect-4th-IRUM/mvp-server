@@ -59,8 +59,9 @@ public class CouponService {
     }
 
     /** 적용한 쿠폰 가격 반환 */
-    public int applyCoupons(List<UUID> couponIdList) {
-        return 0;
+    public int calCoupons(List<UUID> couponIdList) {
+        List<Coupon> coupons = couponRepository.findAllById(couponIdList);
+        return coupons.stream().mapToInt(Coupon::getDiscountAmount).sum();
     }
 
     /**쿠폰 유효성 검증 및 할인 금액 계산*/

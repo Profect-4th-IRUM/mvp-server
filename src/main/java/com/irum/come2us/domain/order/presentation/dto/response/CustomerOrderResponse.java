@@ -1,14 +1,19 @@
 package com.irum.come2us.domain.order.presentation.dto.response;
 
+import com.irum.come2us.domain.deliveryaddress.domain.entity.Address;
+import lombok.Builder;
+
 import java.util.List;
 import java.util.UUID;
 
+@Builder
 public record CustomerOrderResponse (
         List<ProductSummary> prodcutList,
         UUID orderId,
-        String address,
+        AddressResponse address,
         int totalPrice
         ){
+    @Builder
     public record ProductSummary(
             UUID orderDetailId,
             String productName,

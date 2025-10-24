@@ -4,6 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.UUID;
 
+import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.domain.payment.domain.entity.enums.PaymentCorp;
+import com.irum.come2us.domain.payment.domain.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +43,19 @@ public class PaymentService {
 	private final TosspaymentsClient tosspaymentsClient;
 	private final OrderRepository orderRepository;
 	private final ProductOptionValueService productOptionValueService;
+    private final PaymentRepository paymentRepository;
+
+    public Payment preparePayment(Member member, int finalPaymentAmount, PaymentCorp paymentCorp) {
+        Payment payment = Payment.builder()
+                .member(member)
+                .amount(finalPaymentAmount)
+                .paymentStatus(PaymentStatus.PENDING)
+                .paymentCorp(paymentCorp)
+                .build();
+        return paymentRepository.save(payment);
+    }
+
+
 	public PaymentResponse createPayment(PaymentRequest request){
 		Order order = orderRepository.findById(request.orderId())
 			.orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));

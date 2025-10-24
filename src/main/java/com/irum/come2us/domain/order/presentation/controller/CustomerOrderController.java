@@ -22,6 +22,6 @@ public class CustomerOrderController {
     public CustomerOrderResponse orderCreate(
             @RequestBody CustomerOrderRequest request
     ){
-        return customerOrderService.createOrder(request);
+        return customerOrderService.prepareOrder(request);
     }
 }
