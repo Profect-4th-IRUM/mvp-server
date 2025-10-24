@@ -28,8 +28,9 @@ public class Refund extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RefundReason reason;
 
-    private String description;
+    @Lob private String description;
 
+    @Column(nullable = false)
     private int price;
 
     @Enumerated(EnumType.STRING)
@@ -41,7 +42,7 @@ public class Refund extends BaseEntity {
     private Order order;
 
     public static Refund createRefund(
-            RefundReason reason, String description, Integer price, Order order) {
+            RefundReason reason, String description, int price, Order order) {
         return Refund.builder()
                 .reason(reason)
                 .description(description)

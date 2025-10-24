@@ -51,7 +51,7 @@ public class StoreRefundService {
     public StoreRefundResponse createRefund(UUID orderId, StoreRefundCreateRequest request) {
         Order order =
                 refundRepository
-                        .findByOrderId(orderId) // orderRepository.findById(orderId)로 변경 예정
+                        .findByOrder_OrderId(orderId) // orderRepository.findById(orderId)로 변경 예정
                         .orElseThrow(() -> new CommonException(RefundErrorCode.ORDER_NOT_FOUND));
 
         Refund refund =
