@@ -3,6 +3,7 @@ package com.irum.come2us.domain.category.presentation.controller;
 import com.irum.come2us.domain.category.application.service.CategoryService;
 import com.irum.come2us.domain.category.presentation.dto.request.CategoryCreateRequest;
 import com.irum.come2us.domain.category.presentation.dto.request.CategoryUpdateRequest;
+import com.irum.come2us.domain.category.presentation.dto.response.CategoryInfoResponse;
 import com.irum.come2us.domain.category.presentation.dto.response.CategoryResponse;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,7 +19,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryResponse> getAllCategories(@RequestParam(required = false) UUID parentId) {
+    public List<CategoryInfoResponse> getAllCategories(@RequestParam(required = false) UUID parentId) {
         if (parentId != null) {
             return categoryService.findByParentId(parentId);
         }

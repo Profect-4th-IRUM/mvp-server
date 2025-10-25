@@ -4,6 +4,7 @@ import com.irum.come2us.domain.category.domain.entity.Category;
 import com.irum.come2us.domain.category.domain.repository.CategoryRepository;
 import com.irum.come2us.domain.category.presentation.dto.request.CategoryCreateRequest;
 import com.irum.come2us.domain.category.presentation.dto.request.CategoryUpdateRequest;
+import com.irum.come2us.domain.category.presentation.dto.response.CategoryInfoResponse;
 import com.irum.come2us.domain.category.presentation.dto.response.CategoryResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
@@ -22,16 +23,16 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> findRootCategories() {
+    public List<CategoryInfoResponse> findRootCategories() {
         return categoryRepository.findByParentIsNull().stream()
-                .map(CategoryResponse::fromEntity)
+                .map(CategoryInfoResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> findByParentId(UUID parentId) {
+    public List<CategoryInfoResponse> findByParentId(UUID parentId) {
         return categoryRepository.findChildrenByParentId(parentId).stream()
-                .map(CategoryResponse::fromEntity)
+                .map(CategoryInfoResponse::from)
                 .toList();
     }
 
