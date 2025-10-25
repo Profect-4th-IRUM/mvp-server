@@ -3,7 +3,6 @@ package com.irum.come2us.domain.product.presentation.dto.response;
 import com.irum.come2us.domain.category.presentation.dto.response.CategoryInfoResponse;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
-
 import java.util.List;
 import java.util.UUID;
 
