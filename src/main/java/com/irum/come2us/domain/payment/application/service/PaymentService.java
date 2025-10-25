@@ -7,6 +7,7 @@ import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
+import com.irum.come2us.domain.payment.application.client.TosspaymentsAPI;
 import com.irum.come2us.domain.payment.application.client.TosspaymentsClient;
 import com.irum.come2us.domain.payment.application.client.dto.TossPaymentsRequest;
 import com.irum.come2us.domain.payment.application.client.dto.TossPaymentsResponse;
@@ -17,7 +18,6 @@ import com.irum.come2us.domain.payment.domain.repository.PaymentRepository;
 import com.irum.come2us.domain.payment.presentation.dto.request.PaymentRequest;
 import com.irum.come2us.domain.payment.presentation.dto.response.PaymentResponse;
 import com.irum.come2us.domain.product.application.service.ProductOptionValueService;
-import com.irum.come2us.global.infrastructure.properties.TossProperties;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.PaymentErrorCode;
@@ -38,7 +38,6 @@ public class PaymentService {
 
     private final AppliedCouponService appliedCouponService;
 
-    private final TossProperties tossProperties;
 
     private final TosspaymentsClient tosspaymentsClient;
     private final OrderRepository orderRepository;
@@ -73,19 +72,11 @@ public class PaymentService {
             return new PaymentResponse(order.getOrderNum(), payment.getAmount());
         }
 
-        // 토스페이먼츠 authorization 제작
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes =
-                encoder.encode((tossProperties.secretKey() + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
 
-        // 토스 페이먼츠 승인 API호출
-        TossPaymentsRequest tossPaymentsRequest =
-                new TossPaymentsRequest(
-                        request.tossPaymentKey(), request.tossOrderId(), payment.getAmount());
         try {
+            // 토스 페이먼츠 승인 API호출
             TossPaymentsResponse tossPaymentsResponse =
-                    tosspaymentsClient.confirmPayment(authorizations, tossPaymentsRequest);
+                tosspaymentsClient.confirmPayment(request, payment.getAmount());
 
             // 상태 업데이트
             payment.updateToPaid(PaymentStatus.PAID, tossPaymentsResponse);
