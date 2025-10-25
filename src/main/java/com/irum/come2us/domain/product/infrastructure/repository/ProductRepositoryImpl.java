@@ -42,7 +42,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.price,
                                 product.isPublic,
                                 product.avgRating,
-                                product.reviewCount))
+                                product.reviewCount,
+                                product.category.categoryId,
+                                product.category.name))
                 .from(product)
                 .where(product.isPublic.isTrue(), ltCursor(cursor, product))
                 .orderBy(product.id.desc())
@@ -65,7 +67,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.price,
                                 product.isPublic,
                                 product.avgRating,
-                                product.reviewCount))
+                                product.reviewCount,
+                                product.category.categoryId,
+                                product.category.name))
                 .from(product)
                 .where(
                         product.isPublic.isTrue(),
@@ -116,7 +120,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.price,
                                 product.isPublic,
                                 product.avgRating,
-                                product.reviewCount))
+                                product.reviewCount,
+                                product.category.categoryId,
+                                product.category.name))
                 .from(product)
                 .where(
                         product.isPublic.isTrue(),
@@ -143,7 +149,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 product.price,
                                 product.isPublic,
                                 product.avgRating,
-                                product.reviewCount))
+                                product.reviewCount,
+                                product.category.categoryId,
+                                product.category.name))
                 .from(product)
                 .where(
                         product.isPublic.isTrue(),
