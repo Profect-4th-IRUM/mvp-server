@@ -53,7 +53,12 @@ public class ProductController {
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size,
             @RequestParam(required = false) String keyword) {
-        log.info("상품 목록 조회 요청: categoryId={}, cursor={}, size={}, keyword={}", categoryId, cursor, size, keyword);
+        log.info(
+                "상품 목록 조회 요청: categoryId={}, cursor={}, size={}, keyword={}",
+                categoryId,
+                cursor,
+                size,
+                keyword);
         return productService.getProductList(categoryId, cursor, size, keyword);
     }
 
