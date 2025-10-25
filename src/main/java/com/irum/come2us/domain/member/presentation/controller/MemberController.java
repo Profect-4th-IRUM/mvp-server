@@ -5,6 +5,7 @@ import com.irum.come2us.domain.member.presentation.dto.request.MemberCreateReque
 import com.irum.come2us.domain.member.presentation.dto.request.MemberInfoUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,14 +20,14 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> joinCustomer(@RequestBody MemberCreateRequest request) {
+    public ResponseEntity<Void> joinCustomer(@Valid @RequestBody MemberCreateRequest request) {
         log.info("고객 회원가입 요청: {}", request);
         memberService.createCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/owner-signup")
-    public ResponseEntity<Void> joinOwner(@RequestBody MemberCreateRequest request) {
+    public ResponseEntity<Void> joinOwner(@Valid @RequestBody MemberCreateRequest request) {
         log.info("판매자 회원가입 요청: {}", request);
         memberService.createOwner(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -54,12 +55,14 @@ public class MemberController {
 
     @PatchMapping("/role")
     public ResponseEntity<Void> updateCustomerToOwner() {
+        log.info("멤버 권한 변경 요청: CUSTOMER->OWNER");
         memberService.changeCustomerRoleToOwner();
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/me")
+    @DeleteMapping
     public ResponseEntity<Void> deleteCustomer() {
+        log.info("멤버 삭제 요청");
         memberService.withdrawCustomer();
         return ResponseEntity.noContent().build();
     }
