@@ -3,6 +3,8 @@ package com.irum.come2us.domain.category.application.service;
 import com.irum.come2us.domain.category.domain.entity.Category;
 import com.irum.come2us.domain.category.domain.repository.CategoryRepository;
 import com.irum.come2us.domain.category.presentation.dto.request.CategoryCreateRequest;
+import com.irum.come2us.domain.category.presentation.dto.request.CategoryUpdateRequest;
+import com.irum.come2us.domain.category.presentation.dto.response.CategoryInfoResponse;
 import com.irum.come2us.domain.category.presentation.dto.response.CategoryResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
@@ -20,15 +22,20 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    // ------------------- 전체 조회 -------------------
     @Transactional(readOnly = true)
-    public List<CategoryResponse> findAllCategories() {
-        return categoryRepository.findAll().stream()
-                .map(CategoryResponse::fromEntity)
-                .collect(Collectors.toList());
+    public List<CategoryInfoResponse> findRootCategories() {
+        return categoryRepository.findByParentIsNull().stream()
+                .map(CategoryInfoResponse::from)
+                .toList();
     }
 
-    // ------------------- 단일 조회 -------------------
+    @Transactional(readOnly = true)
+    public List<CategoryInfoResponse> findByParentId(UUID parentId) {
+        return categoryRepository.findChildrenByParentId(parentId).stream()
+                .map(CategoryInfoResponse::from)
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(UUID id) {
         Category category =
@@ -39,7 +46,6 @@ public class CategoryService {
         return CategoryResponse.fromEntity(category);
     }
 
-    // ------------------- 트리 조회 -------------------
     @Transactional(readOnly = true)
     public List<CategoryResponse> findCategoryTree() {
         List<Category> roots = categoryRepository.findByParentIsNull();
@@ -48,7 +54,6 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
-    // ------------------- 생성 -------------------
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         Category category;
 
@@ -69,18 +74,16 @@ public class CategoryService {
         return CategoryResponse.fromEntity(saved);
     }
 
-    // ------------------- 수정 -------------------
-    public CategoryResponse updateCategory(UUID id, String newName) {
+    public CategoryResponse updateCategory(UUID id, CategoryUpdateRequest request) {
         Category category =
                 categoryRepository
                         .findById(id)
                         .orElseThrow(
                                 () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
-        category.updateName(newName);
+        category.updateName(request.name());
         return CategoryResponse.fromEntity(category);
     }
 
-    // ------------------- 삭제 -------------------
     public void deleteCategory(UUID id) {
         Category category =
                 categoryRepository
