@@ -61,6 +61,7 @@ public class StoreService {
 
     public void withdrawStore(UUID storeId) {
         Store store = getStoreById(storeId);
+        memberUtil.assertMemberResourceAccess(store.getMember());
         storeRepository.delete(store);
     }
 
