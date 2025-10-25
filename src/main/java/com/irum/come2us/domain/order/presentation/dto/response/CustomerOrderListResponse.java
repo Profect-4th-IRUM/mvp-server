@@ -21,15 +21,16 @@ public record CustomerOrderListResponse(
 		LocalDateTime orderAt,
         RefundStatus refundStatus,
 		List<ProductResponse> productResponseList
-	){}
+	){
+	}
 	@Builder
 	public record ProductResponse(
 		UUID orderDetailId,
+		String productName,
 		String optionName,
 		int quantity,
-		OrderStatus orderStatus,
-		RefundStatus refundStatus,
-		int price
+		int price,
+		OrderStatus orderStatus
 	){}
 
 }

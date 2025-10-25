@@ -35,12 +35,12 @@ public class CustomerOrderController {
 	}
 
 	/**주문 목록 조회*/
-	@GetMapping("")
+	@GetMapping
 	public CustomerOrderListResponse orderListGet(
-            @RequestParam UUID cursor,
+            @RequestParam(required = false) UUID cursor,
             @RequestParam int size,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
     ){
 		return customerOrderService.getOrderList(cursor, size, startDate, endDate);
 	}

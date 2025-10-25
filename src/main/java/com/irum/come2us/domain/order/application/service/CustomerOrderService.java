@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderDetailRow;
+import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderSummaryRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import org.springframework.stereotype.Service;
@@ -63,25 +65,37 @@ public class CustomerOrderService {
 
 	@Transactional
 	public CustomerOrderListResponse getOrderList(UUID cursor, int size, LocalDate startDate, LocalDate endDate){
+
 		Member member = memberUtil.getCurrentMember();
-		List<Order> orderList = orderRepository.findAllByMember(member);
+		log.info("member {}", member.getMemberId());
 
         // 2. order list 검색
-        List<CustomerOrderListResponse.OrderResponse> headerList =
+        List<CustomerOrderSummaryRow> headerList =
                 orderRepository.fetchOrderListByMember(member, startDate, endDate, cursor, size);
+		log.info("order list {}", headerList);
 
         boolean hasNext = headerList.size() > size;
         if (hasNext) {
             headerList = headerList.subList(0, size);
         }
+		log.info("hasNext {}", hasNext);
 
         // 3. order id list
-        List<UUID> orderIdList = headerList.stream().map(CustomerOrderListResponse.OrderResponse::orderId).toList();
+        List<UUID> orderIdList = headerList.stream().map(CustomerOrderSummaryRow::orderId).toList();
+        List<CustomerOrderDetailRow> orderDetailList = orderRepository.fetchOrderDetailListByMember(orderIdList);
+		log.info("orderDetailList ", orderDetailList);
 
-        // 4. orderId로 그룹핑 : productSummary 제작
-        Map<UUID, List<CustomerOrderListResponse.ProductResponse>> detailMap = orderRepository.fetchOrderDetailListByMember(orderIdList);
+		// 4. orderId로 그룹핑 : productSummary 제작
+		Map<UUID, List<CustomerOrderListResponse.ProductResponse>> detailMap =
+			orderDetailList.stream()
+				.collect(
+					Collectors.groupingBy(
+						CustomerOrderDetailRow::orderId,
+						Collectors.mapping(
+							CustomerOrderMapper::toProductResponse,
+							Collectors.toList())));
 
-        // 5. orderResponse 제작
+		// 5. orderResponse 제작
         List<CustomerOrderListResponse.OrderResponse> orderResponseList =
                 headerList.stream()
                         .filter(order -> detailMap.containsKey(order.orderId()))

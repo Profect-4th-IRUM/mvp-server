@@ -2,11 +2,16 @@ package com.irum.come2us.domain.order.application.mapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
+import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderDetailRow;
+import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderSummaryRow;
+import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
 import com.irum.come2us.domain.order.presentation.dto.response.AddressResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
@@ -57,13 +62,24 @@ public class CustomerOrderMapper {
 	}
 
 	public static CustomerOrderListResponse.OrderResponse toOrderResponse(
-		CustomerOrderListResponse.OrderResponse or, List<CustomerOrderListResponse.ProductResponse> pList
+		CustomerOrderSummaryRow or, List<CustomerOrderListResponse.ProductResponse> pList
 	){
+
 		return CustomerOrderListResponse.OrderResponse.builder()
 			.orderId(or.orderId())
 			.orderAt(or.orderAt())
 			.refundStatus(or.refundStatus())
 			.productResponseList(pList)
+			.build();
+	}
+	public static CustomerOrderListResponse.ProductResponse toProductResponse(CustomerOrderDetailRow c){
+		return CustomerOrderListResponse.ProductResponse.builder()
+			.orderStatus(c.orderStatusIndi())
+			.orderDetailId(c.orderDetailId())
+			.optionName(c.optionName())
+			.price(c.price())
+			.productName(c.productName())
+			.quantity(c.quantity())
 			.build();
 	}
 }
