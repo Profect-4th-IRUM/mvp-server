@@ -6,20 +6,8 @@
 :toclevels: 2
 :sectlinks:
 
-== 회원 (Member) API
+include::_member.adoc[]
+include::_manager.adoc[]
 
-=== 1. 고객 회원가입
+// include::_product.adoc[]
 
-`POST /members/signup`
-
-==== 요청 본문 (Request Body)
-include::{snippets}/member-signup/request-fields.adoc[]
-
-==== 예시 요청 (cURL)
-include::{snippets}/member-signup/curl-request.adoc[]
-
-==== 예시 요청 (HTTPie)
-include::{snippets}/member-signup/httpie-request.adoc[]
-
-==== 응답 (Response)
-include::{snippets}/member-signup/http-response.adoc[]

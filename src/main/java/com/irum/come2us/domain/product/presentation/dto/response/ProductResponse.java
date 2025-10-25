@@ -21,7 +21,9 @@ public record ProductResponse(
         int price,
         boolean isPublic,
         Double avgRating,
-        Integer reviewCount) {
+        Integer reviewCount,
+        UUID categoryId,
+        String categoryName) {
     public static ProductResponse from(Product product) {
         return new ProductResponse(
                 product.getId(),
@@ -31,6 +33,8 @@ public record ProductResponse(
                 product.getPrice(),
                 product.isPublic(),
                 product.getAvgRating(),
-                product.getReviewCount());
+                product.getReviewCount(),
+                product.getCategory().getCategoryId(),
+                product.getCategory().getName());
     }
 }

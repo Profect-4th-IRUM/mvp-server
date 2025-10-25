@@ -3,7 +3,7 @@ package com.irum.come2us.domain.store.domain.entity;
 import com.irum.come2us.domain.deliverypolicy.domain.entity.DeliveryPolicy;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.constants.RegexConstants;
-import com.irum.come2us.global.domain.BaseTimeEntity;
+import com.irum.come2us.global.domain.BaseEntity;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import jakarta.persistence.*;
@@ -22,7 +22,7 @@ import org.hibernate.annotations.Where;
 @Table(name = "p_store")
 @SQLDelete(sql = "UPDATE p_store SET deleted_at = NOW() WHERE store_id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class Store extends BaseTimeEntity {
+public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -48,16 +48,19 @@ public class Store extends BaseTimeEntity {
             columnDefinition = "char(10)")
     private String telemarketingRegistrationNumber;
 
-    @Column(name = "delivery_fee", nullable = false)
-    private int deliveryFee;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_policy_id")
+    @OneToOne(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private DeliveryPolicy deliveryPolicy;
+
+    public void setDeliveryPolicy(DeliveryPolicy deliveryPolicy) {
+        this.deliveryPolicy = deliveryPolicy;
+        if (deliveryPolicy != null && deliveryPolicy.getStore() != this) {
+            deliveryPolicy.setStore(this);
+        }
+    }
 
     @Builder(access = AccessLevel.PRIVATE)
     private Store(
@@ -66,8 +69,8 @@ public class Store extends BaseTimeEntity {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee,
-            Member member) {
+            Member member,
+            DeliveryPolicy deliveryPolicy) {
 
         this.name = name;
         this.contact = validContact(contact);
@@ -76,8 +79,8 @@ public class Store extends BaseTimeEntity {
                 validBusinessRegistrationNumber(businessRegistrationNumber);
         this.telemarketingRegistrationNumber =
                 validTelemarketingRegistrationNumber(telemarketingRegistrationNumber);
-        this.deliveryFee = validDeliveryFee(deliveryFee);
         this.member = member;
+        this.deliveryPolicy = null;
     }
 
     public static Store createStore(
@@ -86,7 +89,6 @@ public class Store extends BaseTimeEntity {
             String address,
             String businessRegistrationNumber,
             String telemarketingRegistrationNumber,
-            int deliveryFee,
             Member member) {
         return Store.builder()
                 .name(name)
@@ -94,7 +96,6 @@ public class Store extends BaseTimeEntity {
                 .address(address)
                 .businessRegistrationNumber(businessRegistrationNumber)
                 .telemarketingRegistrationNumber(telemarketingRegistrationNumber)
-                .deliveryFee(deliveryFee)
                 .member(member)
                 .build();
     }
@@ -103,10 +104,6 @@ public class Store extends BaseTimeEntity {
         this.name = name;
         this.contact = validContact(contact);
         this.address = address;
-    }
-
-    public void changeDeliveryFee(int deliveryFee) {
-        this.deliveryFee = validDeliveryFee(deliveryFee);
     }
 
     private static final Pattern PHONE_NUMBER_PATTERN =
@@ -140,12 +137,5 @@ public class Store extends BaseTimeEntity {
             throw new CommonException(StoreErrorCode.INVALID_BUSINESS_REGISTRATION_NUMBER);
         }
         return businessRegistrationNumber;
-    }
-
-    private static int validDeliveryFee(int deliveryFee) {
-        if (deliveryFee < 0) {
-            throw new CommonException(StoreErrorCode.INVALID_DELIVERY_FEE);
-        }
-        return deliveryFee;
     }
 }

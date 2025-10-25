@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.category.domain.entity;
 
+import com.irum.come2us.global.domain.BaseEntity;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import org.hibernate.annotations.UuidGenerator;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
-public class Category {
+public class Category extends BaseEntity {
 
     private static final int MAX_DEPTH = 3;
 
@@ -37,7 +38,6 @@ public class Category {
     @Column(name = "depth", nullable = false)
     private int depth;
 
-    // ------------------- 생성 메서드 -------------------
     public static Category createRootCategory(String name) {
         return Category.builder().name(name).depth(1).build();
     }
@@ -58,7 +58,6 @@ public class Category {
         this.children.add(child);
     }
 
-    // ------------------- 수정 메서드 -------------------
     public void updateName(String name) {
         this.name = name;
     }

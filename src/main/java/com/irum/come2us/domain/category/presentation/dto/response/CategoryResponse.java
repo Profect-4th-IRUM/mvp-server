@@ -11,7 +11,6 @@ public record CategoryResponse(
         UUID parentId,
         List<CategoryResponse> children // 트리 조회용
         ) {
-    // ------------------- 단일 조회용 -------------------
     public static CategoryResponse fromEntity(Category category) {
         return new CategoryResponse(
                 category.getCategoryId(),
@@ -21,7 +20,6 @@ public record CategoryResponse(
                 null);
     }
 
-    // ------------------- 트리 조회용 -------------------
     public static CategoryResponse fromEntityWithChildren(Category category) {
         return new CategoryResponse(
                 category.getCategoryId(),

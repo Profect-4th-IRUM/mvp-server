@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
@@ -32,8 +33,9 @@ public class Refund extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RefundReason reason;
 
-    private String description;
+    @Lob private String description;
 
+    @Column(nullable = false)
     private int price;
 
     @Enumerated(EnumType.STRING)
@@ -43,4 +45,19 @@ public class Refund extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    public static Refund createRefund(
+            RefundReason reason, String description, int price, Order order) {
+        return Refund.builder()
+                .reason(reason)
+                .description(description)
+                .price(price)
+                .refundStatus(RefundStatus.REQUESTED)
+                .order(order)
+                .build();
+    }
+
+    public void updateStatus(RefundStatus newStatus) {
+        this.refundStatus = newStatus;
+    }
 }

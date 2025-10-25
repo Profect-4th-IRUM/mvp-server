@@ -1,28 +1,31 @@
 package com.irum.come2us.domain.product.application.service;
 
+import com.irum.come2us.domain.category.domain.entity.Category;
+import com.irum.come2us.domain.category.domain.repository.CategoryRepository;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.Product;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionGroup;
+import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
+import com.irum.come2us.domain.product.domain.repository.ProductOptionGroupRepository;
+import com.irum.come2us.domain.product.domain.repository.ProductOptionValueRepository;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
-import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
-import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
+import com.irum.come2us.domain.product.presentation.dto.request.*;
+import com.irum.come2us.domain.product.presentation.dto.response.*;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
-import com.irum.come2us.global.security.MemberDetails;
+import com.irum.come2us.global.util.MemberUtil;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,30 +35,62 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ProductOptionGroupRepository optionGroupRepository;
+    private final ProductOptionValueRepository optionValueRepository;
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
+    private final CategoryRepository categoryRepository;
+    private final MemberUtil memberUtil;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
-        Member member = getCurrentUser();
+        Member member = memberUtil.getCurrentMember();
 
         Store store =
                 storeRepository
                         .findByMember(member)
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
 
+        // memberUtil.assertMemberResourceAccess(store.getMember());
+        // Store를 현재 인증된 유저 기반으로 조회했기 때문에, 다시 한 번 검증할 필요 없다고 생각
+
         if (!member.getRole().equals(Role.OWNER)) {
             log.warn("상품 등록 실패: 비인가 사용자 memberId={}", member.getMemberId());
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
         }
 
+        Category category =
+                categoryRepository
+                        .findById(request.categoryId())
+                        .orElseThrow(
+                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
         Product product =
                 Product.createProduct(
                         store,
+                        category,
                         request.name(),
                         request.description(),
                         request.detailDescription(),
                         request.price(),
                         request.isPublic());
+
+        if (request.optionGroups() != null && !request.optionGroups().isEmpty()) {
+            for (ProductOptionGroupRequest groupReq : request.optionGroups()) {
+                ProductOptionGroup group =
+                        ProductOptionGroup.createOptionGroup(product, groupReq.name());
+                product.addOptionGroup(group);
+
+                if (groupReq.optionValues() != null) {
+                    for (ProductOptionValueRequest valueReq : groupReq.optionValues()) {
+                        ProductOptionValue.createOptionValue(
+                                group,
+                                valueReq.name(),
+                                valueReq.stockQuantity(),
+                                valueReq.extraPrice());
+                    }
+                }
+            }
+        }
 
         productRepository.save(product);
         log.info("상품 등록 완료: storeId={}, productName={}", store.getId(), product.getName());
@@ -63,20 +98,12 @@ public class ProductService {
     }
 
     public ProductResponse updateProduct(UUID productId, ProductUpdateRequest request) {
-        Member member = getCurrentUser();
-
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        if (!product.getStore().getMember().equals(member)) {
-            log.warn(
-                    "상품 수정 실패: 비인가 사용자 memberId={}, storeOwnerId={}",
-                    member.getMemberId(),
-                    product.getStore().getMember().getMemberId());
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         if (request.name() == null
                 && request.description() == null
@@ -132,21 +159,12 @@ public class ProductService {
 
     public ProductResponse updateProductPublicStatus(
             UUID productId, ProductPublicUpdateRequest request) {
-        Member member = getCurrentUser();
-
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        if (!product.getStore().getMember().equals(member)
-                && !member.getRole().equals(Role.MANAGER)) {
-            log.warn(
-                    "상품 공개 상태 수정 실패: 비인가 사용자 memberId={}, storeOwnerId={}",
-                    member.getMemberId(),
-                    product.getStore().getMember().getMemberId());
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         boolean newStatus = request.isPublic();
         boolean currentStatus = product.isPublic();
@@ -168,8 +186,28 @@ public class ProductService {
         return ProductResponse.from(product);
     }
 
+    public ProductResponse updateProductCategory(
+            UUID productId, ProductCategoryUpdateRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
+
+        Category category =
+                categoryRepository
+                        .findById(request.categoryId())
+                        .orElseThrow(
+                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        product.updateCategory(category);
+        return ProductResponse.from(product);
+    }
+
     @Transactional(readOnly = true)
-    public ProductCursorResponse getProductList(UUID cursor, Integer size, String keyword) {
+    public ProductCursorResponse getProductList(
+            UUID categoryId, UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -177,7 +215,15 @@ public class ProductService {
 
         List<ProductResponse> products;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
+        if (categoryId != null && keyword != null && !keyword.trim().isEmpty()) {
+            List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
+            products =
+                    productRepository.findProductsByCategoryIdsAndKeyword(
+                            cursor, size, categoryIds, keyword);
+        } else if (categoryId != null) {
+            List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
+            products = productRepository.findProductsByCategoryIds(cursor, size, categoryIds);
+        } else if (keyword != null && !keyword.trim().isEmpty()) {
             log.info("상품 검색 요청: keyword={}, cursor={}, size={}", keyword, cursor, size);
             products = productRepository.findProductsByKeyword(cursor, size, keyword);
         } else {
@@ -200,40 +246,150 @@ public class ProductService {
     }
 
     public void deleteProduct(UUID productId) {
-        Member member = getCurrentUser();
-
         Product product =
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        if (!product.getStore().getMember().equals(member)) {
-            log.warn(
-                    "상품 삭제 실패: 비인가 사용자 memberId={}, storeOwnerId={}",
-                    member.getMemberId(),
-                    product.getStore().getMember().getMemberId());
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
-        }
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         productRepository.delete(product);
         log.info("상품 삭제 완료: productId={}", productId);
     }
 
-    private Member getCurrentUser() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
+    public void createOptionGroup(UUID productId, ProductOptionGroupRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        if (authentication == null
-                || !(authentication.getPrincipal() instanceof MemberDetails details)) {
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
+
+        ProductOptionGroup group = ProductOptionGroup.createOptionGroup(product, request.name());
+        product.addOptionGroup(group);
+
+        if (request.optionValues() != null && !request.optionValues().isEmpty()) {
+            for (ProductOptionValueRequest valueReq : request.optionValues()) {
+                ProductOptionValue.createOptionValue(
+                        group, valueReq.name(), valueReq.stockQuantity(), valueReq.extraPrice());
+            }
         }
 
-        try {
-            Long memberId = Long.parseLong(details.getUsername());
-            return memberRepository
-                    .findById(memberId)
-                    .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-        } catch (NumberFormatException e) {
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
+        productRepository.save(product);
+        log.info("상품 옵션 그룹 추가 완료: productId={}, groupName={}", productId, request.name());
+    }
+
+    public void createOptionValue(UUID optionGroupId, ProductOptionValueRequest request) {
+        ProductOptionGroup optionGroup =
+                optionGroupRepository
+                        .findById(optionGroupId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(optionGroup.getProduct().getStore().getMember());
+
+        ProductOptionValue.createOptionValue(
+                optionGroup,
+                request.name(),
+                request.stockQuantity(),
+                request.extraPrice() != null ? request.extraPrice() : 0);
+
+        optionGroupRepository.save(optionGroup);
+        log.info("옵션 값 추가 완료: optionGroupId={}, valueName={}", optionGroupId, request.name());
+    }
+
+    public ProductOptionGroupResponse updateProductOptionGroup(
+            UUID optionGroupId, ProductOptionGroupRequest request) {
+        ProductOptionGroup optionGroup =
+                optionGroupRepository
+                        .findById(optionGroupId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(optionGroup.getProduct().getStore().getMember());
+
+        optionGroup.updateOptionGroupName(request.name());
+
+        return ProductOptionGroupResponse.from(optionGroup);
+    }
+
+    public ProductOptionValueResponse updateProductOptionValue(
+            UUID optionValueId, ProductOptionValueUpdateRequest request) {
+        ProductOptionValue optionValue =
+                optionValueRepository
+                        .findById(optionValueId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(
+                optionValue.getOptionGroup().getProduct().getStore().getMember());
+
+        if ((request.name() == null || request.name().isBlank())
+                && request.stockQuantity() == null
+                && request.extraPrice() == null) {
+            log.warn("옵션 값 수정 실패: 변경된 필드가 없습니다. optionValueId={}", optionValueId);
+            throw new CommonException(ProductErrorCode.PRODUCT_NOT_MODIFIED);
+        }
+
+        String updatedName =
+                request.name() != null && !request.name().isBlank()
+                        ? request.name().trim()
+                        : optionValue.getName();
+
+        int updatedStockQuantity =
+                request.stockQuantity() != null
+                        ? request.stockQuantity()
+                        : optionValue.getStockQuantity();
+
+        Integer updatedExtraPrice =
+                request.extraPrice() != null ? request.extraPrice() : optionValue.getExtraPrice();
+
+        optionValue.updateOptionValue(updatedName, updatedStockQuantity, updatedExtraPrice);
+        optionValueRepository.save(optionValue);
+
+        log.info("상품 옵션 값 수정 완료: optionValueId={}", optionValueId);
+
+        return ProductOptionValueResponse.from(optionValue);
+    }
+
+    public void deleteProductOptionGroup(UUID optionGroupId) {
+        ProductOptionGroup optionGroup =
+                optionGroupRepository
+                        .findById(optionGroupId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(optionGroup.getProduct().getStore().getMember());
+
+        optionGroupRepository.delete(optionGroup);
+        log.info("상품 옵션 그룹 삭제 완료: groupId={}", optionGroupId);
+    }
+
+    public void deleteProductOptionValue(UUID optionValueId) {
+        ProductOptionValue optionValue =
+                optionValueRepository
+                        .findById(optionValueId)
+                        .orElseThrow(
+                                () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(
+                optionValue.getOptionGroup().getProduct().getStore().getMember());
+
+        optionValueRepository.delete(optionValue);
+        log.info("상품 옵션 값 삭제 완료: valueId={}", optionValueId);
+    }
+
+    private List<UUID> getAllDescendantCategoryIds(UUID categoryId) {
+        List<UUID> ids = new ArrayList<>();
+        collectDescendants(categoryId, ids);
+        return ids;
+    }
+
+    private void collectDescendants(UUID categoryId, List<UUID> ids) {
+        ids.add(categoryId);
+        List<Category> children = categoryRepository.findChildrenByParentId(categoryId);
+        for (Category child : children) {
+            collectDescendants(child.getCategoryId(), ids);
         }
     }
 }

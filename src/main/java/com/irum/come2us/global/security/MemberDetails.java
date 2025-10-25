@@ -26,6 +26,10 @@ public class MemberDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return memberId.toString();
+        return null;
+    }
+
+    public Long getUserId() {
+        return memberId;
     }
 }

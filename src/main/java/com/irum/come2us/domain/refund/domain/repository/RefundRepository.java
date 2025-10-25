@@ -5,9 +5,17 @@ import com.irum.come2us.domain.refund.domain.entity.Refund;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
+import java.util.List;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RefundRepository extends JpaRepository<Refund, UUID> {
     Optional<Refund> findByOrder(Order order);
+    List<Refund> findByRefundStatus(RefundStatus status);
+
+    // RefundRepository 추후 orderRepository에서 가져오는 것으로 변경 예정
+    // public interface OrderRepository extends JpaRepository<Order, UUID> {..}
+    Optional<Order> findByOrder_OrderId(@Param("orderId") UUID orderId);
 }
