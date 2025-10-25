@@ -101,20 +101,22 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<ProductResponse> findProductsByCategoryIds(UUID cursor, int size, List<UUID> categoryIds) {
+    public List<ProductResponse> findProductsByCategoryIds(
+            UUID cursor, int size, List<UUID> categoryIds) {
         QProduct product = QProduct.product;
 
         return queryFactory
-                .select(Projections.constructor(
-                        ProductResponse.class,
-                        product.id,
-                        product.name,
-                        product.description,
-                        product.detailDescription,
-                        product.price,
-                        product.isPublic,
-                        product.avgRating,
-                        product.reviewCount))
+                .select(
+                        Projections.constructor(
+                                ProductResponse.class,
+                                product.id,
+                                product.name,
+                                product.description,
+                                product.detailDescription,
+                                product.price,
+                                product.isPublic,
+                                product.avgRating,
+                                product.reviewCount))
                 .from(product)
                 .where(
                         product.isPublic.isTrue(),
@@ -126,20 +128,22 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
-    public List<ProductResponse> findProductsByCategoryIdsAndKeyword(UUID cursor, int size, List<UUID> categoryIds, String keyword) {
+    public List<ProductResponse> findProductsByCategoryIdsAndKeyword(
+            UUID cursor, int size, List<UUID> categoryIds, String keyword) {
         QProduct product = QProduct.product;
 
         return queryFactory
-                .select(Projections.constructor(
-                        ProductResponse.class,
-                        product.id,
-                        product.name,
-                        product.description,
-                        product.detailDescription,
-                        product.price,
-                        product.isPublic,
-                        product.avgRating,
-                        product.reviewCount))
+                .select(
+                        Projections.constructor(
+                                ProductResponse.class,
+                                product.id,
+                                product.name,
+                                product.description,
+                                product.detailDescription,
+                                product.price,
+                                product.isPublic,
+                                product.avgRating,
+                                product.reviewCount))
                 .from(product)
                 .where(
                         product.isPublic.isTrue(),

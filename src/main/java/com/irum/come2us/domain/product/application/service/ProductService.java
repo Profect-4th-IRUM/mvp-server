@@ -24,8 +24,6 @@ import com.irum.come2us.global.util.MemberUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -208,7 +206,8 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductCursorResponse getProductList(UUID categoryId, UUID cursor, Integer size, String keyword) {
+    public ProductCursorResponse getProductList(
+            UUID categoryId, UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -218,7 +217,9 @@ public class ProductService {
 
         if (categoryId != null && keyword != null && !keyword.trim().isEmpty()) {
             List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
-            products = productRepository.findProductsByCategoryIdsAndKeyword(cursor, size, categoryIds, keyword);
+            products =
+                    productRepository.findProductsByCategoryIdsAndKeyword(
+                            cursor, size, categoryIds, keyword);
         } else if (categoryId != null) {
             List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
             products = productRepository.findProductsByCategoryIds(cursor, size, categoryIds);

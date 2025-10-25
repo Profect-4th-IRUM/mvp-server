@@ -13,5 +13,6 @@ public interface ProductRepositoryCustom {
 
     List<ProductResponse> findProductsByCategoryIds(UUID cursor, int size, List<UUID> categoryIds);
 
-    List<ProductResponse> findProductsByCategoryIdsAndKeyword(UUID cursor, int size, List<UUID> categoryIds, String keyword);
+    List<ProductResponse> findProductsByCategoryIdsAndKeyword(
+            UUID cursor, int size, List<UUID> categoryIds, String keyword);
 }
