@@ -19,49 +19,40 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(
-            @Valid @RequestBody ProductCreateRequest request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponse createProduct(@Valid @RequestBody ProductCreateRequest request) {
         log.info("상품 등록 요청: {}", request);
-        ProductResponse response = productService.createProduct(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-        // TODO: Security 적용
+        return productService.createProduct(request);
     }
 
     @PatchMapping("/{productId}")
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ProductResponse updateProduct(
             @PathVariable UUID productId, @RequestBody ProductUpdateRequest request) {
         log.info("상품 정보 수정 요청: productId={}, request={}", productId, request);
-        ProductResponse response = productService.updateProduct(productId, request);
-        return ResponseEntity.ok(response);
-
-        // TODO: Security 적용
+        return productService.updateProduct(productId, request);
     }
 
     @PatchMapping("/{productId}/public")
-    public ResponseEntity<ProductResponse> updateProductPublicStatus(
+    public ProductResponse updateProductPublicStatus(
             @PathVariable UUID productId, @Valid @RequestBody ProductPublicUpdateRequest request) {
         log.info("상품 공개 상태 변경 요청: productId={}, isPublic={}", productId, request.isPublic());
-        ProductResponse response = productService.updateProductPublicStatus(productId, request);
-        return ResponseEntity.ok(response);
+        return productService.updateProductPublicStatus(productId, request);
     }
 
     @GetMapping
-    public ResponseEntity<ProductCursorResponse> getProductList(
+    public ProductCursorResponse getProductList(
             @RequestParam(required = false) UUID cursor,
             @RequestParam(required = false) Integer size,
             @RequestParam(required = false) String keyword) {
         log.info("상품 목록 조회 요청: cursor={}, size={}, keyword={}", cursor, size, keyword);
-        ProductCursorResponse response = productService.getProductList(cursor, size, keyword);
-        return ResponseEntity.ok(response);
+        return productService.getProductList(cursor, size, keyword);
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDetailResponse> getProduct(@PathVariable UUID productId) {
+    public ProductDetailResponse getProduct(@PathVariable UUID productId) {
         log.info("상품 상세 조회 요청: productId={}", productId);
 
-        ProductDetailResponse response = productService.getProductById(productId);
-        return ResponseEntity.ok(response);
+        return productService.getProductById(productId);
     }
 
     @DeleteMapping("/{productId}")
@@ -89,23 +80,19 @@ public class ProductController {
     }
 
     @PatchMapping("/options/{optionGroupId}")
-    public ResponseEntity<ProductOptionGroupResponse> updateProductOptionGroup(
+    public ProductOptionGroupResponse updateProductOptionGroup(
             @PathVariable UUID optionGroupId,
             @Valid @RequestBody ProductOptionGroupRequest request) {
         log.info("상품 옵션 그룹 수정 요청: groupId={}", optionGroupId);
-        ProductOptionGroupResponse response =
-                productService.updateProductOptionGroup(optionGroupId, request);
-        return ResponseEntity.ok(response);
+        return productService.updateProductOptionGroup(optionGroupId, request);
     }
 
     @PatchMapping("/options/values/{optionValueId}")
-    public ResponseEntity<ProductOptionValueResponse> updateProductOptionValue(
+    public ProductOptionValueResponse updateProductOptionValue(
             @PathVariable UUID optionValueId,
             @Valid @RequestBody ProductOptionValueUpdateRequest request) {
         log.info("상품 옵션 값 수정 요청: valueId={}", optionValueId);
-        ProductOptionValueResponse response =
-                productService.updateProductOptionValue(optionValueId, request);
-        return ResponseEntity.ok(response);
+        return productService.updateProductOptionValue(optionValueId, request);
     }
 
     @DeleteMapping("/options/{optionGroupId}")
