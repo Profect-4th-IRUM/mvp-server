@@ -49,9 +49,8 @@ public class MemberService {
     }
 
     public void changeMemberNameAndContact(MemberInfoUpdateRequest request) {
-        Member member = memberUtil.getCurrentMember();
-        member.updateName(request.name());
-        member.updateContact(request.contact());
+        memberValidator.applyValidUpdate(
+                memberUtil.getCurrentMember(), request.name(), request.contact());
     }
 
     public void changeMemberPassword(MemberPasswordUpdateRequest request) {
