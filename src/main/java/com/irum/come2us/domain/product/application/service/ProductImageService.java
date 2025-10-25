@@ -73,7 +73,11 @@ public class ProductImageService {
                 images.stream()
                         .filter(img -> img.getId().equals(imageId))
                         .findFirst()
-                        .orElseThrow(() -> new CommonException(ProductImageErrorCode.INVALID_PRODUCT_IMAGE_RELATION));
+                        .orElseThrow(
+                                () ->
+                                        new CommonException(
+                                                ProductImageErrorCode
+                                                        .INVALID_PRODUCT_IMAGE_RELATION));
 
         images.stream()
                 .filter(ProductImage::isDefault)
@@ -95,7 +99,8 @@ public class ProductImageService {
         }
 
         if (image.isDefault()) {
-            productImageRepository.findTopByProductIdOrderByCreatedAtDesc(productId)
+            productImageRepository
+                    .findTopByProductIdOrderByCreatedAtDesc(productId)
                     .ifPresent(ProductImage::markAsDefault);
         }
 
@@ -118,13 +123,16 @@ public class ProductImageService {
 
     /** 내부 유효성 검증 */
     private Product findValidProduct(UUID productId) {
-        return productRepository.findById(productId)
+        return productRepository
+                .findById(productId)
                 .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
 
     private ProductImage findValidImage(UUID imageId) {
-        return productImageRepository.findById(imageId)
-                .orElseThrow(() -> new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
+        return productImageRepository
+                .findById(imageId)
+                .orElseThrow(
+                        () -> new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
     }
 
     private void validateFile(MultipartFile file) {
