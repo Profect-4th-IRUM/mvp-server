@@ -1,5 +1,7 @@
 package com.irum.come2us.domain.product.application.service;
 
+import com.irum.come2us.domain.category.domain.entity.Category;
+import com.irum.come2us.domain.category.domain.repository.CategoryRepository;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
@@ -14,10 +16,12 @@ import com.irum.come2us.domain.product.presentation.dto.response.*;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +39,7 @@ public class ProductService {
     private final ProductOptionValueRepository optionValueRepository;
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
+    private final CategoryRepository categoryRepository;
     private final MemberUtil memberUtil;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
@@ -53,9 +58,16 @@ public class ProductService {
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
         }
 
+        Category category =
+                categoryRepository
+                        .findById(request.categoryId())
+                        .orElseThrow(
+                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
         Product product =
                 Product.createProduct(
                         store,
+                        category,
                         request.name(),
                         request.description(),
                         request.detailDescription(),
@@ -174,8 +186,28 @@ public class ProductService {
         return ProductResponse.from(product);
     }
 
+    public ProductResponse updateProductCategory(
+            UUID productId, ProductCategoryUpdateRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
+
+        Category category =
+                categoryRepository
+                        .findById(request.categoryId())
+                        .orElseThrow(
+                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        product.updateCategory(category);
+        return ProductResponse.from(product);
+    }
+
     @Transactional(readOnly = true)
-    public ProductCursorResponse getProductList(UUID cursor, Integer size, String keyword) {
+    public ProductCursorResponse getProductList(
+            UUID categoryId, UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -183,7 +215,15 @@ public class ProductService {
 
         List<ProductResponse> products;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
+        if (categoryId != null && keyword != null && !keyword.trim().isEmpty()) {
+            List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
+            products =
+                    productRepository.findProductsByCategoryIdsAndKeyword(
+                            cursor, size, categoryIds, keyword);
+        } else if (categoryId != null) {
+            List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
+            products = productRepository.findProductsByCategoryIds(cursor, size, categoryIds);
+        } else if (keyword != null && !keyword.trim().isEmpty()) {
             log.info("상품 검색 요청: keyword={}, cursor={}, size={}", keyword, cursor, size);
             products = productRepository.findProductsByKeyword(cursor, size, keyword);
         } else {
@@ -337,5 +377,19 @@ public class ProductService {
 
         optionValueRepository.delete(optionValue);
         log.info("상품 옵션 값 삭제 완료: valueId={}", optionValueId);
+    }
+
+    private List<UUID> getAllDescendantCategoryIds(UUID categoryId) {
+        List<UUID> ids = new ArrayList<>();
+        collectDescendants(categoryId, ids);
+        return ids;
+    }
+
+    private void collectDescendants(UUID categoryId, List<UUID> ids) {
+        ids.add(categoryId);
+        List<Category> children = categoryRepository.findChildrenByParentId(categoryId);
+        for (Category child : children) {
+            collectDescendants(child.getCategoryId(), ids);
+        }
     }
 }
