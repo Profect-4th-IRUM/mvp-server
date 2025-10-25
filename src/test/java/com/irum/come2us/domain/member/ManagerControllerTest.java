@@ -128,12 +128,10 @@ public class ManagerControllerTest {
                         new MemberInfoResponse(
                                 1L, "manager1@example.com", "매니저1", "010-1111-1111", Role.MANAGER));
 
-        // 레코드의 필드명(memberInfoList)에 맞게 응답 객체 생성
         MemberInfoListResponse response = new MemberInfoListResponse(managerList, null, false);
 
         when(managerService.findManagerInfoList(any(), eq(10))).thenReturn(response);
 
-        // When & Then
         mockMvc.perform(get("/managers").param("size", "10").with(csrf().asHeader()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
@@ -270,7 +268,7 @@ public class ManagerControllerTest {
                 .andExpect(jsonPath("$.data.message").value("이메일 형식에 맞지 않습니다."))
                 .andDo(
                         document(
-                                "manager-signup-fail-invalid-email", // 문서 이름 변경
+                                "manager-signup-fail-invalid-email",
                                 responseFields(
                                         fieldWithPath("success").description("false"),
                                         fieldWithPath("status").description("400"),
