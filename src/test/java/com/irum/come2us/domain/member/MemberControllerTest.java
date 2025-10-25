@@ -317,7 +317,7 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$.data.message").value("연락처는 필수 입력값입니다."))
                 .andDo(
                         document(
-                                "member-signup-fail-invalid-name",
+                                "member-signup-fail-invalid-contact",
                                 responseFields(
                                         fieldWithPath("success").description("false"),
                                         fieldWithPath("status").description("400"),
