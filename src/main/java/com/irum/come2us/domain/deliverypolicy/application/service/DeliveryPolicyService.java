@@ -12,10 +12,10 @@ import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DeliveryPolicyErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
-import jakarta.transaction.Transactional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -25,7 +25,7 @@ public class DeliveryPolicyService {
     private final StoreRepository storeRepository;
     private final MemberUtil memberUtil;
 
-    public UUID createDeliveryPolicy(DeliveryPolicyCreateRequest request) {
+    public void createDeliveryPolicy(DeliveryPolicyCreateRequest request) {
         Member member = memberUtil.getCurrentMember();
         Store store = validateAndGetStoreByMember(member);
 
@@ -42,17 +42,21 @@ public class DeliveryPolicyService {
 
         storeRepository.save(store);
         deliveryPolicyRepository.save(deliveryPolicy);
-
-        return deliveryPolicy.getId();
     }
 
     public void changeDeliveryPolicy(
             UUID deliveryPolicyId, DeliveryPolicyInfoUpdateRequest request) {
         DeliveryPolicy deliveryPolicy = validDeliveryPolicy(deliveryPolicyId);
 
-        deliveryPolicy.updateFee(request.defaultDeliveryFee());
-        deliveryPolicy.updateQuantity(request.minQuantity());
-        deliveryPolicy.updateAmount(request.minAmount());
+        if (request.defaultDeliveryFee() != null) {
+            deliveryPolicy.updateFee(request.defaultDeliveryFee());
+        }
+        if (request.minQuantity() != null) {
+            deliveryPolicy.updateQuantity(request.minQuantity());
+        }
+        if (request.minAmount() != null) {
+            deliveryPolicy.updateAmount(request.minAmount());
+        }
     }
 
     public void withdrawDeliveryPolicy(UUID deliveryPolicyId) {
@@ -66,7 +70,7 @@ public class DeliveryPolicyService {
         storeRepository.save(store);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public DeliveryPolicyInfoResponse findDeliveryPolicy(UUID deliveryPolicyId) {
         DeliveryPolicy deliveryPolicy = validDeliveryPolicy(deliveryPolicyId);
         return DeliveryPolicyInfoResponse.from(deliveryPolicy);
