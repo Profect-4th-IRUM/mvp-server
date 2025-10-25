@@ -21,6 +21,7 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErr
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -207,7 +208,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductCursorResponse getProductList(UUID cursor, Integer size, String keyword) {
+    public ProductCursorResponse getProductList(UUID categoryId, UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -215,7 +216,13 @@ public class ProductService {
 
         List<ProductResponse> products;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
+        if (categoryId != null && keyword != null && !keyword.trim().isEmpty()) {
+            List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
+            products = productRepository.findProductsByCategoryIdsAndKeyword(cursor, size, categoryIds, keyword);
+        } else if (categoryId != null) {
+            List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
+            products = productRepository.findProductsByCategoryIds(cursor, size, categoryIds);
+        } else if (keyword != null && !keyword.trim().isEmpty()) {
             log.info("상품 검색 요청: keyword={}, cursor={}, size={}", keyword, cursor, size);
             products = productRepository.findProductsByKeyword(cursor, size, keyword);
         } else {
@@ -369,5 +376,19 @@ public class ProductService {
 
         optionValueRepository.delete(optionValue);
         log.info("상품 옵션 값 삭제 완료: valueId={}", optionValueId);
+    }
+
+    private List<UUID> getAllDescendantCategoryIds(UUID categoryId) {
+        List<UUID> ids = new ArrayList<>();
+        collectDescendants(categoryId, ids);
+        return ids;
+    }
+
+    private void collectDescendants(UUID categoryId, List<UUID> ids) {
+        ids.add(categoryId);
+        List<Category> children = categoryRepository.findChildrenByParentId(categoryId);
+        for (Category child : children) {
+            collectDescendants(child.getCategoryId(), ids);
+        }
     }
 }

@@ -10,4 +10,8 @@ public interface ProductRepositoryCustom {
     List<ProductResponse> findProductsByKeyword(UUID cursor, int size, String keyword);
 
     List<ProductResponse> findProductsByStoreWithCursor(UUID storeId, UUID cursor, int size);
+
+    List<ProductResponse> findProductsByCategoryIds(UUID cursor, int size, List<UUID> categoryIds);
+
+    List<ProductResponse> findProductsByCategoryIdsAndKeyword(UUID cursor, int size, List<UUID> categoryIds, String keyword);
 }
