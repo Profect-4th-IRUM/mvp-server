@@ -1,0 +1,77 @@
+== 회원 (Member) API
+
+=== 1. 고객 회원가입
+`POST /members/signup`
+
+요청 본문:
+include::{snippets}/member-signup/request-fields.adoc[]
+
+응답:
+include::{snippets}/member-signup/http-response.adoc[]
+
+==== 고객 회원가입 실패: 유효성 검사
+* `이메일 형식 오류`
+include::{snippets}/member-signup-fail-invalid-email/http-response.adoc[]
+include::{snippets}/member-signup-fail-invalid-email/response-fields.adoc[]
+
+* `비밀번호 누락`
+include::{snippets}/member-signup-fail-invalid-password/http-response.adoc[]
+include::{snippets}/member-signup-fail-invalid-password/response-fields.adoc[]
+
+* `이름 누락`
+include::{snippets}/member-signup-fail-invalid-name/http-response.adoc[]
+include::{snippets}/member-signup-fail-invalid-name/response-fields.adoc[]
+
+
+=== 2. 판매자 회원가입
+`POST /members/owner-signup`
+
+요청 본문:
+include::{snippets}/owner-signup/request-fields.adoc[]
+
+응답:
+include::{snippets}/owner-signup/http-response.adoc[]
+
+
+=== 3. 회원 정보 조회
+`GET /members/info`
+
+응답 본문:
+include::{snippets}/member-info-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/member-info-get/http-response.adoc[]
+
+
+=== 4. 회원 정보 수정
+`PATCH /members/info`
+
+요청 본문:
+include::{snippets}/member-info-update/request-fields.adoc[]
+
+응답:
+include::{snippets}/member-info-update/http-response.adoc[]
+
+
+=== 5. 회원 비밀번호 변경
+`PATCH /members/password`
+
+요청 본문:
+include::{snippets}/member-password-update/request-fields.adoc[]
+
+응답:
+include::{snippets}/member-password-update/http-response.adoc[]
+
+
+=== 6. 회원 권한 변경 (판매자 전환)
+`PATCH /members/role`
+
+응답:
+include::{snippets}/member-role-update/http-response.adoc[]
+
+
+=== 7. 회원 탈퇴
+`DELETE /members`
+
+응답:
+include::{snippets}/member-delete/http-response.adoc[]
