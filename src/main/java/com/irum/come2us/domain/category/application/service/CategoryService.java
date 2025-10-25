@@ -22,10 +22,17 @@ public class CategoryService {
 
     // ------------------- 전체 조회 -------------------
     @Transactional(readOnly = true)
-    public List<CategoryResponse> findAllCategories() {
-        return categoryRepository.findAll().stream()
+    public List<CategoryResponse> findRootCategories() {
+        return categoryRepository.findByParentIsNull().stream()
                 .map(CategoryResponse::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> findByParentId(UUID parentId) {
+        return categoryRepository.findChildrenByParentId(parentId).stream()
+                .map(CategoryResponse::fromEntity)
+                .toList();
     }
 
     // ------------------- 단일 조회 -------------------

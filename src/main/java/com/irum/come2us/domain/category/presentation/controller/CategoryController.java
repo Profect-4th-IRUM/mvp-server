@@ -18,8 +18,11 @@ public class CategoryController {
 
     // ------------------- 전체 조회 -------------------
     @GetMapping
-    public List<CategoryResponse> getAllCategories() {
-        return categoryService.findAllCategories();
+    public List<CategoryResponse> getAllCategories(@RequestParam(required = false) UUID parentId) {
+        if (parentId != null) {
+            return categoryService.findByParentId(parentId);
+        }
+        return categoryService.findRootCategories();
     }
 
     // ------------------- 단일 조회 -------------------
