@@ -10,6 +10,7 @@ import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoListRe
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ManagerService {
     private final MemberRepository memberRepository;
     private final MemberValidator memberValidator;
@@ -39,7 +41,11 @@ public class ManagerService {
     }
 
     @Transactional(readOnly = true)
-    public MemberInfoListResponse findManagerInfoList(Long lastMemberId, int pageSize) {
+    public MemberInfoListResponse findManagerInfoList(Long lastMemberId, Integer pageSize) {
+        if (pageSize == null || (pageSize != 10 && pageSize != 30 && pageSize != 50)) {
+            log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", pageSize);
+            pageSize = 10;
+        }
         int limit = pageSize + 1;
         List<MemberInfoResponse> memberInfoList =
                 memberRepository.findMembersByCursor(lastMemberId, limit);
@@ -55,9 +61,8 @@ public class ManagerService {
     }
 
     public void changeManagerNameAndContact(Long memberId, MemberInfoUpdateRequest request) {
-        Member member = memberValidator.getMemberById(memberId);
-        member.updateName(request.name());
-        member.updateContact(request.contact());
+        memberValidator.applyValidUpdate(
+                memberValidator.getMemberById(memberId), request.name(), request.contact());
     }
 
     public void changeManagerPassword(Long memberId, MemberPasswordUpdateRequest request) {
