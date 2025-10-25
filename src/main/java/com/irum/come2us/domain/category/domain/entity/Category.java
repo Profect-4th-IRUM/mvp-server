@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.category.domain.entity;
 
+import com.irum.come2us.global.domain.BaseEntity;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import org.hibernate.annotations.UuidGenerator;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
-public class Category {
+public class Category extends BaseEntity {
 
     private static final int MAX_DEPTH = 3;
 
