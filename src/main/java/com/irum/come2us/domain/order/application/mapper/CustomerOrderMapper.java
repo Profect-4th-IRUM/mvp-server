@@ -21,7 +21,7 @@ public class CustomerOrderMapper {
                 .totalProductPrice(order.getTotalPrice())
                 .totalDiscountAmount(order.getPayment().getTotalDiscountAmount())
                 .totalPaymentAmount(order.getPayment().getAmount())
-                .prodcutList(productSummaryList)
+                .productList(productSummaryList)
                 .build();
     }
 

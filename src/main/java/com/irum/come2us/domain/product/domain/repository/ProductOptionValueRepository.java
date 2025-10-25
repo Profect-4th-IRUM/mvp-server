@@ -16,7 +16,7 @@ public interface ProductOptionValueRepository extends JpaRepository<ProductOptio
 
     /** 락 획득까지 최대 3초 대기 TODO : 대기 시간 정책 정하기 */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "3000")})
+    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
     @Query("select pov from ProductOptionValue pov where pov.id = :id")
     Optional<ProductOptionValue> findByIdWithLock(UUID id);
 }

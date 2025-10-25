@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("")
+    @PostMapping
     public PaymentResponse paymentCreate(@RequestBody PaymentRequest request) {
         return paymentService.createPayment(request);
     }

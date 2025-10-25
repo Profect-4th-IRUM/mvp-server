@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record CustomerOrderResponse(
-        List<ProductSummary> prodcutList,
+        List<ProductSummary> productList,
         UUID orderId,
         AddressResponse address,
         int totalProductPrice,

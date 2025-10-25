@@ -143,11 +143,11 @@ public class CustomerOrderService {
         appliedCouponService.createAppliedCouponList(payment, request.couponIdList());
 
         // 주문 엔티티 생성 PENDING 상태
-        String orderId = "ORD-" + (int) ((Math.random() * 10000000));
+        String orderNum = "ORD-" + (int) ((Math.random() * 10000000));
 
         Order order =
                 Order.builder()
-                        .orderNum(orderId)
+                        .orderNum(orderNum)
                         .totalPrice(calculatedTotalPrice)
                         .deliveryFee(deliveryFee)
                         .deliveryRequest(request.deliveryRequest())
