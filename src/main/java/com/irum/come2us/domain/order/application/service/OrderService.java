@@ -6,7 +6,6 @@ import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
-import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
@@ -78,8 +77,7 @@ public class OrderService {
             UUID storeId, OrderStatus orderStatus, UUID cursor, Integer size) {
 
         // 2. order list 검색
-        var headerList =
-                orderRepository.fetchOrderHeaderList(storeId, orderStatus, cursor, size);
+        var headerList = orderRepository.fetchOrderHeaderList(storeId, orderStatus, cursor, size);
 
         boolean hasNext = headerList.size() > size;
         if (hasNext) {

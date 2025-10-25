@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderMapper {
 
-    //TODO: builder로 리팩터링
+    // TODO: builder로 리팩터링
     public OwnerOrderListResponse.ProductSummary toProductSummary(OrderDetailRow detail) {
         return new OwnerOrderListResponse.ProductSummary(
                 detail.orderDetailId(),

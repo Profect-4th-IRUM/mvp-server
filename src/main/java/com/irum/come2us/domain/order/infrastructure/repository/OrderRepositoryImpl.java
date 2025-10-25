@@ -5,7 +5,6 @@ import static java.util.Collections.*;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.entity.QMember;
-import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.QOrder;
 import com.irum.come2us.domain.order.domain.entity.QOrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
@@ -14,16 +13,12 @@ import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrder
 import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderSummaryRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
-import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
 import com.irum.come2us.domain.refund.domain.entity.QRefund;
-import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -100,35 +95,34 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .fetch();
     }
 
-    /**주목 목록 및 refundstatus 조회, pageing적용*/
+    /** 주목 목록 및 refundstatus 조회, pageing적용 */
     @Override
-    public List<CustomerOrderSummaryRow> fetchOrderListByMember(Member member, LocalDate startDate, LocalDate endDate,  UUID cursor, int size) {
+    public List<CustomerOrderSummaryRow> fetchOrderListByMember(
+            Member member, LocalDate startDate, LocalDate endDate, UUID cursor, int size) {
 
         QOrder o = QOrder.order;
         QRefund r = QRefund.refund;
         QMember m = QMember.member;
 
         return queryFactory
-            .select(
-                Projections.constructor(
-                    CustomerOrderSummaryRow.class,
-                    o.orderId,
-                    o.createdAt,
-                    r.refundStatus
-                ))
-            .from(o)
-            .leftJoin(r)
+                .select(
+                        Projections.constructor(
+                                CustomerOrderSummaryRow.class,
+                                o.orderId,
+                                o.createdAt,
+                                r.refundStatus))
+                .from(o)
+                .leftJoin(r)
                 .on(r.order.eq(o))
-            .leftJoin(o.member, m)
-            .where(
-                ltCursor(cursor, o),
-                m.memberId.eq(member.getMemberId()),
-                geStartDate(startDate, o),
-                ltEndDateExclusive(endDate, o)
-            )
-            .orderBy(o.orderId.desc())
-            .limit(size+1)
-            .fetch();
+                .leftJoin(o.member, m)
+                .where(
+                        ltCursor(cursor, o),
+                        m.memberId.eq(member.getMemberId()),
+                        geStartDate(startDate, o),
+                        ltEndDateExclusive(endDate, o))
+                .orderBy(o.orderId.desc())
+                .limit(size + 1)
+                .fetch();
     }
 
     @Override
@@ -138,23 +132,19 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         }
         QOrderDetail od = QOrderDetail.orderDetail;
 
-
         return queryFactory
-            .select(
-                Projections.constructor(
-                    CustomerOrderDetailRow.class,
-                    od.order.orderId,
-                    od.orderDetailId,
-                    od.productName,
-                    od.optionName,
-                    od.quantity,
-                    od.price,
-                    od.orderStatusIndi
-                )
-            )
-            .from(od)
-            .where(od.order.orderId.in(orderIdList))
-            .fetch();
-
+                .select(
+                        Projections.constructor(
+                                CustomerOrderDetailRow.class,
+                                od.order.orderId,
+                                od.orderDetailId,
+                                od.productName,
+                                od.optionName,
+                                od.quantity,
+                                od.price,
+                                od.orderStatusIndi))
+                .from(od)
+                .where(od.order.orderId.in(orderIdList))
+                .fetch();
     }
 }
