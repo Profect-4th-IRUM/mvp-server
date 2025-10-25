@@ -2,6 +2,7 @@ package com.irum.come2us.domain.refund.application.service;
 
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
+import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
 import com.irum.come2us.domain.refund.domain.entity.Refund;
@@ -36,16 +37,14 @@ public class RefundService {
     public void createRefund(UUID orderId, RefundCreateRequest request) {
         assertNoRefundExistsByOrder(orderId);
         Order order = getValidOrder(orderId);
-        refundRepository.save(
-                Refund.create(
-                        request.reason(),
-                        request.description(),
-                        order.getPayment().getAmount())); // Payment 도메인 Getter 삽입 필요
+        if (!order.getOrderStatusAll().equals(OrderStatus.PREPARING))
+            throw new CommonException(RefundErrorCode.REFUND_NOT_AVAILABLE);
+        refundRepository.save(Refund.create(request.reason(), request.description(), order));
     }
 
     @Transactional(readOnly = true)
     public RefundDetailResponse findRefundDetail(UUID orderId) {
-        Order order = getValidOrderWithAddress(orderId);
+        Order order = getValidOrderWithAddressAndPayment(orderId);
         Refund refund = getValidRefund(orderId);
         List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrder(order);
         return RefundDetailResponse.of(order, orderDetails, refund);
@@ -102,10 +101,10 @@ public class RefundService {
         return order;
     }
 
-    private Order getValidOrderWithAddress(UUID orderId) {
+    private Order getValidOrderWithAddressAndPayment(UUID orderId) {
         Order order =
                 orderRepository
-                        .findOrderWithAddress(orderId)
+                        .findOrderWithAddressAndPayment(orderId)
                         .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));
         memberUtil.assertMemberResourceAccess(order.getMember());
         return order;

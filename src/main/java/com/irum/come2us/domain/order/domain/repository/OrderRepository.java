@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
-    @Query("SELECT o FROM Order o JOIN FETCH o.deliveryAddress da WHERE o.orderId =: orderId")
-    Optional<Order> findOrderWithAddress(@Param("orderId") UUID orderId);
+    @Query(
+            "SELECT o FROM Order o JOIN FETCH o.deliveryAddress da JOIN FETCH o.payment p WHERE o.orderId = :orderId")
+    Optional<Order> findOrderWithAddressAndPayment(@Param("orderId") UUID orderId);
 }
