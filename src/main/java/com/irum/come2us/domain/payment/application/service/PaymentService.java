@@ -108,7 +108,7 @@ public class PaymentService {
                     });
 
             // 재고 롤백
-            productOptionValueService.rollbackStockForOrder(order);
+            productOptionValueService.rollbackStockForOrder(orderDetailList);
             // 쿠폰 롤백
             appliedCouponService.rollbackAppliedCouponList(payment);
 
