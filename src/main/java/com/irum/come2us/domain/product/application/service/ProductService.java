@@ -17,14 +17,11 @@ import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
-import com.irum.come2us.global.security.MemberDetails;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
-
-import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +45,9 @@ public class ProductService {
                         .findByMember(member)
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
 
-//        memberUtil.assertMemberResourceAccess(store.getMember());     // Store를 현재 인증된 유저 기반으로 조회했기 때문에, 다시 한 번 검증할 필요 없다고 생각
+        // memberUtil.assertMemberResourceAccess(store.getMember());
+        // Store를 현재 인증된 유저 기반으로 조회했기 때문에, 다시 한 번 검증할 필요 없다고 생각
+
         if (!member.getRole().equals(Role.OWNER)) {
             log.warn("상품 등록 실패: 비인가 사용자 memberId={}", member.getMemberId());
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
@@ -282,7 +281,8 @@ public class ProductService {
                         .orElseThrow(
                                 () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
 
-        memberUtil.assertMemberResourceAccess(optionValue.getOptionGroup().getProduct().getStore().getMember());
+        memberUtil.assertMemberResourceAccess(
+                optionValue.getOptionGroup().getProduct().getStore().getMember());
 
         if ((request.name() == null || request.name().isBlank())
                 && request.stockQuantity() == null
@@ -332,7 +332,8 @@ public class ProductService {
                         .orElseThrow(
                                 () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
 
-        memberUtil.assertMemberResourceAccess(optionValue.getOptionGroup().getProduct().getStore().getMember());
+        memberUtil.assertMemberResourceAccess(
+                optionValue.getOptionGroup().getProduct().getStore().getMember());
 
         optionValueRepository.delete(optionValue);
         log.info("상품 옵션 값 삭제 완료: valueId={}", optionValueId);
