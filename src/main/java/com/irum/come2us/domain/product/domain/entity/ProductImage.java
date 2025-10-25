@@ -15,9 +15,7 @@ import org.hibernate.annotations.Where;
 @Getter
 @Table(
         name = "p_product_image",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"product_id", "is_default"})
-        })
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"product_id", "is_default"})})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_product_image SET deleted_at = NOW() WHERE product_image_id = ?")
 @Where(clause = "deleted_at IS NULL")

@@ -24,96 +24,112 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class ProductImageService {
 
-    private final ProductImageRepository productImageRepository;
     private final ProductRepository productRepository;
+    private final ProductImageRepository productImageRepository;
     private final MemberUtil memberUtil;
 
-    public ProductImageResponse addImage(UUID productId, ProductImageCreateRequest request) {
+    /** 상품 이미지 추가 */
+    public void addProductImage(UUID productId, ProductImageCreateRequest request) {
         Member member = memberUtil.getCurrentMember();
-        Product product =
-                productRepository
-                        .findById(productId)
-                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        Product product = findValidProduct(productId);
 
         // 상품 소유자 검증
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
-        // 대표 이미지 중복 등록 방지
+        // 대표 이미지 설정 요청 시 기존 대표 이미지 해제
         if (request.isDefault()) {
-            boolean alreadyHasDefault =
-                    productImageRepository.findByProductId(productId).stream()
-                            .anyMatch(ProductImage::isDefault);
-            if (alreadyHasDefault) {
-                throw new CommonException(ProductImageErrorCode.DUPLICATE_DEFAULT_IMAGE);
-            }
+            productImageRepository.findByProductId(productId).stream()
+                    .filter(ProductImage::isDefault)
+                    .findFirst()
+                    .ifPresent(ProductImage::unmarkAsDefault);
         }
 
-        ProductImage image = ProductImage.create(product, request.imageUrl(), request.isDefault());
-        productImageRepository.save(image);
+        ProductImage productImage =
+                ProductImage.create(product, request.imageUrl(), request.isDefault());
+        productImageRepository.save(productImage);
 
         log.info(
-                "상품 이미지 추가 완료: productId={}, imageUrl={}, isDefault={}",
+                "상품 이미지 등록 완료: productId={}, imageUrl={}, isDefault={}",
                 productId,
                 request.imageUrl(),
                 request.isDefault());
-
-        return ProductImageResponse.from(image);
     }
 
-    public void deleteImage(UUID productId, UUID imageId) {
+    /** 대표 이미지 변경 */
+    public void changeDefaultImage(UUID productId, UUID imageId) {
         Member member = memberUtil.getCurrentMember();
-        ProductImage image =
-                productImageRepository
-                        .findById(imageId)
-                        .orElseThrow(
-                                () ->
-                                        new CommonException(
-                                                ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
-
-        // 상품 소유자 검증
-        memberUtil.assertMemberResourceAccess(image.getProduct().getStore().getMember());
-
-        // 요청한 productId와 이미지가 속한 product 불일치 시 → 잘못된 요청
-        if (!image.getProduct().getId().equals(productId)) {
-            throw new CommonException(ProductImageErrorCode.INVALID_PRODUCT_IMAGE_RELATION);
-        }
-
-        try {
-            productImageRepository.delete(image);
-            log.info("상품 이미지 삭제 완료: imageId={}, productId={}", imageId, productId);
-        } catch (Exception e) {
-            throw new CommonException(ProductImageErrorCode.IMAGE_DELETE_FAILED);
-        }
-    }
-
-    public void setDefaultImage(UUID productId, UUID imageId) {
-        Member member = memberUtil.getCurrentMember();
-        Product product =
-                productRepository
-                        .findById(productId)
-                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
-
-        // 상품 소유자 검증
+        Product product = findValidProduct(productId);
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         List<ProductImage> images = productImageRepository.findByProductId(productId);
 
-        boolean imageExists = images.stream().anyMatch(img -> img.getId().equals(imageId));
-        if (!imageExists) {
-            throw new CommonException(ProductImageErrorCode.INVALID_PRODUCT_IMAGE_RELATION);
-        }
+        ProductImage target =
+                images.stream()
+                        .filter(img -> img.getId().equals(imageId))
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new CommonException(
+                                                ProductImageErrorCode
+                                                        .INVALID_PRODUCT_IMAGE_RELATION));
 
-        images.forEach(img -> img.update(img.getImageUrl(), img.getId().equals(imageId)));
+        // 현재 대표 이미지 해제
+        images.stream()
+                .filter(ProductImage::isDefault)
+                .findFirst()
+                .ifPresent(ProductImage::unmarkAsDefault);
+
+        // 선택 이미지 대표 설정
+        target.markAsDefault();
 
         log.info("대표 이미지 변경 완료: productId={}, newDefaultImageId={}", productId, imageId);
     }
 
+    /** 상품 이미지 삭제 */
+    public void deleteProductImage(UUID productId, UUID imageId) {
+        Member member = memberUtil.getCurrentMember();
+        ProductImage image = findValidImage(imageId);
+
+        // 소유자 검증
+        memberUtil.assertMemberResourceAccess(image.getProduct().getStore().getMember());
+
+        if (!image.getProduct().getId().equals(productId)) {
+            throw new CommonException(ProductImageErrorCode.INVALID_PRODUCT_IMAGE_RELATION);
+        }
+
+        // 대표 이미지 삭제 시: 다른 이미지 중 최신 생성된 걸 대표로 지정
+        if (image.isDefault()) {
+            productImageRepository
+                    .findTopByProductIdOrderByCreatedAtDesc(productId)
+                    .ifPresent(ProductImage::markAsDefault);
+        }
+
+        productImageRepository.delete(image);
+        log.info("상품 이미지 삭제 완료: imageId={}, productId={}", imageId, productId);
+    }
+
+    /** 상품 이미지 목록 조회 */
     @Transactional(readOnly = true)
-    public List<ProductImageResponse> getImages(UUID productId) {
+    public List<ProductImageResponse> getProductImages(UUID productId) {
         List<ProductImage> images = productImageRepository.findByProductId(productId);
         if (images.isEmpty()) {
             throw new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND);
         }
         return images.stream().map(ProductImageResponse::from).toList();
+    }
+
+    /** 유효한 상품 조회 */
+    private Product findValidProduct(UUID productId) {
+        return productRepository
+                .findById(productId)
+                .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+    }
+
+    /** 유효한 이미지 조회 */
+    private ProductImage findValidImage(UUID imageId) {
+        return productImageRepository
+                .findById(imageId)
+                .orElseThrow(
+                        () -> new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
     }
 }
