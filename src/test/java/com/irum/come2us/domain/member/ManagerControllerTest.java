@@ -341,8 +341,8 @@ public class ManagerControllerTest {
     }
 
     @Test
-    @DisplayName("매니저 삭제 실패 - 매니저가 아닌 회원 삭제 시도")
-    void managerDeleteApiTest_Fail_NotAManager() throws Exception {
+    @DisplayName("매니저 삭제 실패 - 매니저가 스스로 계정 삭제 시도")
+    void managerDeleteApiTest_ManagerCannotWithdraw() throws Exception {
         long memberId = 2L;
         doThrow(new CommonException(MemberErrorCode.MANAGER_CANNOT_WITHDRAW))
                 .when(managerService)
@@ -365,7 +365,7 @@ public class ManagerControllerTest {
                                 .value(MemberErrorCode.MANAGER_CANNOT_WITHDRAW.getMessage()))
                 .andDo(
                         document(
-                                "manager-delete-fail-not-manager",
+                                "manager-delete-fail-self-delete",
                                 pathParameters(
                                         parameterWithName("memberId").description("삭제 시도할 ID")),
                                 responseFields(
