@@ -7,9 +7,7 @@ import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
-import com.irum.come2us.domain.payment.application.client.TosspaymentsAPI;
 import com.irum.come2us.domain.payment.application.client.TosspaymentsClient;
-import com.irum.come2us.domain.payment.application.client.dto.TossPaymentsRequest;
 import com.irum.come2us.domain.payment.application.client.dto.TossPaymentsResponse;
 import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentCorp;
@@ -22,8 +20,6 @@ import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.PaymentErrorCode;
 import feign.FeignException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
 
     private final AppliedCouponService appliedCouponService;
-
 
     private final TosspaymentsClient tosspaymentsClient;
     private final OrderRepository orderRepository;
@@ -72,11 +67,10 @@ public class PaymentService {
             return new PaymentResponse(order.getOrderNum(), payment.getAmount());
         }
 
-
         try {
             // 토스 페이먼츠 승인 API호출
             TossPaymentsResponse tossPaymentsResponse =
-                tosspaymentsClient.confirmPayment(request, payment.getAmount());
+                    tosspaymentsClient.confirmPayment(request, payment.getAmount());
 
             // 상태 업데이트
             payment.updateToPaid(PaymentStatus.PAID, tossPaymentsResponse);

@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.product.application.service;
 
-import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
@@ -11,10 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
-
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,17 +26,19 @@ public class ProductOptionValueService {
     public void rollbackStockForOrder(List<OrderDetail> orderDetailList) {
 
         // 재고를 되돌릴 ProductOptionValue ID 목록 추출
-        List<UUID> optionIds = orderDetailList.stream()
-            .map(detail -> detail.getProductOptionValue().getId())
-            .distinct() // 중복 ID 제거
-            .toList();
+        List<UUID> optionIds =
+                orderDetailList.stream()
+                        .map(detail -> detail.getProductOptionValue().getId())
+                        .distinct() // 중복 ID 제거
+                        .toList();
 
         // 락 획득
-        List<ProductOptionValue> options = productOptionValueRepository.findAllByIdInWithLock(optionIds);
+        List<ProductOptionValue> options =
+                productOptionValueRepository.findAllByIdInWithLock(optionIds);
 
         // <productOptionValueId , ProductOptionValue> 형태의 Map
-        Map<UUID, ProductOptionValue> optionMap = options.stream()
-            .collect(Collectors.toMap(ProductOptionValue::getId, pov -> pov));
+        Map<UUID, ProductOptionValue> optionMap =
+                options.stream().collect(Collectors.toMap(ProductOptionValue::getId, pov -> pov));
 
         // 재고 되돌리기
         for (OrderDetail detail : orderDetailList) {

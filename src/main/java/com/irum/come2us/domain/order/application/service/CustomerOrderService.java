@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,29 +70,31 @@ public class CustomerOrderService {
                                                         .DELIVERY_ADDRESS_NOT_FOUND));
         log.info("[주문준비] 멤버 {} {} , 상점, 주소 검색", member.getMemberId(), member.getName());
 
+        // 요청에서 id목록 추출
+        List<UUID> productIds =
+                request.productList().stream()
+                        .map(CustomerOrderRequest.ProductSummary::productId)
+                        .distinct()
+                        .toList();
 
-        //요청에서 id목록 추출
-        List<UUID> productIds = request.productList().stream()
-            .map(CustomerOrderRequest.ProductSummary::productId)
-            .distinct()
-            .toList();
-
-        List<UUID> optionValueIds = request.productList().stream()
-            .map(CustomerOrderRequest.ProductSummary::optionValueId)
-            .distinct()
-            .toList();
+        List<UUID> optionValueIds =
+                request.productList().stream()
+                        .map(CustomerOrderRequest.ProductSummary::optionValueId)
+                        .distinct()
+                        .toList();
 
         // 조회
         List<Product> products = productRepository.findAllById(productIds);
         List<ProductOptionValue> optionValues =
-            productOptionValueRepository.findAllByIdInWithLock(optionValueIds);
+                productOptionValueRepository.findAllByIdInWithLock(optionValueIds);
 
         // Map으로 변환
-        Map<UUID, Product> productMap = products.stream()
-            .collect(Collectors.toMap(Product::getId, product -> product));
+        Map<UUID, Product> productMap =
+                products.stream().collect(Collectors.toMap(Product::getId, product -> product));
 
-        Map<UUID, ProductOptionValue> optionMap = optionValues.stream()
-            .collect(Collectors.toMap(ProductOptionValue::getId, option -> option));
+        Map<UUID, ProductOptionValue> optionMap =
+                optionValues.stream()
+                        .collect(Collectors.toMap(ProductOptionValue::getId, option -> option));
 
         // 정합 정검
         if (productMap.size() != productIds.size()) {
