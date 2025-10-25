@@ -5,7 +5,7 @@ import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
-import com.irum.come2us.domain.order.presentation.dto.response.OrderListResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,10 +19,10 @@ public interface OrderRepositoryCustom {
     List<OrderDetailRow> fetchOrderDetailList(List<UUID> orderIdList);
 
 
-    List<Order> fetchOrderHeaderListByMember(
+    List<CustomerOrderListResponse.OrderResponse> fetchOrderListByMember(
             Member member, LocalDate startDate, LocalDate endDate, UUID cursor, int size);
 
-    Map<UUID, List<OrderListResponse.OrderResponse>> fetchOrderDetailListByMember(
+    Map<UUID, List<CustomerOrderListResponse.ProductResponse>> fetchOrderDetailListByMember(
             List<UUID> orderIdList
     );
 }

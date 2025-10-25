@@ -1,5 +1,8 @@
 package com.irum.come2us.domain.order.infrastructure.repository;
 
+import static com.querydsl.core.group.GroupBy.*;
+import static java.util.Collections.*;
+
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.QOrder;
@@ -8,7 +11,9 @@ import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
-import com.irum.come2us.domain.order.presentation.dto.response.OrderListResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
+import com.irum.come2us.domain.refund.domain.entity.QRefund;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -71,6 +76,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .select(
                         Projections.constructor(
                                 OrderDetailRow.class,
+                                od.order.orderId,
                                 od.orderDetailId,
                                 od.productName,
                                 od.quantity,
@@ -81,58 +87,60 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .fetch();
     }
 
+    /**주목 목록 및 refundstatus 조회, pageing적용*/
     @Override
-    public List<Order> fetchOrderHeaderListByMember(Member member, LocalDate startDate, LocalDate endDate,  UUID cursor, int size) {
+    public List<CustomerOrderListResponse.OrderResponse> fetchOrderListByMember(Member member, LocalDate startDate, LocalDate endDate,  UUID cursor, int size) {
 
         QOrder o = QOrder.order;
+        QRefund r = QRefund.refund;
 
         return queryFactory
-                .selectFrom(o)
-                .where(
-                        o.member.memberId.eq(member.getMemberId()),
-                        ltCursor(cursor, o),
-                        o.createdAt.after(startDate.atStartOfDay()),
-                        o.createdAt.before(endDate.atStartOfDay())
-                )
-                .orderBy(o.orderId.desc())
-                .limit(size+1)
-                .fetch();
+            .select(
+                Projections.constructor(
+                    CustomerOrderListResponse.OrderResponse.class,
+                    o.orderId,
+                    o.createdAt,
+                    r.refundStatus
+                ))
+            .from(o)
+            .leftJoin(r)
+            .where(
+                ltCursor(cursor, o),
+                o.member.memberId.eq(member.getMemberId()),
+                o.createdAt.after(startDate.atStartOfDay()),
+                o.createdAt.before(endDate.atStartOfDay())
+            )
+            .orderBy(o.orderId.desc())
+            .limit(size+1)
+            .fetch();
     }
 
     @Override
-    public Map<UUID, List<OrderListResponse.OrderResponse>> fetchOrderDetailListByMember(List<UUID> orderIdList) {
+    public Map<UUID, List<CustomerOrderListResponse.ProductResponse>> fetchOrderDetailListByMember(List<UUID> orderIdList) {
         if (orderIdList.isEmpty()) {
             return Map.of();
         }
         QOrder o = QOrder.order;
-
+        QOrderDetail od = QOrderDetail.orderDetail;
 
         return queryFactory
-                .from(o)
-                .join(o., orderDetail)
-                .where(order.orderId.in(orderIds))
+                .from(od)
+                .where(od.order.orderId.in(orderIdList))
                 .transform(
-                        GroupBy.groupBy(order.orderId).as(
-                                Projections.constructor(
-                                        OrderListResponse.OrderResponse.class,
-                                        order.createdAt, // orderAt
-                                        GroupBy.list(
-                                                Projections.constructor(
-                                                        OrderListResponse.OrderResponse.ProductResponse.class,
-                                                        orderDetail.orderDetailId,
-                                                        orderDetail.optionName,
-                                                        orderDetail.quantity,
-                                                        orderDetail.orderStatusIndi, // 개별 상태
-                                                        // RefundStatus 없으면 null 주입
-                                                        Expressions.nullExpression(RefundStatus.class),
-                                                        orderDetail.price
-                                                )
-                                        )
-                                )
-                        )
+                        groupBy(od.order.orderId)
+                            .as(
+
+                                list(
+                                    Projections.constructor(
+                                            CustomerOrderListResponse.ProductResponse.class,
+                                            od.orderDetailId,
+                                            od.productName,
+                                            od.optionName,
+                                            od.quantity,
+                                            od.price,
+                                            od.orderStatusIndi
+                                    )
+                            ))
                 );
-
-
-        return Map.of();
     }
 }

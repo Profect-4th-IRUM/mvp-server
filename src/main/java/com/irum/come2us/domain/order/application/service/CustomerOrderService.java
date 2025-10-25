@@ -7,21 +7,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
-import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.order.application.mapper.CustomerOrderMapper;
-import com.irum.come2us.domain.order.application.mapper.OrderMapper;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailStatusResponse;
-import com.irum.come2us.domain.order.presentation.dto.response.OrderListResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
 import com.irum.come2us.domain.refund.domain.entity.Refund;
 import com.irum.come2us.domain.refund.domain.repository.RefundRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -64,42 +62,32 @@ public class CustomerOrderService {
 	}
 
 	@Transactional
-	public OrderListResponse getOrderList(UUID cursor, int size, LocalDate startDate, LocalDate endDate){
+	public CustomerOrderListResponse getOrderList(UUID cursor, int size, LocalDate startDate, LocalDate endDate){
 		Member member = memberUtil.getCurrentMember();
 		List<Order> orderList = orderRepository.findAllByMember(member);
 
         // 2. order list 검색
-        var headerList =
-                orderRepository.fetchOrderHeaderListByMember(member, startDate, endDate, cursor, size);
+        List<CustomerOrderListResponse.OrderResponse> headerList =
+                orderRepository.fetchOrderListByMember(member, startDate, endDate, cursor, size);
 
         boolean hasNext = headerList.size() > size;
         if (hasNext) {
             headerList = headerList.subList(0, size);
         }
 
-        // 3. order detail 검색
-        List<UUID> orderIdList = headerList.stream().map(Order::getOrderId).toList();
-
-
-        var orderDetailList = orderRepository.fetchOrderDetailList(orderIdList);
+        // 3. order id list
+        List<UUID> orderIdList = headerList.stream().map(CustomerOrderListResponse.OrderResponse::orderId).toList();
 
         // 4. orderId로 그룹핑 : productSummary 제작
-        Map<UUID, List<OwnerOrderListResponse.ProductSummary>> detailMap =
-                orderDetailList.stream()
-                        .collect(
-                                Collectors.groupingBy(
-                                        OrderDetailRow::orderId,
-                                        Collectors.mapping(
-                                                orderMapper::toProductSummary,
-                                                Collectors.toList())));
+        Map<UUID, List<CustomerOrderListResponse.ProductResponse>> detailMap = orderRepository.fetchOrderDetailListByMember(orderIdList);
 
-        // 5. orderSummary 제작
-        List<OwnerOrderListResponse.OrderSummary> orderSummaryList =
+        // 5. orderResponse 제작
+        List<CustomerOrderListResponse.OrderResponse> orderResponseList =
                 headerList.stream()
                         .filter(order -> detailMap.containsKey(order.orderId()))
                         .map(
                                 order ->
-                                        orderMapper.toOrderSummary(
+                                        CustomerOrderMapper.toOrderResponse(
                                                 order,
                                                 detailMap.getOrDefault(
                                                         order.orderId(),
@@ -108,8 +96,13 @@ public class CustomerOrderService {
                         .toList();
 
         // 6. next cursor계산
-        UUID nextCursor = orderSummaryList.isEmpty() ? null : headerList.getLast().orderId();
+        UUID nextCursor = orderResponseList.isEmpty() ? null : headerList.getLast().orderId();
 
 
+		return CustomerOrderListResponse.builder()
+			.orderList(orderResponseList)
+			.hasNext(hasNext)
+			.nextCursor(nextCursor)
+			.build();
 	}
 }

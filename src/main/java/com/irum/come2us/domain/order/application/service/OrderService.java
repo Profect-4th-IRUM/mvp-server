@@ -88,7 +88,7 @@ public class OrderService {
 
         // 3. order detail 검색
         var orderIdList = headerList.stream().map(OrderSummaryRow::orderId).toList();
-        var orderDetailList = orderRepository.fetchOrderDetailList(orderIdList);
+        List<OrderDetailRow> orderDetailList = orderRepository.fetchOrderDetailList(orderIdList);
 
         // 4. orderId로 그룹핑 : productSummary 제작
         Map<UUID, List<OwnerOrderListResponse.ProductSummary>> detailMap =

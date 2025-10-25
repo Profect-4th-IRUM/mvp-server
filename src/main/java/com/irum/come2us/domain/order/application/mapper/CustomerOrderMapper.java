@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.presentation.dto.response.AddressResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.refund.domain.entity.Refund;
 import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
@@ -52,6 +53,17 @@ public class CustomerOrderMapper {
 			.optionTitle(orderDetail.getOptionName())
 			.price(orderDetail.getPrice())
 			.quantity(orderDetail.getQuantity())
+			.build();
+	}
+
+	public static CustomerOrderListResponse.OrderResponse toOrderResponse(
+		CustomerOrderListResponse.OrderResponse or, List<CustomerOrderListResponse.ProductResponse> pList
+	){
+		return CustomerOrderListResponse.OrderResponse.builder()
+			.orderId(or.orderId())
+			.orderAt(or.orderAt())
+			.refundStatus(or.refundStatus())
+			.productResponseList(pList)
 			.build();
 	}
 }
