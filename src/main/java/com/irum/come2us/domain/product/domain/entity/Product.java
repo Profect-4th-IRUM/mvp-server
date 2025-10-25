@@ -132,5 +132,5 @@ public class Product extends BaseEntity {
         this.category = category;
     }
 
-    // TODO: 이미지 매핑
+    // TODO: 이미지 매핑, 리뷰 매핑
 }
