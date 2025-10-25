@@ -16,8 +16,7 @@ import org.hibernate.annotations.Where;
 @Table(
         name = "p_product_image",
         uniqueConstraints = {
-            // 하나의 상품당 대표 이미지는 하나만 존재
-            @UniqueConstraint(columnNames = {"product_id", "is_default"})
+                @UniqueConstraint(columnNames = {"product_id", "is_default"})
         })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE p_product_image SET deleted_at = NOW() WHERE product_image_id = ?")
@@ -37,13 +36,13 @@ public class ProductImage extends BaseEntity {
     private String imageUrl;
 
     @Column(name = "is_default", nullable = false)
-    private Boolean isDefault;
+    private boolean isDefault;
 
     @Builder(access = AccessLevel.PRIVATE)
     private ProductImage(Product product, String imageUrl, Boolean isDefault) {
         this.product = product;
         this.imageUrl = imageUrl;
-        this.isDefault = isDefault != null ? isDefault : false;
+        this.isDefault = (isDefault != null) && isDefault;
     }
 
     public static ProductImage create(Product product, String imageUrl, Boolean isDefault) {
@@ -54,12 +53,18 @@ public class ProductImage extends BaseEntity {
                 .build();
     }
 
+    /** 이미지 URL 변경 */
     public void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
-    public void updateIsDefault(boolean isDefault) {
-        this.isDefault = isDefault;
+    /** 대표 이미지로 설정 */
+    public void markAsDefault() {
+        this.isDefault = true;
     }
+
+    /** 대표 이미지 해제 */
+    public void unmarkAsDefault() {
+        this.isDefault = false;
     }
 }
