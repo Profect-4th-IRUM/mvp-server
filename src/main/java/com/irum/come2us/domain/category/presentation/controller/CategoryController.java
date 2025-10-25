@@ -19,7 +19,8 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<CategoryInfoResponse> getAllCategories(@RequestParam(required = false) UUID parentId) {
+    public List<CategoryInfoResponse> getAllCategories(
+            @RequestParam(required = false) UUID parentId) {
         if (parentId != null) {
             return categoryService.findByParentId(parentId);
         }
