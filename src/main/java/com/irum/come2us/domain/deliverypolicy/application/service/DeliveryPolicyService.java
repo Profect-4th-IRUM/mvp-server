@@ -40,7 +40,6 @@ public class DeliveryPolicyService {
 
         store.setDeliveryPolicy(deliveryPolicy);
 
-        storeRepository.save(store);
         deliveryPolicyRepository.save(deliveryPolicy);
     }
 
@@ -67,7 +66,6 @@ public class DeliveryPolicyService {
         deliveryPolicy.setStore(null);
 
         deliveryPolicyRepository.delete(deliveryPolicy);
-        storeRepository.save(store);
     }
 
     @Transactional(readOnly = true)

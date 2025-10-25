@@ -52,8 +52,7 @@ public class Store extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_policy_id")
+    @OneToOne(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private DeliveryPolicy deliveryPolicy;
 
     public void setDeliveryPolicy(DeliveryPolicy deliveryPolicy) {
