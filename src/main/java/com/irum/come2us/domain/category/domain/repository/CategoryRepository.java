@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
-    List<Category> findByParentIsNull(); // 루트 카테고리 조회
+    List<Category> findByParentIsNull();
 
     @Query("SELECT c FROM Category c WHERE c.parent.categoryId = :parentId")
     List<Category> findChildrenByParentId(@Param("parentId") UUID parentId);

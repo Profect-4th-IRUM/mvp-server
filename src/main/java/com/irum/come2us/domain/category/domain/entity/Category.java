@@ -38,7 +38,6 @@ public class Category extends BaseEntity {
     @Column(name = "depth", nullable = false)
     private int depth;
 
-    // ------------------- 생성 메서드 -------------------
     public static Category createRootCategory(String name) {
         return Category.builder().name(name).depth(1).build();
     }
@@ -59,7 +58,6 @@ public class Category extends BaseEntity {
         this.children.add(child);
     }
 
-    // ------------------- 수정 메서드 -------------------
     public void updateName(String name) {
         this.name = name;
     }
