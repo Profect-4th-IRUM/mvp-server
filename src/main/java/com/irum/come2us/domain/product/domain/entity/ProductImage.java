@@ -54,12 +54,12 @@ public class ProductImage extends BaseEntity {
                 .build();
     }
 
-    public void update(String imageUrl, Boolean isDefault) {
-        if (imageUrl != null) {
-            this.imageUrl = imageUrl;
-        }
-        if (isDefault != null) {
-            this.isDefault = isDefault;
-        }
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void updateIsDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
     }
 }
