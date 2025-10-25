@@ -1,5 +1,7 @@
 package com.irum.come2us.domain.product.application.service;
 
+import com.irum.come2us.domain.category.domain.entity.Category;
+import com.irum.come2us.domain.category.domain.repository.CategoryRepository;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
@@ -14,12 +16,15 @@ import com.irum.come2us.domain.product.presentation.dto.response.*;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
+
+import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,7 @@ public class ProductService {
     private final ProductOptionValueRepository optionValueRepository;
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
+    private final CategoryRepository categoryRepository;
     private final MemberUtil memberUtil;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
@@ -53,9 +59,16 @@ public class ProductService {
             throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
         }
 
+        Category category =
+                categoryRepository
+                        .findById(request.categoryId())
+                        .orElseThrow(
+                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
         Product product =
                 Product.createProduct(
                         store,
+                        category,
                         request.name(),
                         request.description(),
                         request.detailDescription(),
@@ -171,6 +184,25 @@ public class ProductService {
                 product.getPrice(),
                 newStatus);
 
+        return ProductResponse.from(product);
+    }
+
+    public ProductResponse updateProductCategory(
+            UUID productId, ProductCategoryUpdateRequest request) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
+
+        Category category =
+                categoryRepository
+                        .findById(request.categoryId())
+                        .orElseThrow(
+                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        product.updateCategory(category);
         return ProductResponse.from(product);
     }
 

@@ -39,6 +39,14 @@ public class ProductController {
         return productService.updateProductPublicStatus(productId, request);
     }
 
+    @PatchMapping("/{productId}/categories")
+    public ProductResponse updateProductCategory(
+            @PathVariable UUID productId,
+            @Valid @RequestBody ProductCategoryUpdateRequest request) {
+        log.info("상품 카테고리 변경 요청: productId={}", productId);
+        return productService.updateProductCategory(productId, request);
+    }
+
     @GetMapping
     public ProductCursorResponse getProductList(
             @RequestParam(required = false) UUID cursor,
