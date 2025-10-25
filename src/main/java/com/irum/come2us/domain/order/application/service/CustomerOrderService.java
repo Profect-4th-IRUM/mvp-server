@@ -30,6 +30,10 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErro
 import com.irum.come2us.global.util.MemberUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +59,7 @@ public class CustomerOrderService {
         Member member = memberUtil.getCurrentMember();
         Store store =
                 storeRepository
-                        .findById(request.storeId())
+                        .findByIdWithDeliveryPolicy(request.storeId())
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
         DeliveryAddress deliveryAddress =
                 deliveryAddressRepository
@@ -67,30 +71,53 @@ public class CustomerOrderService {
                                                         .DELIVERY_ADDRESS_NOT_FOUND));
         log.info("[주문준비] 멤버 {} {} , 상점, 주소 검색", member.getMemberId(), member.getName());
 
+
+        //요청에서 id목록 추출
+        List<UUID> productIds = request.productList().stream()
+            .map(CustomerOrderRequest.ProductSummary::productId)
+            .distinct()
+            .toList();
+
+        List<UUID> optionValueIds = request.productList().stream()
+            .map(CustomerOrderRequest.ProductSummary::optionValueId)
+            .distinct()
+            .toList();
+
+        // 조회
+        List<Product> products = productRepository.findAllById(productIds);
+        List<ProductOptionValue> optionValues =
+            productOptionValueRepository.findAllByIdInWithLock(optionValueIds);
+
+        // Map으로 변환
+        Map<UUID, Product> productMap = products.stream()
+            .collect(Collectors.toMap(Product::getId, product -> product));
+
+        Map<UUID, ProductOptionValue> optionMap = optionValues.stream()
+            .collect(Collectors.toMap(ProductOptionValue::getId, option -> option));
+
+        // 정합 정검
+        if (productMap.size() != productIds.size()) {
+            throw new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND);
+        }
+        if (optionMap.size() != optionValueIds.size()) {
+            throw new CommonException(ProductErrorCode.PRODUCT_OPTION_VALUE_NOT_FOUND);
+        }
+
         // 상품 확인, 재고확인, 상품 정보 조회 , 가격 계산, 주문 상세 엔티티 생성 준비
         int calculatedTotalPrice = 0;
         int productCount = 0;
         List<OrderDetail> orderDetails = new ArrayList<>();
         for (CustomerOrderRequest.ProductSummary productReq : request.productList()) {
             // 상품이 해당 상점의 상품인지 확인
-            Product product =
-                    productRepository
-                            .findById(productReq.productId())
-                            .orElseThrow(
-                                    () -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+            Product product = productMap.get(productReq.productId());
+
             if (!product.getStore().getId().equals(store.getId())) {
                 throw new CommonException(OrderErrorCode.INVALID_ORDER);
             }
 
             // 재고 확인
-            ProductOptionValue productOptionValue =
-                    productOptionValueRepository
-                            .findByIdWithLock(productReq.optionValueId())
-                            .orElseThrow(
-                                    () ->
-                                            new CommonException(
-                                                    ProductErrorCode
-                                                            .PRODUCT_OPTION_VALUE_NOT_FOUND));
+            ProductOptionValue productOptionValue = optionMap.get(productReq.optionValueId());
+
             if (productOptionValue.getStockQuantity() < productReq.quantity()) {
                 throw new CommonException(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
             }
