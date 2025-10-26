@@ -1,7 +1,6 @@
 package com.irum.come2us.domain.review.application;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.review.domain.entity.Review;
@@ -12,13 +11,11 @@ import com.irum.come2us.domain.review.presentation.dto.request.ReviewCreateReque
 import com.irum.come2us.domain.review.presentation.dto.request.ReviewUpdateRequest;
 import com.irum.come2us.domain.review.presentation.dto.response.ReviewResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
-import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ReviewErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
-
-import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -96,7 +93,9 @@ public class ReviewService {
                         .map(ReviewImage::getImageUrl)
                         .toList();
 
-        if (request.rate() != null) { updateProductRating(review.getProduct()); }
+        if (request.rate() != null) {
+            updateProductRating(review.getProduct());
+        }
 
         return ReviewResponse.from(review, imageUrls);
     }
@@ -156,7 +155,10 @@ public class ReviewService {
         product.updateRating(avg, count);
         productRepository.save(product);
 
-        log.info("상품 평점 갱신 완료: productId={}, avgRate={}, reviewCount={}",
-                product.getId(), avg, count);
+        log.info(
+                "상품 평점 갱신 완료: productId={}, avgRate={}, reviewCount={}",
+                product.getId(),
+                avg,
+                count);
     }
 }
