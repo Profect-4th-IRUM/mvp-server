@@ -32,20 +32,21 @@ public class ProductImageService {
     private final FileStorageService fileStorageService;
 
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    private static final Pattern IMAGE_PATTERN =
-            Pattern.compile("(?i).*(\\.jpg|\\.jpeg|\\.png)$"); // 대소문자 구분 없는 확장자 검증
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("(?i).*(\\.jpg|\\.jpeg|\\.png)$");
 
-    /** 상품 이미지 업로드 */
+    /** 상품 이미지 업로드 - 파일 저장은 트랜잭션 밖 - DB insert는 트랜잭션 안 */
     public void uploadProductImages(UUID productId, List<MultipartFile> files, Boolean isDefault) {
-        // 파일 저장
+        // ✅ 1. 파일 저장 (트랜잭션 밖)
         List<String> storedUrls =
                 files.stream()
-                        .map(file -> {
-                            validateFile(file);
-                            return fileStorageService.save(file);
-                        })
+                        .map(
+                                file -> {
+                                    validateFile(file);
+                                    return fileStorageService.save(file);
+                                })
                         .collect(Collectors.toList());
-        // DB 저장
+
+        // ✅ 2. DB 저장 (트랜잭션 안)
         saveProductImages(productId, storedUrls, isDefault);
     }
 
@@ -55,11 +56,14 @@ public class ProductImageService {
         Product product = findValidProduct(productId);
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
+        // ✅ 대표 이미지 중복 방지 (이미 존재 시 에러)
         if (Boolean.TRUE.equals(isDefault)) {
-            productImageRepository.findByProductId(productId).stream()
-                    .filter(ProductImage::isDefault)
-                    .findFirst()
-                    .ifPresent(ProductImage::unmarkAsDefault);
+            boolean alreadyHasDefault =
+                    productImageRepository.findByProductId(productId).stream()
+                            .anyMatch(ProductImage::isDefault);
+            if (alreadyHasDefault) {
+                throw new CommonException(ProductImageErrorCode.DUPLICATE_DEFAULT_IMAGE);
+            }
         }
 
         for (String storedUrl : storedUrls) {
@@ -111,10 +115,9 @@ public class ProductImageService {
 
         boolean wasDefault = image.isDefault();
 
-        // 파일 삭제 + DB 삭제 순서 조정
         fileStorageService.delete(image.getImageUrl());
         productImageRepository.delete(image);
-        productImageRepository.flush(); // 삭제 반영 후 최신 이미지 조회
+        productImageRepository.flush();
 
         if (wasDefault) {
             productImageRepository
@@ -150,7 +153,7 @@ public class ProductImageService {
                         () -> new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
     }
 
-    /** 파일 확장자 및 크기 검증 */
+    /** 파일 검증 */
     private void validateFile(MultipartFile file) {
         String originalName = file.getOriginalFilename();
         if (originalName == null || !IMAGE_PATTERN.matcher(originalName).matches()) {

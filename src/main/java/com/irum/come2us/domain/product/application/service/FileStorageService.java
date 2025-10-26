@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,50 +15,39 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class FileStorageService {
 
-    private static final String UPLOAD_DIR = "uploads/";
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    private static final Pattern IMAGE_PATTERN =
-            Pattern.compile("(?i).*(\\.jpg|\\.jpeg|\\.png)$"); // 대소문자 무시 확장자 검사
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
 
+    /** 파일 저장 */
     public String save(MultipartFile file) {
-        validateFile(file);
-
         try {
             String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path path = Paths.get(UPLOAD_DIR + uniqueName);
+            Path uploadPath = Paths.get(UPLOAD_DIR);
 
-            Files.createDirectories(path.getParent());
-            file.transferTo(path.toFile());
+            // 디렉토리 없으면 생성
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
 
-            log.info("파일 저장 완료: {}", path.toAbsolutePath());
-            return path.toString(); // S3 시에는 URL로 대체
+            Path filePath = uploadPath.resolve(uniqueName);
+            file.transferTo(filePath.toFile());
+
+            log.info("파일 저장 완료: {}", filePath.toAbsolutePath());
+            return filePath.toAbsolutePath().toString(); // 절대경로 반환 (S3 시 URL로 대체)
         } catch (IOException e) {
             log.error("파일 저장 실패", e);
             throw new CommonException(ProductImageErrorCode.FILE_SAVE_FAILED);
         }
     }
 
+    /** 파일 삭제 */
     public void delete(String filePath) {
         try {
+            if (filePath == null) return;
             Path path = Paths.get(filePath);
             Files.deleteIfExists(path);
             log.info("파일 삭제 완료: {}", path.toAbsolutePath());
         } catch (IOException e) {
             log.warn("파일 삭제 실패: {}", filePath);
-        }
-    }
-
-    private void validateFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new CommonException(ProductImageErrorCode.INVALID_FILE);
-        }
-
-        if (!IMAGE_PATTERN.matcher(file.getOriginalFilename()).matches()) {
-            throw new CommonException(ProductImageErrorCode.INVALID_FILE_TYPE);
-        }
-
-        if (file.getSize() > MAX_FILE_SIZE) {
-            throw new CommonException(ProductImageErrorCode.FILE_TOO_LARGE);
         }
     }
 }
