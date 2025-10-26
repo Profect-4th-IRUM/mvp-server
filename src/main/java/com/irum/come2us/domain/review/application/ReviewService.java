@@ -17,6 +17,8 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductEr
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ReviewErrorCode;
 import java.util.List;
 import java.util.UUID;
+
+import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,23 +36,21 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
+    private final MemberUtil memberUtil;
 
-    public ReviewResponse createReview(Long memberId, ReviewCreateRequest request) {
-        log.info(
-                "리뷰 작성 요청: memberId={}, productId={}, rate={}",
-                memberId,
-                request.productId(),
-                request.rate());
-
-        Member member =
-                memberRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-
+    public ReviewResponse createReview(ReviewCreateRequest request) {
         Product product =
                 productRepository
                         .findById(request.productId())
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        Member member = memberUtil.getCurrentMember();
+
+        log.info(
+                "리뷰 작성 요청: memberId={}, productId={}, rate={}",
+                member.getMemberId(),
+                request.productId(),
+                request.rate());
 
         Review review = Review.createReview(request.content(), request.rate(), member, product);
         Review saved = reviewRepository.save(review);
@@ -75,6 +75,8 @@ public class ReviewService {
                 reviewRepository
                         .findById(reviewId)
                         .orElseThrow(() -> new CommonException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(review.getMember());
 
         if (request.content() == null && request.rate() == null && request.imageUrls() == null) {
             throw new CommonException(ReviewErrorCode.REVIEW_NOT_MODIFIED);
@@ -102,11 +104,13 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewResponse> getMyReviews(Long memberId, Pageable pageable) {
-        log.info("내 리뷰 목록 조회 요청: memberId={}", memberId);
+    public Page<ReviewResponse> getMyReviews(Pageable pageable) {
+        Member member = memberUtil.getCurrentMember();
+
+        log.info("내 리뷰 목록 조회 요청: memberId={}", member.getMemberId());
 
         return reviewRepository
-                .findAllByMember_MemberId(memberId, pageable)
+                .findAllByMember_MemberId(member.getMemberId(), pageable)
                 .map(
                         review -> {
                             List<String> urls =
