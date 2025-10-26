@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,21 @@ public class ProductImageService {
             Pattern.compile("(?i).*(\\.jpg|\\.jpeg|\\.png)$"); // 대소문자 구분 없는 확장자 검증
 
     /** 상품 이미지 업로드 */
-    @Transactional
     public void uploadProductImages(UUID productId, List<MultipartFile> files, Boolean isDefault) {
+        // 파일 저장
+        List<String> storedUrls =
+                files.stream()
+                        .map(file -> {
+                            validateFile(file);
+                            return fileStorageService.save(file);
+                        })
+                        .collect(Collectors.toList());
+        // DB 저장
+        saveProductImages(productId, storedUrls, isDefault);
+    }
+
+    @Transactional
+    protected void saveProductImages(UUID productId, List<String> storedUrls, Boolean isDefault) {
         Member member = memberUtil.getCurrentMember();
         Product product = findValidProduct(productId);
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
@@ -48,15 +62,11 @@ public class ProductImageService {
                     .ifPresent(ProductImage::unmarkAsDefault);
         }
 
-        for (MultipartFile file : files) {
-            validateFile(file);
-            String storedUrl = fileStorageService.save(file);
-
+        for (String storedUrl : storedUrls) {
             ProductImage productImage = ProductImage.create(product, storedUrl, isDefault);
             productImageRepository.save(productImage);
-
             log.info(
-                    "상품 이미지 업로드 완료: productId={}, storedUrl={}, isDefault={}",
+                    "상품 이미지 등록 완료: productId={}, storedUrl={}, isDefault={}",
                     productId,
                     storedUrl,
                     isDefault);
