@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.order.application.service;
 
+import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.order.application.mapper.OrderMapper;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
@@ -10,11 +11,13 @@ import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
+import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderRepositoryCustom orderRepositoryCustom;
     private final OrderMapper orderMapper;
+    private final AppliedCouponRepository appliedCouponRepository;
 
     @Transactional(readOnly = true)
     public OwnerOrderListResponse getPreparingOrderList(UUID storeId, UUID cursor, Integer size) {
@@ -223,5 +227,76 @@ public class OrderService {
 
         // 모든 정책에 해당하지 않는 경우
         return OrderStatus.PREPARING;
+    }
+
+    @Transactional(readOnly = true)
+    public OrderDetailResponse detailResponse(UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByOrderId(orderId)
+                        .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));
+
+        List<OrderDetailResponse.ProductSummary> productList =
+                order.getOrderDetails().stream()
+                        .map(
+                                od ->
+                                        new OrderDetailResponse.ProductSummary(
+                                                od.getOrderDetailId(),
+                                                od.getProductName(),
+                                                od.getPrice(),
+                                                od.getQuantity(),
+                                                od.getOptionName()))
+                        .toList();
+        String couponName = getCouponName(order.getPaymentId());
+        int discountAmount = getDiscountAmount(order.getPaymentId());
+        // 아직 결제 상태 Field 없음
+        String trackingNumber =
+                order.getOrderDetails().stream()
+                        .map(od -> od.getTrackingNumber())
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .map(dt -> dt.toString())
+                        .orElse(null);
+
+        String arrivedDate =
+                order.getOrderDetails().stream()
+                        .map(od -> od.getArrivedDate())
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .map(dt -> dt.toString())
+                        .orElse(null);
+
+        Integer deliveryFee = order.getDeliveryFee() != null ? order.getDeliveryFee() : 0;
+        Integer totalProductPrice = order.getTotalPrice() != null ? order.getTotalPrice() : 0;
+        Integer payingAmount = totalProductPrice + deliveryFee - discountAmount;
+
+        return new OrderDetailResponse(
+                productList,
+                order.getDeliveryAddress().getRecipientName(),
+                order.getDeliveryAddress().getRecipientContact(),
+                order.getDeliveryAddress().getAddress().toString(),
+                order.getOrderStatusAll().name(),
+                order.getOrderStatusAll().name(),
+                order.getDeliveryRequest(),
+                trackingNumber,
+                arrivedDate,
+                couponName,
+                deliveryFee,
+                discountAmount,
+                payingAmount,
+                order.getCreatedAt().toString(),
+                totalProductPrice);
+    }
+
+    private String getCouponName(UUID paymentId) {
+        return appliedCouponRepository.findByPaymentIdWithCoupon(paymentId).stream()
+                .findFirst()
+                .map(ac -> ac.getCoupon().getName())
+                .orElse(null);
+    }
+
+    private int getDiscountAmount(UUID paymentId) {
+        Integer sum = appliedCouponRepository.getTotalDiscountByPaymentId(paymentId);
+        return sum != null ? sum : 0;
     }
 }
