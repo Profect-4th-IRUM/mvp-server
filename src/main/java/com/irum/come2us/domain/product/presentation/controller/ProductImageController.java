@@ -20,15 +20,9 @@ public class ProductImageController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadProductImages(
-            @PathVariable UUID productId,
-            @RequestPart("files") List<MultipartFile> files,
-            @RequestPart("isDefault") Boolean isDefault) {
-        log.info(
-                "상품 이미지 업로드 요청: productId={}, fileCount={}, isDefault={}",
-                productId,
-                files.size(),
-                isDefault);
-        productImageService.uploadProductImages(productId, files, isDefault);
+            @PathVariable UUID productId, @RequestPart("files") List<MultipartFile> files) {
+        log.info("상품 이미지 업로드 요청: productId={}, fileCount={}", productId, files.size());
+        productImageService.uploadProductImages(productId, files);
     }
 
     @PatchMapping("/{imageId}/default")

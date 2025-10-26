@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.product.application.service;
 
-import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.entity.ProductImage;
 import com.irum.come2us.domain.product.domain.repository.ProductImageRepository;
@@ -11,11 +10,11 @@ import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductImageErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,43 +35,38 @@ public class ProductImageService {
             Pattern.compile(FileStorageConstants.IMAGE_EXTENSION_REGEX);
 
     /** 상품 이미지 업로드 */
-    public void uploadProductImages(UUID productId, List<MultipartFile> files, Boolean isDefault) {
-        // 파일 저장
-        List<String> storedUrls =
-                files.stream()
-                        .map(
-                                file -> {
-                                    validateFile(file);
-                                    return fileStorageService.save(file);
-                                })
-                        .collect(Collectors.toList());
+    public void uploadProductImages(UUID productId, List<MultipartFile> files) {
+        List<String> storedUrls = new ArrayList<>();
 
-        // DB 저장
-        saveProductImages(productId, storedUrls, isDefault);
+        try {
+            for (MultipartFile file : files) {
+                validateFile(file);
+                storedUrls.add(fileStorageService.save(file));
+            }
+
+            saveProductImages(productId, storedUrls);
+        } catch (Exception e) {
+            storedUrls.forEach(fileStorageService::delete);
+            log.warn("파일 저장 중 예외 발생, 업로드된 파일 {}건 삭제 완료", storedUrls.size());
+            throw e;
+        }
     }
 
     @Transactional
-    protected void saveProductImages(UUID productId, List<String> storedUrls, Boolean isDefault) {
-        Member member = memberUtil.getCurrentMember();
+    protected void saveProductImages(UUID productId, List<String> storedUrls) {
         Product product = findValidProduct(productId);
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
-        if (Boolean.TRUE.equals(isDefault)) {
-            boolean alreadyHasDefault =
-                    productImageRepository.findByProductId(productId).stream()
-                            .anyMatch(ProductImage::isDefault);
-            if (alreadyHasDefault) {
-                throw new CommonException(ProductImageErrorCode.DUPLICATE_DEFAULT_IMAGE);
-            }
-        }
+        boolean hasExistingImages = productImageRepository.existsByProductId(productId);
 
-        for (String storedUrl : storedUrls) {
-            ProductImage productImage = ProductImage.create(product, storedUrl, isDefault);
+        for (int i = 0; i < storedUrls.size(); i++) {
+            boolean isDefault = !hasExistingImages && i == 0;
+            ProductImage productImage = ProductImage.create(product, storedUrls.get(i), isDefault);
             productImageRepository.save(productImage);
             log.info(
                     "상품 이미지 등록 완료: productId={}, storedUrl={}, isDefault={}",
                     productId,
-                    storedUrl,
+                    storedUrls.get(i),
                     isDefault);
         }
     }
@@ -114,6 +108,7 @@ public class ProductImageService {
         boolean wasDefault = image.isDefault();
 
         fileStorageService.delete(image.getImageUrl());
+        image.unmarkAsDefault();
         productImageRepository.delete(image);
         productImageRepository.flush();
 

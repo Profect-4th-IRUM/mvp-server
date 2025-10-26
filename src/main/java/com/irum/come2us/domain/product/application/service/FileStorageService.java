@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.product.application.service;
 
-import com.irum.come2us.global.constants.FileStorageConstants;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductImageErrorCode;
 import java.io.IOException;
@@ -10,37 +9,30 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
 public class FileStorageService {
 
-    /** 파일 저장 */
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
+
+    /** 로컬 디렉토리에 파일 저장 */
     public String save(MultipartFile file) {
         try {
-            // 파일명 정화 (경로 탈출 방지)
             String originalName = file.getOriginalFilename();
-            if (originalName == null || originalName.isBlank()) {
-                throw new CommonException(ProductImageErrorCode.FILE_SAVE_FAILED);
+            if (originalName == null) {
+                throw new CommonException(ProductImageErrorCode.INVALID_FILE_FORMAT);
             }
 
-            String cleanFilename = StringUtils.cleanPath(originalName);
-            String uniqueName = UUID.randomUUID() + "_" + cleanFilename;
+            String uniqueName = UUID.randomUUID() + "_" + originalName;
+            Path path = Paths.get(UPLOAD_DIR, uniqueName);
 
-            // 디렉토리 생성
-            Path uploadPath = Paths.get(FileStorageConstants.UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            Files.createDirectories(path.getParent());
+            file.transferTo(path.toFile());
 
-            // 안전하게 경로 연결
-            Path filePath = uploadPath.resolve(uniqueName).normalize();
-
-            file.transferTo(filePath.toFile());
-            log.info("파일 저장 완료: {}", filePath.toAbsolutePath());
-            return filePath.toAbsolutePath().toString(); // S3 시 URL로 대체
+            log.info("파일 저장 완료: {}", path.toAbsolutePath());
+            return path.toString();
         } catch (IOException e) {
             log.error("파일 저장 실패", e);
             throw new CommonException(ProductImageErrorCode.FILE_SAVE_FAILED);
@@ -51,11 +43,11 @@ public class FileStorageService {
     public void delete(String filePath) {
         try {
             if (filePath == null || filePath.isBlank()) return;
-            Path path = Paths.get(filePath).normalize();
+            Path path = Paths.get(filePath);
             Files.deleteIfExists(path);
             log.info("파일 삭제 완료: {}", path.toAbsolutePath());
         } catch (IOException e) {
-            log.warn("파일 삭제 실패: {}", filePath);
+            log.warn("파일 삭제 실패: {}", filePath, e);
         }
     }
 }
