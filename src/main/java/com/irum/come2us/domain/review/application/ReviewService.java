@@ -65,6 +65,8 @@ public class ReviewService {
 
         reviewImageRepository.saveAll(images);
 
+        updateProductRating(product);
+
         return ReviewResponse.from(saved, images.stream().map(ReviewImage::getImageUrl).toList());
     }
 
@@ -93,6 +95,8 @@ public class ReviewService {
                 reviewImageRepository.findAllByReview(review).stream()
                         .map(ReviewImage::getImageUrl)
                         .toList();
+
+        if (request.rate() != null) { updateProductRating(review.getProduct()); }
 
         return ReviewResponse.from(review, imageUrls);
     }
@@ -138,6 +142,33 @@ public class ReviewService {
         reviewImageRepository.deleteAll(reviewImageRepository.findAllByReview(review));
         reviewRepository.delete(review);
 
+        updateProductRating(review.getProduct());
+
         log.info("리뷰 삭제 완료: reviewId={}", reviewId);
+    }
+
+    private void updateProductRating(Product product) {
+        Object[] result = reviewRepository.findAverageAndCountByProduct(product);
+
+        double avg = 0.0;
+        int count = 0;
+
+        if (result != null && result.length == 2) {
+            Object avgObj = result[0];
+            Object countObj = result[1];
+
+            if (avgObj instanceof Number a) {
+                avg = a.doubleValue();
+            }
+            if (countObj instanceof Number c) {
+                count = c.intValue();
+            }
+        }
+
+        product.updateRating(avg, count);
+        productRepository.save(product);
+
+        log.debug("상품 평점 갱신 완료: productId={}, avgRate={}, reviewCount={}",
+                product.getId(), avg, count);
     }
 }
