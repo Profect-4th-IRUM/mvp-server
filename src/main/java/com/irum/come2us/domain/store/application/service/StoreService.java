@@ -9,6 +9,7 @@ import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreCreateRequest;
 import com.irum.come2us.domain.store.presentation.dto.request.StoreUpdateRequest;
+import com.irum.come2us.domain.store.presentation.dto.response.StoreCreateResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreInfoResponse;
 import com.irum.come2us.domain.store.presentation.dto.response.StoreListResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -30,12 +31,12 @@ public class StoreService {
     private final MemberValidator memberValidator;
     private final MemberUtil memberUtil;
 
-    public UUID createStore(StoreCreateRequest request) {
+    public StoreCreateResponse createStore(StoreCreateRequest request) {
         Member member = memberUtil.getCurrentMember();
 
-        validateMemberHasNoStore(member); // 1인 1상점 제한
-        validateBusinessNumber(request.businessRegistrationNumber()); // 사업자번호 중복 체크
-        validateTelemarketingNumber(request.telemarketingRegistrationNumber()); // 통신판매번호 중복 체크
+        validateMemberHasNoStore(member);
+        validateBusinessNumber(request.businessRegistrationNumber());
+        validateTelemarketingNumber(request.telemarketingRegistrationNumber());
 
         Store store =
                 Store.createStore(
@@ -47,7 +48,8 @@ public class StoreService {
                         member);
 
         storeRepository.save(store);
-        return store.getId();
+
+        return new StoreCreateResponse(store.getId());
     }
 
     public void changeStore(UUID storeId, StoreUpdateRequest request) {

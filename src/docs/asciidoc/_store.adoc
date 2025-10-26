@@ -1,0 +1,77 @@
+
+== 상점(Store) API
+
+=== 1. 상점 생성
+`POST /stores`
+
+요청 본문:
+include::{snippets}/store-create/request-fields.adoc[]
+
+응답:
+include::{snippets}/store-create/http-response.adoc[]
+==== 상점 생성 실패: 유효성 검사
+
+* `상점명 누락`
+include::{snippets}/store-create-fail-blank-name/http-response.adoc[]
+include::{snippets}/store-create-fail-blank-name/response-fields.adoc[]
+
+* `연락처 누락`
+include::{snippets}/store-create-fail-blank-contact/http-response.adoc[]
+include::{snippets}/store-create-fail-blank-contact/response-fields.adoc[]
+
+* `주소 누락`
+include::{snippets}/store-create-fail-blank-address/http-response.adoc[]
+include::{snippets}/store-create-fail-blank-address/response-fields.adoc[]
+
+* `사업자등록번호 누락`
+include::{snippets}/store-create-fail-blank-business-number/http-response.adoc[]
+include::{snippets}/store-create-fail-blank-business-number/response-fields.adoc[]
+
+* `통신판매업번호 누락`
+include::{snippets}/store-create-fail-blank-telemarketing-number/http-response.adoc[]
+include::{snippets}/store-create-fail-blank-telemarketing-number/response-fields.adoc[]
+
+
+
+=== 2. 상점 수정
+`PATCH /stores/{storeId}`
+
+요청 본문:
+include::{snippets}/store-update/request-fields.adoc[]
+
+응답:
+include::{snippets}/store-update/http-response.adoc[]
+
+=== 3. 상점 삭제
+`DELETE /stores/{storeId}`
+
+응답:
+include::{snippets}/store-delete/http-response.adoc[]
+
+=== 4. 상점 목록 조회
+`GET /stores`
+
+응답:
+include::{snippets}/store-list/response-fields.adoc[]
+include::{snippets}/store-list/http-response.adoc[]
+
+=== 5. 상점 상세 조회
+`GET /stores/{storeId}`
+
+응답:
+include::{snippets}/store-detail/response-fields.adoc[]
+include::{snippets}/store-detail/http-response.adoc[]
+
+=== 6. 내 상점 상품 목록 조회
+`GET /stores/products`
+
+응답:
+include::{snippets}/store-my-products/response-fields.adoc[]
+include::{snippets}/store-my-products/http-response.adoc[]
+
+=== 7. 특정 상점 상품 목록 조회
+`GET /stores/{storeId}/products`
+
+응답:
+include::{snippets}/store-products/response-fields.adoc[]
+include::{snippets}/store-products/http-response.adoc[]
