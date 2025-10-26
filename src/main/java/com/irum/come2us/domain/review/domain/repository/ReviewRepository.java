@@ -15,6 +15,17 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     Page<Review> findAllByProduct_Id(UUID productId, Pageable pageable);
 
-    @Query("SELECT COALESCE(AVG(r.rate), 0), COUNT(r) FROM Review r WHERE r.product = :product")
-    Object[] findAverageAndCountByProduct(@Param("product") Product product);
+    @Query("""
+        SELECT COALESCE(AVG(r.rate), 0)
+        FROM Review r
+        WHERE r.product.id = :productId
+        """)
+    Double findAverageByProductId(@Param("productId") UUID productId);
+
+    @Query("""
+        SELECT COUNT(r)
+        FROM Review r
+        WHERE r.product.id = :productId
+        """)
+    Integer findCountByProductId(@Param("productId") UUID productId);
 }

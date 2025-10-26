@@ -34,7 +34,6 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
-    private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
     private final MemberUtil memberUtil;
 
@@ -64,7 +63,6 @@ public class ReviewService {
                                 .toList();
 
         reviewImageRepository.saveAll(images);
-
         updateProductRating(product);
 
         return ReviewResponse.from(saved, images.stream().map(ReviewImage::getImageUrl).toList());
@@ -152,27 +150,13 @@ public class ReviewService {
     }
 
     private void updateProductRating(Product product) {
-        Object[] result = reviewRepository.findAverageAndCountByProduct(product);
-
-        double avg = 0.0;
-        int count = 0;
-
-        if (result != null && result.length == 2) {
-            Object avgObj = result[0];
-            Object countObj = result[1];
-
-            if (avgObj instanceof Number a) {
-                avg = a.doubleValue();
-            }
-            if (countObj instanceof Number c) {
-                count = c.intValue();
-            }
-        }
+        Double avg = reviewRepository.findAverageByProductId(product.getId());
+        Integer count = reviewRepository.findCountByProductId(product.getId());
 
         product.updateRating(avg, count);
         productRepository.save(product);
 
-        log.debug("상품 평점 갱신 완료: productId={}, avgRate={}, reviewCount={}",
+        log.info("상품 평점 갱신 완료: productId={}, avgRate={}, reviewCount={}",
                 product.getId(), avg, count);
     }
 }
