@@ -11,7 +11,8 @@ public enum ProductImageErrorCode implements BaseErrorCode {
     INVALID_PRODUCT_IMAGE_RELATION(HttpStatus.BAD_REQUEST, "요청한 상품과 이미지가 일치하지 않습니다."),
     INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "허용되지 않은 이미지 형식입니다."),
     FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "파일 크기가 허용 범위를 초과했습니다."),
-    FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 중 오류가 발생했습니다.");
+    FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장 중 오류가 발생했습니다."),
+    INVALID_FILE(HttpStatus.BAD_REQUEST, "유효하지 않은 파일입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
