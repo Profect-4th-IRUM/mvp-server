@@ -1,0 +1,15 @@
+package com.irum.come2us.global.constants;
+
+public final class FileStorageConstants {
+
+    private FileStorageConstants() {}
+
+    /** 파일 업로드 기본 경로 */
+    public static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
+
+    /** 허용 이미지 확장자 정규식 (대소문자 무시) */
+    public static final String IMAGE_EXTENSION_REGEX = "(?i).*(\\.jpg|\\.jpeg|\\.png)$";
+
+    /** 최대 업로드 허용 크기 (10MB) */
+    public static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
+}

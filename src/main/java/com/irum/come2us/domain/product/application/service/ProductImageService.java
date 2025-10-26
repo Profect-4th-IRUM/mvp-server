@@ -6,6 +6,7 @@ import com.irum.come2us.domain.product.domain.entity.ProductImage;
 import com.irum.come2us.domain.product.domain.repository.ProductImageRepository;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.response.ProductImageResponse;
+import com.irum.come2us.global.constants.FileStorageConstants;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductImageErrorCode;
@@ -31,12 +32,12 @@ public class ProductImageService {
     private final MemberUtil memberUtil;
     private final FileStorageService fileStorageService;
 
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    private static final Pattern IMAGE_PATTERN = Pattern.compile("(?i).*(\\.jpg|\\.jpeg|\\.png)$");
+    private static final Pattern IMAGE_PATTERN =
+            Pattern.compile(FileStorageConstants.IMAGE_EXTENSION_REGEX);
 
-    /** 상품 이미지 업로드 - 파일 저장은 트랜잭션 밖 - DB insert는 트랜잭션 안 */
+    /** 상품 이미지 업로드 */
     public void uploadProductImages(UUID productId, List<MultipartFile> files, Boolean isDefault) {
-        // ✅ 1. 파일 저장 (트랜잭션 밖)
+        // 파일 저장
         List<String> storedUrls =
                 files.stream()
                         .map(
@@ -46,7 +47,7 @@ public class ProductImageService {
                                 })
                         .collect(Collectors.toList());
 
-        // ✅ 2. DB 저장 (트랜잭션 안)
+        // DB 저장
         saveProductImages(productId, storedUrls, isDefault);
     }
 
@@ -56,7 +57,6 @@ public class ProductImageService {
         Product product = findValidProduct(productId);
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
-        // ✅ 대표 이미지 중복 방지 (이미 존재 시 에러)
         if (Boolean.TRUE.equals(isDefault)) {
             boolean alreadyHasDefault =
                     productImageRepository.findByProductId(productId).stream()
@@ -77,7 +77,6 @@ public class ProductImageService {
         }
     }
 
-    /** 대표 이미지 변경 */
     @Transactional
     public void changeDefaultImage(UUID productId, UUID imageId) {
         Product product = findValidProduct(productId);
@@ -103,7 +102,6 @@ public class ProductImageService {
         log.info("대표 이미지 변경 완료: productId={}, newDefaultImageId={}", productId, imageId);
     }
 
-    /** 상품 이미지 삭제 */
     @Transactional
     public void deleteProductImage(UUID productId, UUID imageId) {
         ProductImage image = findValidImage(imageId);
@@ -128,7 +126,6 @@ public class ProductImageService {
         log.info("상품 이미지 삭제 완료: imageId={}, productId={}", imageId, productId);
     }
 
-    /** 상품 이미지 조회 */
     @Transactional(readOnly = true)
     public List<ProductImageResponse> getProductImages(UUID productId) {
         List<ProductImage> images = productImageRepository.findByProductId(productId);
@@ -139,7 +136,6 @@ public class ProductImageService {
         return images.stream().map(ProductImageResponse::from).toList();
     }
 
-    /** 내부 유효성 검증 */
     private Product findValidProduct(UUID productId) {
         return productRepository
                 .findById(productId)
@@ -153,13 +149,12 @@ public class ProductImageService {
                         () -> new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
     }
 
-    /** 파일 검증 */
     private void validateFile(MultipartFile file) {
         String originalName = file.getOriginalFilename();
         if (originalName == null || !IMAGE_PATTERN.matcher(originalName).matches()) {
             throw new CommonException(ProductImageErrorCode.INVALID_FILE_FORMAT);
         }
-        if (file.getSize() > MAX_FILE_SIZE) {
+        if (file.getSize() > FileStorageConstants.MAX_FILE_SIZE) {
             throw new CommonException(ProductImageErrorCode.FILE_TOO_LARGE);
         }
     }
