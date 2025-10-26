@@ -5,6 +5,7 @@ import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
 import com.irum.come2us.domain.order.presentation.dto.response.SalesResponse;
+import com.irum.come2us.domain.refund.domain.entity.Refund;
 import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
 import com.irum.come2us.domain.refund.domain.repository.RefundRepository;
 import com.irum.come2us.domain.store.domain.entity.Store;
@@ -13,6 +14,7 @@ import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,6 +65,12 @@ public class SalesService {
                                                 detail.getPrice(),
                                                 detail.getOptionName()))
                         .toList();
+        Optional<Refund> latestRefund = refundRepository.findLatestByOrder(order);
+
+        String displayStatus = latestRefund
+                .map(r -> r.getRefundStatus().name())
+                .orElse(order.getOrderStatusAll().name());
+
 
         return new SalesResponse.OrderSummary(
                 order.getOrderId(),
@@ -75,6 +83,6 @@ public class SalesService {
                 order.getTotalPrice() + order.getDeliveryFee(),
                 order.getDeliveryFee(),
                 productList,
-                order.getOrderStatusAll().name());
+                displayStatus);
     }
 }

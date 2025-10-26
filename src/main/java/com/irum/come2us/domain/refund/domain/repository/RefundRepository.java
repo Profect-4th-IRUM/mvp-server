@@ -17,4 +17,7 @@ public interface RefundRepository extends JpaRepository<Refund, UUID> {
     // RefundRepository 추후 orderRepository에서 가져오는 것으로 변경 예정
     // public interface OrderRepository extends JpaRepository<Order, UUID> {..}
     Optional<Order> findByOrder_OrderId(@Param("orderId") UUID orderId);
+
+    Optional<Refund> findLatestByOrder(Order order);
+
 }
