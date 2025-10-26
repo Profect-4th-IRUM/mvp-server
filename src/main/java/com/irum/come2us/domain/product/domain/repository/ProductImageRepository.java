@@ -18,4 +18,6 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, UUID
 
     /** 해당 상품의 대표 이미지 존재 여부 확인 */
     boolean existsByProductIdAndIsDefaultTrue(UUID productId);
+
+    boolean existsByProductId(UUID productId);
 }
