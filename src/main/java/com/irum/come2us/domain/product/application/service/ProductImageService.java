@@ -13,6 +13,7 @@ import com.irum.come2us.global.util.MemberUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,14 +28,17 @@ public class ProductImageService {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
     private final MemberUtil memberUtil;
-    private final FileStorageService fileStorageService; // 신규 추가
+    private final FileStorageService fileStorageService;
+
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    private static final Pattern IMAGE_PATTERN =
+            Pattern.compile("(?i).*(\\.jpg|\\.jpeg|\\.png)$"); // 대소문자 구분 없는 확장자 검증
 
     /** 상품 이미지 업로드 */
     @Transactional
     public void uploadProductImages(UUID productId, List<MultipartFile> files, Boolean isDefault) {
         Member member = memberUtil.getCurrentMember();
         Product product = findValidProduct(productId);
-
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
         if (Boolean.TRUE.equals(isDefault)) {
@@ -45,10 +49,7 @@ public class ProductImageService {
         }
 
         for (MultipartFile file : files) {
-            // 확장자 및 크기 검증
             validateFile(file);
-
-            // 실제 파일 저장 (로컬 또는 S3)
             String storedUrl = fileStorageService.save(file);
 
             ProductImage productImage = ProductImage.create(product, storedUrl, isDefault);
@@ -98,14 +99,18 @@ public class ProductImageService {
             throw new CommonException(ProductImageErrorCode.INVALID_PRODUCT_IMAGE_RELATION);
         }
 
-        if (image.isDefault()) {
+        boolean wasDefault = image.isDefault();
+
+        // 파일 삭제 + DB 삭제 순서 조정
+        fileStorageService.delete(image.getImageUrl());
+        productImageRepository.delete(image);
+        productImageRepository.flush(); // 삭제 반영 후 최신 이미지 조회
+
+        if (wasDefault) {
             productImageRepository
                     .findTopByProductIdOrderByCreatedAtDesc(productId)
                     .ifPresent(ProductImage::markAsDefault);
         }
-
-        fileStorageService.delete(image.getImageUrl());
-        productImageRepository.delete(image);
 
         log.info("상품 이미지 삭제 완료: imageId={}, productId={}", imageId, productId);
     }
@@ -135,12 +140,13 @@ public class ProductImageService {
                         () -> new CommonException(ProductImageErrorCode.PRODUCT_IMAGE_NOT_FOUND));
     }
 
+    /** 파일 확장자 및 크기 검증 */
     private void validateFile(MultipartFile file) {
         String originalName = file.getOriginalFilename();
-        if (originalName == null || !originalName.matches(".*\\.(jpg|jpeg|png)$")) {
+        if (originalName == null || !IMAGE_PATTERN.matcher(originalName).matches()) {
             throw new CommonException(ProductImageErrorCode.INVALID_FILE_FORMAT);
         }
-        if (file.getSize() > 10 * 1024 * 1024) {
+        if (file.getSize() > MAX_FILE_SIZE) {
             throw new CommonException(ProductImageErrorCode.FILE_TOO_LARGE);
         }
     }
