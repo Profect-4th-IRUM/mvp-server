@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.payment.domain.entity;
 
+import com.irum.come2us.domain.coupon.domain.entity.AppliedCoupon;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.payment.application.client.dto.TossPaymentsResponse;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentCorp;
@@ -7,6 +8,8 @@ import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -49,6 +52,9 @@ public class Payment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
+    private List<AppliedCoupon> appliedCoupons = new ArrayList<>();
 
     public void updateStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;

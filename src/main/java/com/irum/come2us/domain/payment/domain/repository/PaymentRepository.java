@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.payment.domain.repository;
 
+import com.irum.come2us.domain.coupon.domain.entity.AppliedCoupon;
 import com.irum.come2us.domain.payment.domain.entity.Payment;
 import java.util.List;
 import java.util.UUID;
@@ -15,4 +16,10 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Payment p SET p.paymentStatus = 'FAILED' WHERE p.paymentId IN :paymentIds")
     int updateStatusToFailedByIds(@Param("paymentIds") List<UUID> paymentIds);
+
+    @Query("SELECT ac FROM AppliedCoupon ac JOIN ac.payment p WHERE p.id = :paymentId")
+    List<AppliedCoupon> findByPayment_Id(@Param("paymentId") UUID paymentId);
+
+    @Query("SELECT p.totalDiscountAmount FROM Payment p WHERE p.id = :paymentId")
+    Integer getTotalDiscountByPaymentId(@Param("paymentId") UUID paymentId);
 }

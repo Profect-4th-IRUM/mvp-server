@@ -32,7 +32,7 @@ public class SalesService {
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
         memberUtil.assertMemberResourceAccess(store.getMember());
 
-        List<Order> orders = orderRepository.findSalesAll(storeId);
+        List<Order> orders = orderRepository.findAllByStore_Id(storeId);
         List<SalesResponse.OrderSummary> orderList =
                 orders.stream().map(this::toOrderSummary).toList();
         return new SalesResponse(orderList, null, false);

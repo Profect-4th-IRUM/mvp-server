@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.order.application.service;
 
-import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.order.application.mapper.OrderMapper;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
@@ -13,6 +12,7 @@ import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryR
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
+import com.irum.come2us.domain.payment.domain.repository.PaymentRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
 import java.util.List;
@@ -34,7 +34,7 @@ public class OwnerOrderService {
     private final OrderRepository orderRepository;
     private final OrderRepositoryCustom orderRepositoryCustom;
     private final OrderMapper orderMapper;
-    private final AppliedCouponRepository appliedCouponRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
     public OwnerOrderListResponse getPreparingOrderList(UUID storeId, UUID cursor, Integer size) {
@@ -249,8 +249,8 @@ public class OwnerOrderService {
                                                 od.getQuantity(),
                                                 od.getOptionName()))
                         .toList();
-        String couponName = getCouponName(order.getPaymentId());
-        int discountAmount = getDiscountAmount(order.getPaymentId());
+        String couponName = getCouponName(order.getPayment().getPaymentId());
+        int discountAmount = getDiscountAmount(order.getPayment().getPaymentId());
         // 아직 결제 상태 Field 없음
         String trackingNumber =
                 order.getOrderDetails().stream()
@@ -291,14 +291,14 @@ public class OwnerOrderService {
     }
 
     private String getCouponName(UUID paymentId) {
-        return appliedCouponRepository.findByPaymentIdWithCoupon(paymentId).stream()
+        return paymentRepository.findByPayment_Id(paymentId).stream()
                 .findFirst()
                 .map(ac -> ac.getCoupon().getName())
                 .orElse(null);
     }
 
     private int getDiscountAmount(UUID paymentId) {
-        Integer sum = appliedCouponRepository.getTotalDiscountByPaymentId(paymentId);
+        Integer sum = paymentRepository.getTotalDiscountByPaymentId(paymentId);
         return sum != null ? sum : 0;
     }
 }
