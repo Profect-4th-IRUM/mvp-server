@@ -1,8 +1,8 @@
 package com.irum.come2us.domain.coupon.presentation.controller;
 
 import com.irum.come2us.domain.coupon.application.service.CouponService;
-import com.irum.come2us.domain.coupon.domain.entity.Coupon;
 import com.irum.come2us.domain.coupon.presentation.dto.request.CouponGenerateRequest;
+import com.irum.come2us.domain.coupon.presentation.dto.response.CouponResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -29,10 +29,10 @@ public class CouponController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Coupon>> getCoupon(
+    public ResponseEntity<List<CouponResponse>> getCoupon(
             @AuthenticationPrincipal UserDetails userDetails) {
         Long memberId = Long.parseLong(userDetails.getUsername());
-        List<Coupon> coupons = couponService.getCouponByMember(memberId);
+        List<CouponResponse> coupons = couponService.getCouponByMember(memberId);
         return ResponseEntity.ok(coupons);
     }
 
