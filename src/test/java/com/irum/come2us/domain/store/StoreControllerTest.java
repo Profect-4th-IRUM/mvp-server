@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -109,6 +111,8 @@ public class StoreControllerTest {
                 .andDo(
                         document(
                                 "store-update",
+                                pathParameters(
+                                        parameterWithName("storeId").description("수정할 상점 ID")),
                                 requestFields(
                                         fieldWithPath("name").description("상점명"),
                                         fieldWithPath("contact").description("연락처"),
@@ -124,7 +128,11 @@ public class StoreControllerTest {
 
         mockMvc.perform(delete("/stores/{storeId}", storeId).with(csrf().asHeader()))
                 .andExpect(status().isNoContent())
-                .andDo(document("store-delete"));
+                .andDo(
+                        document(
+                                "store-delete",
+                                pathParameters(
+                                        parameterWithName("storeId").description("삭제할 상점 ID"))));
     }
 
     // 4. 상점 목록 조회
@@ -174,6 +182,8 @@ public class StoreControllerTest {
                 .andDo(
                         document(
                                 "store-detail",
+                                pathParameters(
+                                        parameterWithName("storeId").description("조회할 상점 ID")),
                                 responseFields(
                                         fieldWithPath("success").description("API 성공 여부"),
                                         fieldWithPath("status").description("HTTP 상태 코드"),
@@ -268,6 +278,9 @@ public class StoreControllerTest {
                 .andDo(
                         document(
                                 "store-products",
+                                pathParameters(
+                                        parameterWithName("storeId")
+                                                .description("상품 목록 조회할 특정 상점 ID")),
                                 responseFields(
                                         fieldWithPath("success").description("API 성공 여부"),
                                         fieldWithPath("status").description("HTTP 상태 코드"),
