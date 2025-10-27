@@ -32,13 +32,12 @@ public class CouponController {
     public ResponseEntity<List<CouponResponse>> getCoupon(
             @AuthenticationPrincipal UserDetails userDetails) {
         Long memberId = Long.parseLong(userDetails.getUsername());
-        List<CouponResponse> coupons = couponService.getCouponByMember(memberId);
-        return ResponseEntity.ok(coupons);
+        return ResponseEntity.ok(couponService.getCouponByMember(memberId));
     }
 
-    @DeleteMapping("/{coupon-id}")
+    @DeleteMapping("/{couponId}")
     public ResponseEntity<Void> deleteCoupon(
-            @PathVariable("coupon-id") UUID couponId,
+            @PathVariable("couponId") UUID couponId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         Long memberId = Long.parseLong(userDetails.getUsername());
