@@ -1,9 +1,11 @@
 package com.irum.come2us.global.config;
 
 import com.irum.come2us.domain.auth.application.service.AuthService;
+import com.irum.come2us.domain.auth.application.service.JwtTokenService;
 import com.irum.come2us.domain.deliveryaddress.application.service.DeliveryAddressService;
 import com.irum.come2us.domain.member.application.service.ManagerService;
 import com.irum.come2us.domain.member.application.service.MemberService;
+import com.irum.come2us.global.util.CookieUtil;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -28,5 +30,15 @@ public class TestConfig {
     @Bean
     public DeliveryAddressService deliveryAddressService() {
         return Mockito.mock(DeliveryAddressService.class);
+    }
+
+    @Bean
+    public CookieUtil cookieUtil() {
+        return Mockito.mock(CookieUtil.class);
+    }
+
+    @Bean
+    public JwtTokenService jwtTokenService() {
+        return Mockito.mock(JwtTokenService.class);
     }
 }
