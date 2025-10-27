@@ -1,0 +1,66 @@
+== 할인 (Discount) API
+
+=== 1. 상품 할인 등록
+`POST /discounts`
+
+요청 본문:
+include::{snippets}/discount-register/request-fields.adoc[]
+
+응답:
+include::{snippets}/discount-register/http-response.adoc[]
+
+---
+
+=== 2. 상품별 할인 정보 조회
+`GET /products/{productId}/discounts`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/discount-info-get-by-product/path-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/discount-info-get-by-product/response-fields.adoc[]
+
+응답:
+include::{snippets}/discount-info-get-by-product/http-response.adoc[]
+
+---
+
+=== 3. 상점별 할인 목록 조회
+`GET /stores/{storeId}/discounts`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/discount-list-get-by-store/path-parameters.adoc[]
+
+쿼리 파라미터 (Query Parameters):
+include::{snippets}/discount-list-get-by-store/query-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/discount-list-get-by-store/response-fields.adoc[]
+
+응답:
+include::{snippets}/discount-list-get-by-store/http-response.adoc[]
+
+---
+
+=== 4. 할인 정보 수정
+`PATCH /discounts/{discountId}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/discount-info-update/path-parameters.adoc[]
+
+요청 본문:
+include::{snippets}/discount-info-update/request-fields.adoc[]
+
+응답:
+include::{snippets}/discount-info-update/http-response.adoc[]
+
+---
+
+=== 5. 할인 삭제
+`DELETE /discounts/{discountId}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/discount-delete/path-parameters.adoc[]
+
+응답:
+include::{snippets}/discount-delete/http-response.adoc[]
