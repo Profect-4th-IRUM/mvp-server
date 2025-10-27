@@ -13,6 +13,7 @@ import com.irum.come2us.global.util.MemberUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -150,7 +152,13 @@ public class ProductImageService {
 
     private void validateFile(MultipartFile file) {
         String originalName = file.getOriginalFilename();
-        if (originalName == null || !IMAGE_PATTERN.matcher(originalName).matches()) {
+        String cleanFilename = StringUtils.cleanPath(Objects.requireNonNull(originalName));
+
+        log.info("orig={}", originalName);
+        log.info("clean={}", cleanFilename);
+        log.info("match={}", IMAGE_PATTERN.matcher(cleanFilename).matches());
+
+        if (!IMAGE_PATTERN.matcher(cleanFilename).matches()) {
             throw new CommonException(ProductImageErrorCode.INVALID_FILE_FORMAT);
         }
         if (file.getSize() > FileStorageConstants.MAX_FILE_SIZE) {

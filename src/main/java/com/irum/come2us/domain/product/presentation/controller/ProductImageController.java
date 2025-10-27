@@ -22,23 +22,23 @@ public class ProductImageController {
 
     /** 상품 이미지 업로드 */
     @PostMapping(consumes = "multipart/form-data")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void uploadProductImages(
+    public ResponseEntity<Void> uploadProductImages(
             @PathVariable UUID productId,
             @Valid @ModelAttribute ProductImageUploadRequest request) {
 
         log.info("상품 이미지 업로드 요청: productId={}, fileCount={}", productId, request.images().size());
-
         productImageService.uploadProductImages(productId, request.images());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /** 대표 이미지 변경 */
     @PatchMapping("/{imageId}/default")
-    @ResponseStatus(HttpStatus.OK)
-    public void changeDefaultImage(@PathVariable UUID productId, @PathVariable UUID imageId) {
+    public ResponseEntity<Void> changeDefaultImage(
+            @PathVariable UUID productId, @PathVariable UUID imageId) {
 
         log.info("대표 이미지 변경 요청: productId={}, imageId={}", productId, imageId);
         productImageService.changeDefaultImage(productId, imageId);
+        return ResponseEntity.noContent().build();
     }
 
     /** 상품 이미지 삭제 */
