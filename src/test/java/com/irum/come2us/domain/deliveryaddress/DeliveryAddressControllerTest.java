@@ -1,4 +1,4 @@
-package com.irum.come2us.domain.deliveryadress;
+package com.irum.come2us.domain.deliveryaddress;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
