@@ -1,38 +1,61 @@
 package com.irum.come2us.domain.product.application.service;
 
+import com.irum.come2us.global.constants.FileStorageConstants;
+import com.irum.come2us.global.infrastructure.properties.FileProperties;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductImageErrorCode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FileStorageService {
 
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
+    private final FileProperties fileProperties;
 
-    /** 로컬 디렉토리에 파일 저장 */
+    /** 파일 저장 */
     public String save(MultipartFile file) {
         try {
-            String originalName = file.getOriginalFilename();
-            if (originalName == null) {
+            String cleanFilename =
+                    StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+
+            if (!Pattern.matches(FileStorageConstants.IMAGE_EXTENSION_REGEX, cleanFilename)) {
                 throw new CommonException(ProductImageErrorCode.INVALID_FILE_FORMAT);
             }
 
-            String uniqueName = UUID.randomUUID() + "_" + originalName;
-            Path path = Paths.get(UPLOAD_DIR, uniqueName);
+            if (file.getSize() > FileStorageConstants.MAX_FILE_SIZE) {
+                throw new CommonException(ProductImageErrorCode.FILE_TOO_LARGE);
+            }
 
-            Files.createDirectories(path.getParent());
-            file.transferTo(path.toFile());
+            String uniqueName = UUID.randomUUID() + "_" + cleanFilename;
 
-            log.info("파일 저장 완료: {}", path.toAbsolutePath());
-            return path.toString();
+            /*
+            if (fileProperties.storage().equalsIgnoreCase("s3")) {
+                // TODO: S3Uploader 로직 추가 예정
+                return fileProperties.s3().baseUrl() + uniqueName;
+            }
+            */
+
+            Path uploadDir = Paths.get(fileProperties.uploadDir());
+            Files.createDirectories(uploadDir);
+
+            Path targetPath = uploadDir.resolve(uniqueName).normalize();
+            file.transferTo(targetPath.toFile());
+
+            log.info("파일 저장 완료: {}", targetPath.toAbsolutePath());
+            return targetPath.toString();
+
         } catch (IOException e) {
             log.error("파일 저장 실패", e);
             throw new CommonException(ProductImageErrorCode.FILE_SAVE_FAILED);

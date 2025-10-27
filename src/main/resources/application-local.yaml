@@ -20,3 +20,7 @@ spring:
     init:
       mode: never
       encoding: UTF-8
+
+file:
+  storage: local
+  upload-dir: ${user.dir}/uploads/

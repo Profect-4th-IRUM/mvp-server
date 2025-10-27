@@ -17,6 +17,8 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,8 @@ public class ProductImageService {
     private final MemberUtil memberUtil;
     private final FileStorageService fileStorageService;
 
+    @Lazy @Autowired private ProductImageService self;
+
     private static final Pattern IMAGE_PATTERN =
             Pattern.compile(FileStorageConstants.IMAGE_EXTENSION_REGEX);
 
@@ -43,17 +47,17 @@ public class ProductImageService {
                 validateFile(file);
                 storedUrls.add(fileStorageService.save(file));
             }
+            self.saveProductImages(productId, storedUrls);
 
-            saveProductImages(productId, storedUrls);
         } catch (Exception e) {
             storedUrls.forEach(fileStorageService::delete);
-            log.warn("파일 저장 중 예외 발생, 업로드된 파일 {}건 삭제 완료", storedUrls.size());
+            log.warn("업로드 중 예외 발생. 저장된 파일 {}건 복구(삭제) 완료", storedUrls.size(), e);
             throw e;
         }
     }
 
     @Transactional
-    protected void saveProductImages(UUID productId, List<String> storedUrls) {
+    public void saveProductImages(UUID productId, List<String> storedUrls) {
         Product product = findValidProduct(productId);
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
 
