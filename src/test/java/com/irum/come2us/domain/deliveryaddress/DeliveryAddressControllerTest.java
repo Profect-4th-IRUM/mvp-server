@@ -21,6 +21,7 @@ import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.Recipien
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoListResponse;
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoResponse;
 import com.irum.come2us.global.config.SecurityTestConfig;
+import com.irum.come2us.global.config.TestConfig;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DeliveryAddressErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
@@ -28,12 +29,9 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,20 +39,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(DeliveryAddressController.class)
 @AutoConfigureRestDocs
-@Import(SecurityTestConfig.class)
+@Import({SecurityTestConfig.class, TestConfig.class})
 public class DeliveryAddressControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private DeliveryAddressService deliveryAddressService;
     @Autowired private ObjectMapper objectMapper;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public DeliveryAddressService deliveryAddressService() {
-            return Mockito.mock(DeliveryAddressService.class);
-        }
-    }
 
     @Test
     @DisplayName("배송지 주소 등록 API 테스트")
