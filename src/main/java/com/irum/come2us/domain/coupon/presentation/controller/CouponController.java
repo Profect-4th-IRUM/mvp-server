@@ -10,8 +10,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,8 +33,7 @@ public class CouponController {
     }
 
     @DeleteMapping("/{couponId}")
-    public ResponseEntity<Void> deleteCoupon(
-            @PathVariable("couponId") UUID couponId) {
+    public ResponseEntity<Void> deleteCoupon(@PathVariable("couponId") UUID couponId) {
         Long memberId = memberUtil.getCurrentMember().getMemberId();
         couponService.deleteCoupon(couponId, memberId);
         return ResponseEntity.noContent().build();
