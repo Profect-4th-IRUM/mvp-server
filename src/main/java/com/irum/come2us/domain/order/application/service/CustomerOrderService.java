@@ -38,20 +38,28 @@ public class CustomerOrderService {
 
     @Transactional(readOnly = true)
     public OrderDetailStatusResponse getOrderDetailStatus(UUID orderDetailId) {
+        Member member = memberUtil.getCurrentMember();
+
         OrderDetail orderDetail =
                 orderDetailRepository
-                        .findByOrderDetailId(orderDetailId)
+                        .findByOrderDetailIdWithOrderAndMember(orderDetailId)
                         .orElseThrow(
                                 () -> new CommonException(OrderErrorCode.ORDER_DETAIL_NOT_FOUND));
+
+        if (member.equals(orderDetail.getOrder().getMember()))
+            throw new CommonException(OrderErrorCode.ORDER_FORBIDDEN);
 
         return OrderDetailStatusResponse.from(orderDetail);
     }
 
     @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(UUID orderId) {
+        Member member = memberUtil.getCurrentMember();
+
+        // order 조회 및 member 검증
         Order order =
                 orderRepository
-                        .findByOrderId(orderId)
+                        .findByOrderIdAndMember(orderId, member)
                         .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));
 
         List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrder(order);
@@ -83,7 +91,7 @@ public class CustomerOrderService {
         List<UUID> orderIdList = headerList.stream().map(CustomerOrderSummaryRow::orderId).toList();
         List<CustomerOrderDetailRow> orderDetailList =
                 orderRepository.fetchOrderDetailListByMember(orderIdList);
-        log.info("orderDetailList ", orderDetailList);
+        log.info("orderDetailList {}", orderDetailList);
 
         // 4. orderId로 그룹핑 : productSummary 제작
         Map<UUID, List<CustomerOrderListResponse.ProductResponse>> detailMap =

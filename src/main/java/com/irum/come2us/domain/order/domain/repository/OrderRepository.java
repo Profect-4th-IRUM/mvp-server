@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID>, OrderRepositoryCustom {
-    Optional<Order> findByOrderId(UUID orderId);
+    Optional<Order> findByOrderIdAndMember(UUID orderId, Member member);
 
     List<Order> findAllByMember(Member member);
 }
