@@ -60,8 +60,16 @@ public class ProductOptionValue extends BaseEntity {
         return value;
     }
 
+    public void decreaseStock(Integer quantity) {
+        this.stockQuantity -= quantity;
+    }
+
     protected void setOptionGroup(ProductOptionGroup optionGroup) {
         this.optionGroup = optionGroup;
+    }
+
+    public void increaseStock(Integer quantity) {
+        this.stockQuantity += quantity;
     }
 
     public void updateOptionValue(String name, int stockQuantity, Integer extraPrice) {
