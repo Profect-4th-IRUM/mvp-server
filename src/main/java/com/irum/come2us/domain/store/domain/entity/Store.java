@@ -3,7 +3,7 @@ package com.irum.come2us.domain.store.domain.entity;
 import com.irum.come2us.domain.deliverypolicy.domain.entity.DeliveryPolicy;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.constants.RegexConstants;
-import com.irum.come2us.global.domain.BaseTimeEntity;
+import com.irum.come2us.global.domain.BaseEntity;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import jakarta.persistence.*;
@@ -22,7 +22,7 @@ import org.hibernate.annotations.Where;
 @Table(name = "p_store")
 @SQLDelete(sql = "UPDATE p_store SET deleted_at = NOW() WHERE store_id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class Store extends BaseTimeEntity {
+public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -52,9 +52,15 @@ public class Store extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_policy_id")
+    @OneToOne(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private DeliveryPolicy deliveryPolicy;
+
+    public void setDeliveryPolicy(DeliveryPolicy deliveryPolicy) {
+        this.deliveryPolicy = deliveryPolicy;
+        if (deliveryPolicy != null && deliveryPolicy.getStore() != this) {
+            deliveryPolicy.setStore(this);
+        }
+    }
 
     @Builder(access = AccessLevel.PRIVATE)
     private Store(

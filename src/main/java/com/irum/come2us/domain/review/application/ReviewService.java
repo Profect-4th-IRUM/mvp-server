@@ -1,7 +1,6 @@
 package com.irum.come2us.domain.review.application;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
-import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.review.domain.entity.Review;
@@ -12,9 +11,9 @@ import com.irum.come2us.domain.review.presentation.dto.request.ReviewCreateReque
 import com.irum.come2us.domain.review.presentation.dto.request.ReviewUpdateRequest;
 import com.irum.come2us.domain.review.presentation.dto.response.ReviewResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
-import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ReviewErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -32,25 +31,22 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
-    private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
+    private final MemberUtil memberUtil;
 
-    public ReviewResponse createReview(Long memberId, ReviewCreateRequest request) {
-        log.info(
-                "리뷰 작성 요청: memberId={}, productId={}, rate={}",
-                memberId,
-                request.productId(),
-                request.rate());
-
-        Member member =
-                memberRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new CommonException(MemberErrorCode.MEMBER_NOT_FOUND));
-
+    public ReviewResponse createReview(ReviewCreateRequest request) {
         Product product =
                 productRepository
                         .findById(request.productId())
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        Member member = memberUtil.getCurrentMember();
+
+        log.info(
+                "리뷰 작성 요청: memberId={}, productId={}, rate={}",
+                member.getMemberId(),
+                request.productId(),
+                request.rate());
 
         Review review = Review.createReview(request.content(), request.rate(), member, product);
         Review saved = reviewRepository.save(review);
@@ -64,6 +60,7 @@ public class ReviewService {
                                 .toList();
 
         reviewImageRepository.saveAll(images);
+        updateProductRating(product);
 
         return ReviewResponse.from(saved, images.stream().map(ReviewImage::getImageUrl).toList());
     }
@@ -73,6 +70,8 @@ public class ReviewService {
                 reviewRepository
                         .findById(reviewId)
                         .orElseThrow(() -> new CommonException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        memberUtil.assertMemberResourceAccess(review.getMember());
 
         if (request.content() == null && request.rate() == null && request.imageUrls() == null) {
             throw new CommonException(ReviewErrorCode.REVIEW_NOT_MODIFIED);
@@ -94,15 +93,21 @@ public class ReviewService {
                         .map(ReviewImage::getImageUrl)
                         .toList();
 
+        if (request.rate() != null) {
+            updateProductRating(review.getProduct());
+        }
+
         return ReviewResponse.from(review, imageUrls);
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewResponse> getMyReviews(Long memberId, Pageable pageable) {
-        log.info("내 리뷰 목록 조회 요청: memberId={}", memberId);
+    public Page<ReviewResponse> getMyReviews(Pageable pageable) {
+        Member member = memberUtil.getCurrentMember();
+
+        log.info("내 리뷰 목록 조회 요청: memberId={}", member.getMemberId());
 
         return reviewRepository
-                .findAllByMember_MemberId(memberId, pageable)
+                .findAllByMember_MemberId(member.getMemberId(), pageable)
                 .map(
                         review -> {
                             List<String> urls =
@@ -138,6 +143,22 @@ public class ReviewService {
         reviewImageRepository.deleteAll(reviewImageRepository.findAllByReview(review));
         reviewRepository.delete(review);
 
+        updateProductRating(review.getProduct());
+
         log.info("리뷰 삭제 완료: reviewId={}", reviewId);
+    }
+
+    private void updateProductRating(Product product) {
+        Double avg = reviewRepository.findAverageByProductId(product.getId());
+        Integer count = reviewRepository.findCountByProductId(product.getId());
+
+        product.updateRating(avg, count);
+        productRepository.save(product);
+
+        log.info(
+                "상품 평점 갱신 완료: productId={}, avgRate={}, reviewCount={}",
+                product.getId(),
+                avg,
+                count);
     }
 }

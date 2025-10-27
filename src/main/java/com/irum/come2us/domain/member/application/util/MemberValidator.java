@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class MemberValidator {
         }
         try {
             MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
-            return Long.parseLong(memberDetails.getUsername());
+            return memberDetails.getUserId();
         } catch (ClassCastException e) {
             throw new CommonException(AuthErrorCode.AUTHENTICATION_NOT_FOUND);
         } catch (Exception e) {
@@ -103,5 +104,12 @@ public class MemberValidator {
     public void assertMemberIsManager(Member member) {
         if (!member.getRole().equals(Role.MANAGER))
             throw new CommonException(MemberErrorCode.MEMBER_IS_NOT_MANAGER);
+    }
+
+    public void applyValidUpdate(Member member, String newName, String newContact) {
+        if (!StringUtils.hasText(newName) && !StringUtils.hasText(newContact))
+            throw new CommonException(MemberErrorCode.EMPTY_REQUEST);
+        if (StringUtils.hasText(newName)) member.updateName(newName);
+        if (StringUtils.hasText(newContact)) member.updateContact(newContact);
     }
 }

@@ -1,7 +1,10 @@
 package com.irum.come2us.domain.product.domain.entity;
 
+import com.irum.come2us.domain.category.domain.entity.Category;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.global.domain.BaseEntity;
+import com.irum.come2us.global.presentation.advice.exception.CommonException;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,15 +57,21 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @Builder(access = AccessLevel.PRIVATE)
     private Product(
             Store store,
+            Category category,
             String name,
             String description,
             boolean isPublic,
             String detailDescription,
             int price) {
         this.store = store;
+        this.category = category;
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
@@ -72,13 +81,20 @@ public class Product extends BaseEntity {
 
     public static Product createProduct(
             Store store,
+            Category category,
             String name,
             String description,
             String detailDescription,
             int price,
             boolean isPublic) {
+
+        if (category.getDepth() != 3) {
+            throw new CommonException(CategoryErrorCode.INVALID_CATEGORY_DEPTH);
+        }
+
         return Product.builder()
                 .store(store)
+                .category(category)
                 .name(name)
                 .description(description)
                 .detailDescription(detailDescription)
@@ -109,5 +125,12 @@ public class Product extends BaseEntity {
         optionGroups.add(group);
     }
 
-    // TODO: Category, 이미지 매핑
+    public void updateCategory(Category category) {
+        if (category.getDepth() != 3) {
+            throw new CommonException(CategoryErrorCode.INVALID_CATEGORY_DEPTH);
+        }
+        this.category = category;
+    }
+
+    // TODO: 이미지 매핑, 리뷰 매핑
 }
