@@ -18,9 +18,11 @@ import com.irum.come2us.domain.coupon.application.service.CouponService;
 import com.irum.come2us.domain.coupon.presentation.controller.CouponController;
 import com.irum.come2us.domain.coupon.presentation.dto.request.CouponGenerateRequest;
 import com.irum.come2us.domain.coupon.presentation.dto.response.CouponResponse;
+import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.config.SecurityTestConfig;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CouponErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +35,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CouponController.class)
@@ -42,22 +43,33 @@ import org.springframework.test.web.servlet.MockMvc;
 public class CouponControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private CouponService couponService;
+    @Autowired private MemberUtil memberUtil;
     @Autowired private ObjectMapper objectMapper;
+
+    private void mockCurrentMemberId(long memberId) {
+        Member member = Mockito.mock(Member.class);
+        when(member.getMemberId()).thenReturn(memberId);
+        when(memberUtil.getCurrentMember()).thenReturn(member);
+    }
 
     @TestConfiguration
     static class TestConfig {
 
         @Bean
-        @Primary
         public CouponService couponService() {
             return Mockito.mock(CouponService.class);
+        }
+
+        @Bean
+        public MemberUtil memberUtil() {
+            return Mockito.mock(MemberUtil.class);
         }
     }
 
     @Test
     @DisplayName("쿠폰 생성 API")
     void couponCreateApiTest() throws Exception {
-
+        mockCurrentMemberId(1L);
         // Given
         CouponGenerateRequest request =
                 new CouponGenerateRequest(
@@ -86,6 +98,7 @@ public class CouponControllerTest {
     @Test
     @DisplayName("쿠폰 정보 조회 API")
     void couponListTest() throws Exception {
+        mockCurrentMemberId(1L);
         // Given
         LocalDateTime now = LocalDateTime.of(2028, 10, 10, 12, 12, 12);
         CouponResponse coupon1 =
@@ -142,6 +155,7 @@ public class CouponControllerTest {
     @Test
     @DisplayName("쿠폰 삭제 API")
     void couponDeleteApiTest() throws Exception {
+        mockCurrentMemberId(1L);
         // Given
         UUID couponId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         doNothing().when(couponService).deleteCoupon(couponId, 1L);
@@ -164,7 +178,7 @@ public class CouponControllerTest {
                 .when(couponService)
                 .deleteCoupon(couponId, 1L);
 
-        mockMvc.perform(delete("/coupons/{coupon-id}", couponId).with(csrf()).with(user("1")))
+        mockMvc.perform(delete("/coupons/{couponId}", couponId).with(csrf()).with(user("1")))
                 .andExpect(status().isNotFound());
     }
 }
