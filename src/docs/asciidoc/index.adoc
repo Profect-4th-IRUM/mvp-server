@@ -11,6 +11,7 @@ include::_manager.adoc[]
 include::_auth.adoc[]
 include::_delivery_address.adoc[]
 include::_refund.adoc[]
+include::_discount.adoc[]
 
 // include::_product.adoc[]
 
