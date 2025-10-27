@@ -84,28 +84,28 @@ public class SalesService {
         }
         return order.getOrderStatusAll().name();
     }
+
     @Transactional(readOnly = true)
     public BalanceResponse getSettlement(UUID storeId) {
         // 1. 해당 스토어의 모든 주문 가져오기
         List<Order> orders = orderRepository.findAllByStore_Id(storeId);
 
         // 2. 총 결제 금액 계산
-        int totalPaymentAmount = orders.stream()
-                .map(Order::getTotalPrice)
-                .mapToInt(Integer::intValue)
-                .sum();
+        int totalPaymentAmount =
+                orders.stream().map(Order::getTotalPrice).mapToInt(Integer::intValue).sum();
 
         // 3. 환불된 금액 계산
-        List<Refund> refunds = refundRepository.findAll(); // 또는 findByOrder_StoreIdAndRefundStatus(...)
-        int totalRefundAmount = refunds.stream()
-                .filter(refund -> refund.getOrder().getStore().getId().equals(storeId))
-                .mapToInt(Refund::getPrice)
-                .sum();
+        List<Refund> refunds =
+                refundRepository.findAll(); // 또는 findByOrder_StoreIdAndRefundStatus(...)
+        int totalRefundAmount =
+                refunds.stream()
+                        .filter(refund -> refund.getOrder().getStore().getId().equals(storeId))
+                        .mapToInt(Refund::getPrice)
+                        .sum();
 
         // 4. 정산 금액 계산
         int settlementAmount = totalPaymentAmount - totalRefundAmount;
 
         return new BalanceResponse(totalPaymentAmount, totalRefundAmount, settlementAmount);
     }
-
 }

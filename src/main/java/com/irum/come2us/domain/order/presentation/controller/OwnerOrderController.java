@@ -5,7 +5,6 @@ import com.irum.come2us.domain.order.application.service.SalesService;
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
-import com.irum.come2us.domain.order.presentation.dto.response.SalesResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,5 +83,4 @@ public class OwnerOrderController {
         OrderDetailResponse response = ownerOrderService.detailResponse(orderId);
         return ResponseEntity.ok(response);
     }
-
 }
