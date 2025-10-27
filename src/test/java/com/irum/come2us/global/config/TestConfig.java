@@ -5,6 +5,7 @@ import com.irum.come2us.domain.auth.application.service.JwtTokenService;
 import com.irum.come2us.domain.deliveryaddress.application.service.DeliveryAddressService;
 import com.irum.come2us.domain.member.application.service.ManagerService;
 import com.irum.come2us.domain.member.application.service.MemberService;
+import com.irum.come2us.domain.refund.application.service.RefundService;
 import com.irum.come2us.global.util.CookieUtil;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -40,5 +41,10 @@ public class TestConfig {
     @Bean
     public JwtTokenService jwtTokenService() {
         return Mockito.mock(JwtTokenService.class);
+    }
+
+    @Bean
+    public RefundService refundService() {
+        return Mockito.mock(RefundService.class);
     }
 }
