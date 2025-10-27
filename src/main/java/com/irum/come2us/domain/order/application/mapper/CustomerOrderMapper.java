@@ -9,6 +9,8 @@ import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderList
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.refund.domain.entity.Refund;
 import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
+import com.irum.come2us.domain.order.presentation.dto.response.AddressResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +57,32 @@ public class CustomerOrderMapper {
                 .quantity(orderDetail.getQuantity())
                 .build();
     }
+
+    public static CustomerOrderResponse toCustomerOrderResponse(
+            Order order, List<OrderDetail> orderDetailList) {
+        List<CustomerOrderResponse.ProductSummary> productSummaryList =
+                orderDetailList.stream().map(CustomerOrderMapper::toProductSummary).toList();
+
+        return CustomerOrderResponse.builder()
+                .orderId(order.getOrderId())
+                .address(AddressResponse.from(order.getDeliveryAddress().getAddress()))
+                .totalProductPrice(order.getTotalPrice())
+                .totalDiscountAmount(order.getPayment().getTotalDiscountAmount())
+                .totalPaymentAmount(order.getPayment().getAmount())
+                .productList(productSummaryList)
+                .build();
+    }
+
+    private static CustomerOrderResponse.ProductSummary toProductSummary(OrderDetail orderDetail) {
+        return CustomerOrderResponse.ProductSummary.builder()
+                .orderDetailId(orderDetail.getOrderDetailId())
+                .productName(orderDetail.getProductName())
+                .optionName(orderDetail.getOptionName())
+                .price(orderDetail.getPrice())
+                .quantity(orderDetail.getQuantity())
+                .build();
+    }
+
 
     public static CustomerOrderListResponse.OrderResponse toOrderResponse(
             CustomerOrderSummaryRow or, List<CustomerOrderListResponse.ProductResponse> pList) {

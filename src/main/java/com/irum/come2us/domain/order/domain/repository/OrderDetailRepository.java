@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,4 +28,9 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, UUID> 
             @Param("orderDetailId") UUID orderDetailId);
 
     List<OrderDetail> findAllByOrder(Order order);
+
+    @Modifying(clearAutomatically = true)
+    @Query(
+            "UPDATE OrderDetail od SET od.orderStatusIndi = 'FAILED' WHERE od.order.orderId IN :orderIds")
+    int updateStatusToFailedByOrderIds(@Param("orderIds") List<UUID> orderIds);
 }

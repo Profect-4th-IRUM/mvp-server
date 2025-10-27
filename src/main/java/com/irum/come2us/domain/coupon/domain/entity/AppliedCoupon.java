@@ -5,6 +5,8 @@ import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -16,6 +18,8 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(name = "p_applied_coupon")
 @Getter
+@Builder
+@AllArgsConstructor
 @SQLDelete(sql = "UPDATE p_applied_coupon SET deleted_at = NOW() WHERE applied_coupon_id = ?")
 @Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -1,11 +1,15 @@
 package com.irum.come2us.domain.order.presentation.controller;
 
 import com.irum.come2us.domain.order.application.service.CustomerOrderService;
+import com.irum.come2us.domain.order.presentation.dto.request.CustomerOrderRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailStatusResponse;
 import java.time.LocalDate;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +40,10 @@ public class CustomerOrderController {
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate) {
         return customerOrderService.getOrderList(cursor, size, startDate, endDate);
+    }
+
+    @PostMapping
+    public CustomerOrderResponse orderCreate(@Valid @RequestBody CustomerOrderRequest request) {
+        return customerOrderService.prepareOrder(request);
     }
 }
