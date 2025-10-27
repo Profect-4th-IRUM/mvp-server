@@ -87,5 +87,5 @@ include::{snippets}/manager-delete/path-parameters.adoc[]
 include::{snippets}/manager-delete/http-response.adoc[]
 
 ==== 매니저 삭제 실패: 권한 없음
-include::{snippets}/manager-delete-fail-not-manager/http-response.adoc[]
-include::{snippets}/manager-delete-fail-not-manager/response-fields.adoc[]
+include::{snippets}/manager-delete-fail-self-delete/http-response.adoc[]
+include::{snippets}/manager-delete-fail-self-delete/response-fields.adoc[]

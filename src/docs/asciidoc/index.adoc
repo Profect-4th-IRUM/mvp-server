@@ -8,7 +8,9 @@
 
 include::_member.adoc[]
 include::_manager.adoc[]
-include::_coupon.adoc[]
+include::_auth.adoc[]
+include::_delivery_address.adoc[]
+include::_discount.adoc[]
 
 // include::_product.adoc[]
 
