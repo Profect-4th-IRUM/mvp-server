@@ -85,10 +85,4 @@ public class OwnerOrderController {
         return ResponseEntity.ok(response);
     }
 
-    //   정산 내역
-    @GetMapping("/{storeId}/sales")
-    public ResponseEntity<SalesResponse> salesResponse(@PathVariable UUID storeId) {
-        SalesResponse response = salesService.getSalesList(storeId);
-        return ResponseEntity.ok(response);
-    }
 }
