@@ -3,6 +3,7 @@ package com.irum.come2us.domain.order.presentation.controller;
 import com.irum.come2us.domain.order.application.service.CustomerOrderService;
 import com.irum.come2us.domain.order.presentation.dto.request.CustomerOrderRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ public class CustomerOrderController {
     private final CustomerOrderService customerOrderService;
 
     @PostMapping
-    public CustomerOrderResponse orderCreate(@RequestBody CustomerOrderRequest request) {
+    public CustomerOrderResponse orderCreate(@Valid @RequestBody CustomerOrderRequest request) {
         return customerOrderService.prepareOrder(request);
     }
 }
