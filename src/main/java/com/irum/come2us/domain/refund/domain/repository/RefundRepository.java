@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RefundRepository extends JpaRepository<Refund, UUID> {
+    Optional<Refund> findByOrder(Order order);
+
     List<Refund> findByRefundStatus(RefundStatus status);
 
     // RefundRepository 추후 orderRepository에서 가져오는 것으로 변경 예정

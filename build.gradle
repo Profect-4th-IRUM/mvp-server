@@ -87,6 +87,7 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt::jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+
     //feign client
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation group: 'io.github.openfeign', name: 'feign-gson', version: '11.0'
