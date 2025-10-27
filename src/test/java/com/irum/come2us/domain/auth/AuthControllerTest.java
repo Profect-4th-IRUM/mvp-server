@@ -127,8 +127,6 @@ public class AuthControllerTest {
                                 "member-logout",
                                 responseHeaders(
                                         headerWithName(HttpHeaders.SET_COOKIE)
-                                                .description(
-                                                        "Refresh Token 쿠키를 삭제하기 위한 헤더. <br/> "
-                                                                + "정책: **Max-Age=0** 설정으로 즉시 만료 및 삭제됩니다."))));
+                                                .description("Refresh Token 쿠키를 삭제하기 위한 헤더"))));
     }
 }
