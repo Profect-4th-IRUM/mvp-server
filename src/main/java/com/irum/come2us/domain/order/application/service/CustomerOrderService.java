@@ -118,7 +118,7 @@ public class CustomerOrderService {
 
             // 재고 확인
             ProductOptionValue productOptionValue = optionMap.get(productReq.optionValueId());
-            // 재고보다 요청 물품 개수가 많을때  
+            // 재고보다 요청 물품 개수가 많을때
             if (productOptionValue.getStockQuantity() < productReq.quantity()) {
                 throw new CommonException(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
             }
