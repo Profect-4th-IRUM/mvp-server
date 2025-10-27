@@ -6,11 +6,10 @@ import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrder
 import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderSummaryRow;
 import com.irum.come2us.domain.order.presentation.dto.response.AddressResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.refund.domain.entity.Refund;
 import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
-import com.irum.come2us.domain.order.presentation.dto.response.AddressResponse;
-import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -82,7 +81,6 @@ public class CustomerOrderMapper {
                 .quantity(orderDetail.getQuantity())
                 .build();
     }
-
 
     public static CustomerOrderListResponse.OrderResponse toOrderResponse(
             CustomerOrderSummaryRow or, List<CustomerOrderListResponse.ProductResponse> pList) {

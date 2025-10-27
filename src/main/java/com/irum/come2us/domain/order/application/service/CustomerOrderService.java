@@ -8,24 +8,16 @@ import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.order.application.mapper.CustomerOrderMapper;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
+import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.CustomerOrderSummaryRow;
+import com.irum.come2us.domain.order.presentation.dto.request.CustomerOrderRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderListResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailStatusResponse;
-import com.irum.come2us.domain.refund.domain.entity.Refund;
-import com.irum.come2us.domain.refund.domain.repository.RefundRepository;
-import com.irum.come2us.global.presentation.advice.exception.CommonException;
-import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
-import com.irum.come2us.global.util.MemberUtil;
-import java.time.LocalDate;
-import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
-import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
-import com.irum.come2us.domain.order.domain.repository.OrderRepository;
-import com.irum.come2us.domain.order.presentation.dto.request.CustomerOrderRequest;
-import com.irum.come2us.domain.order.presentation.dto.response.CustomerOrderResponse;
 import com.irum.come2us.domain.payment.application.service.PaymentService;
 import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.domain.payment.domain.entity.enums.PaymentCorp;
@@ -33,6 +25,8 @@ import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
 import com.irum.come2us.domain.product.domain.repository.ProductOptionValueRepository;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
+import com.irum.come2us.domain.refund.domain.entity.Refund;
+import com.irum.come2us.domain.refund.domain.repository.RefundRepository;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -41,6 +35,7 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErro
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -146,7 +141,7 @@ public class CustomerOrderService {
                                                 detailMap.getOrDefault(
                                                         order.orderId(),
                                                         List.of()) // order detail 없다면 빈 리스트
-                                        ))
+                                                ))
                         .toList();
 
         // 6. next cursor계산
@@ -158,7 +153,6 @@ public class CustomerOrderService {
                 .nextCursor(nextCursor)
                 .build();
     }
-
 
     public CustomerOrderResponse prepareOrder(CustomerOrderRequest request) {
         Member member = memberUtil.getCurrentMember();
