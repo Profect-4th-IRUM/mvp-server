@@ -18,6 +18,5 @@ public interface RefundRepository extends JpaRepository<Refund, UUID> {
     // public interface OrderRepository extends JpaRepository<Order, UUID> {..}
     Optional<Order> findByOrder_OrderId(@Param("orderId") UUID orderId);
 
-    Optional<Refund> findLatestByOrder(Order order);
-
+    Optional<Refund> findTopByOrderOrderByCreatedAtDesc(Order order);
 }

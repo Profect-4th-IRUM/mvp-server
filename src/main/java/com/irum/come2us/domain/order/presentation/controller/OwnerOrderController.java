@@ -1,8 +1,11 @@
 package com.irum.come2us.domain.order.presentation.controller;
 
 import com.irum.come2us.domain.order.application.service.OwnerOrderService;
+import com.irum.come2us.domain.order.application.service.SalesService;
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
+import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
+import com.irum.come2us.domain.order.presentation.dto.response.SalesResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class OwnerOrderController {
     private final OwnerOrderService ownerOrderService;
+    private final SalesService salesService;
 
     /** [상점] 배송 준비 중 목록 조회 * */
     @GetMapping("/{storeId}/preparing")
@@ -72,5 +76,19 @@ public class OwnerOrderController {
     public ResponseEntity<Void> orderStatusToDeliveredUpdate(@PathVariable UUID orderDetailId) {
         ownerOrderService.updateOrderStatusToDelivered(orderDetailId);
         return ResponseEntity.noContent().build();
+    }
+
+    /* [상점] 주문 상세 */
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDetailResponse> ownerOrderDetail(@PathVariable UUID orderId) {
+        OrderDetailResponse response = ownerOrderService.detailResponse(orderId);
+        return ResponseEntity.ok(response);
+    }
+
+    //   정산 내역
+    @GetMapping("/{storeId}/sales")
+    public ResponseEntity<SalesResponse> salesResponse(@PathVariable UUID storeId) {
+        SalesResponse response = salesService.getSalesList(storeId);
+        return ResponseEntity.ok(response);
     }
 }
