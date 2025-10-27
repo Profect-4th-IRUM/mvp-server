@@ -7,16 +7,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface RefundRepository extends JpaRepository<Refund, UUID> {
-    Optional<Refund> findByOrder(Order order);
-
     List<Refund> findByRefundStatus(RefundStatus status);
 
-    // RefundRepository 추후 orderRepository에서 가져오는 것으로 변경 예정
-    // public interface OrderRepository extends JpaRepository<Order, UUID> {..}
-    Optional<Order> findByOrder_OrderId(@Param("orderId") UUID orderId);
+    @Query("SELECT COUNT(r)>0 FROM Refund r WHERE r.order.orderId =: orderId")
+    boolean existsByOrderId(@Param("orderId") UUID orderId);
+
+    Optional<Refund> findByOrder(Order order);
+
+    @Query("SELECT r FROM Refund r WHERE r.order.orderId =: orderId")
+    Optional<Refund> findByOrderId(@Param("orderId") UUID orderId);
 }
