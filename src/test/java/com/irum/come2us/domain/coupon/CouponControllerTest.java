@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CouponController.class)
 @AutoConfigureRestDocs
-@Import({SecurityTestConfig.class, CouponControllerTest.TestConfig.class})
+@Import(SecurityTestConfig.class)
 public class CouponControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private CouponService couponService;
