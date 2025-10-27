@@ -7,6 +7,7 @@ import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.Recipien
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoListResponse;
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoResponse;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,44 +22,46 @@ public class DeliveryAddressController {
 
     @PostMapping
     public ResponseEntity<Void> registerDeliveryAddress(
-            @RequestBody DeliveryAddressRegisterRequest request) {
+            @Valid @RequestBody DeliveryAddressRegisterRequest request) {
         deliveryAddressService.createDeliveryAddress(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/info")
+    @GetMapping("/{deliveryAddressId}/info")
     public DeliveryAddressInfoResponse getDeliveryAddressInfo(
-            @RequestParam UUID deliveryAddressId) {
+            @PathVariable UUID deliveryAddressId) {
         return deliveryAddressService.findDeliveryAddress(deliveryAddressId);
     }
 
     @GetMapping
     public DeliveryAddressInfoListResponse getDeliveryAddressInfoList(
-            @Nullable @RequestParam UUID cursor, @RequestParam int pageSize) {
-        return deliveryAddressService.findDeliveryAddressList(cursor, pageSize);
+            @Nullable @RequestParam UUID cursor, @RequestParam Integer size) {
+        return deliveryAddressService.findDeliveryAddressList(cursor, size);
     }
 
-    @PatchMapping("/recipient")
-    public ResponseEntity<Void> updateRecipientInfo(@RequestBody RecipientUpdateRequest request) {
-        deliveryAddressService.changeRecipientInfo(request);
+    @PatchMapping("/{deliveryAddressId}/recipient")
+    public ResponseEntity<Void> updateRecipientInfo(
+            @PathVariable UUID deliveryAddressId, @RequestBody RecipientUpdateRequest request) {
+        deliveryAddressService.changeRecipientInfo(deliveryAddressId, request);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/detail")
+    @PatchMapping("/{deliveryAddressId}/detail")
     public ResponseEntity<Void> updateAddressDetail(
-            @RequestBody AddressDetailUpdateRequest request) {
-        deliveryAddressService.changeAddressDetail(request);
+            @PathVariable UUID deliveryAddressId,
+            @Valid @RequestBody AddressDetailUpdateRequest request) {
+        deliveryAddressService.changeAddressDetail(deliveryAddressId, request);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/default")
-    public ResponseEntity<Void> setDefaultDeliveryAddress(@RequestParam UUID deliveryAddressId) {
+    @PatchMapping("/{deliveryAddressId}/default")
+    public ResponseEntity<Void> setDefaultDeliveryAddress(@PathVariable UUID deliveryAddressId) {
         deliveryAddressService.changeDefaultDeliveryAddress(deliveryAddressId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteDeliveryAddress(@RequestParam UUID deliveryAddressId) {
+    @DeleteMapping("/{deliveryAddressId}")
+    public ResponseEntity<Void> deleteDeliveryAddress(@PathVariable UUID deliveryAddressId) {
         deliveryAddressService.removeDeliveryAddress(deliveryAddressId);
         return ResponseEntity.noContent().build();
     }

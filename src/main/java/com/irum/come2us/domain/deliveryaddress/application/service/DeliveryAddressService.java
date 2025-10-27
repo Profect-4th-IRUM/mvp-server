@@ -7,22 +7,24 @@ import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.Delivery
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.request.RecipientUpdateRequest;
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoListResponse;
 import com.irum.come2us.domain.deliveryaddress.presentation.dto.response.DeliveryAddressInfoResponse;
-import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DeliveryAddressErrorCode;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.GlobalErrorCode;
 import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class DeliveryAddressService {
-    private final MemberValidator memberValidator;
     private final MemberUtil memberUtil;
     private final DeliveryAddressRepository deliveryAddressRepository;
 
@@ -52,30 +54,34 @@ public class DeliveryAddressService {
     }
 
     @Transactional(readOnly = true)
-    public DeliveryAddressInfoListResponse findDeliveryAddressList(UUID cursor, int pageSize) {
-        int limit = pageSize + 1;
+    public DeliveryAddressInfoListResponse findDeliveryAddressList(UUID cursor, Integer size) {
+        if (size == null || (size != 10 && size != 30 && size != 50)) {
+            log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
+            size = 10;
+        }
+        int limit = size + 1;
         List<DeliveryAddressInfoResponse> addressList =
                 deliveryAddressRepository.findDeliveryAddressByCursor(
                         memberUtil.getCurrentMember().getMemberId(), cursor, limit);
-        boolean hasNext = addressList.size() > pageSize;
+        boolean hasNext = addressList.size() > size;
         List<DeliveryAddressInfoResponse> resultList =
-                hasNext ? addressList.subList(0, pageSize) : addressList;
+                hasNext ? addressList.subList(0, size) : addressList;
         UUID nextCursor = null;
         if (hasNext) {
             DeliveryAddressInfoResponse lastItem = resultList.get(resultList.size() - 1);
-            nextCursor = lastItem.id();
+            nextCursor = lastItem.deliveryAddressId();
         }
         return new DeliveryAddressInfoListResponse(resultList, nextCursor, hasNext);
     }
 
-    public void changeRecipientInfo(RecipientUpdateRequest request) {
-        DeliveryAddress deliveryAddress = validDeliveryAddress(request.deliveryAddressId());
-        deliveryAddress.updateRecipientName(request.newRecipientName());
-        deliveryAddress.updateRecipientContact(request.newRecipientContact());
+    public void changeRecipientInfo(UUID deliveryAddressId, RecipientUpdateRequest request) {
+        DeliveryAddress deliveryAddress = validDeliveryAddress(deliveryAddressId);
+        applyValidUpdate(
+                deliveryAddress, request.newRecipientName(), request.newRecipientContact());
     }
 
-    public void changeAddressDetail(AddressDetailUpdateRequest request) {
-        DeliveryAddress deliveryAddress = validDeliveryAddress(request.deliveryAddressId());
+    public void changeAddressDetail(UUID deliveryAddressId, AddressDetailUpdateRequest request) {
+        DeliveryAddress deliveryAddress = validDeliveryAddress(deliveryAddressId);
         deliveryAddress.updateAddressDetail(request.newAddressDetail());
     }
 
@@ -118,5 +124,12 @@ public class DeliveryAddressService {
                         () ->
                                 new CommonException(
                                         DeliveryAddressErrorCode.DELIVERY_ADDRESS_NOT_FOUND));
+    }
+
+    public void applyValidUpdate(DeliveryAddress address, String newName, String newContact) {
+        if (!StringUtils.hasText(newName) && !StringUtils.hasText(newContact))
+            throw new CommonException(GlobalErrorCode.EMPTY_REQUEST);
+        if (StringUtils.hasText(newName)) address.updateRecipientName(newName);
+        if (StringUtils.hasText(newContact)) address.updateAddressDetail(newContact);
     }
 }
