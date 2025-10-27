@@ -8,6 +8,7 @@
 
 include::_member.adoc[]
 include::_manager.adoc[]
+include::_manager.adoc[]
 
 // include::_product.adoc[]
 
