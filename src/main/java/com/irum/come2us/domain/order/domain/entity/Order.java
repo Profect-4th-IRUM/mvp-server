@@ -30,7 +30,7 @@ public class Order extends BaseEntity {
     private UUID orderId;
 
     @Column(nullable = false)
-    private Integer orderNum;
+    private String orderNum;
 
     private Integer totalPrice;
 

@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class OrderService {
+public class OwnerOrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
     private final OrderRepositoryCustom orderRepositoryCustom;

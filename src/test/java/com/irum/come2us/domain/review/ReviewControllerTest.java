@@ -68,8 +68,7 @@ public class ReviewControllerTest {
                         LocalDateTime.now(),
                         LocalDateTime.now());
 
-        when(reviewService.createReview(any(Long.class), any(ReviewCreateRequest.class)))
-                .thenReturn(mockResponse);
+        when(reviewService.createReview(any(ReviewCreateRequest.class))).thenReturn(mockResponse);
 
         // when & then
         mockMvc.perform(

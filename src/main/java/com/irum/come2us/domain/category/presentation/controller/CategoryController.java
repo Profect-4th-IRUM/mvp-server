@@ -2,9 +2,11 @@ package com.irum.come2us.domain.category.presentation.controller;
 
 import com.irum.come2us.domain.category.application.service.CategoryService;
 import com.irum.come2us.domain.category.presentation.dto.request.CategoryCreateRequest;
+import com.irum.come2us.domain.category.presentation.dto.request.CategoryUpdateRequest;
+import com.irum.come2us.domain.category.presentation.dto.response.CategoryInfoResponse;
 import com.irum.come2us.domain.category.presentation.dto.response.CategoryResponse;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,38 +18,36 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // ------------------- 전체 조회 -------------------
     @GetMapping
-    public List<CategoryResponse> getAllCategories() {
-        return categoryService.findAllCategories();
+    public List<CategoryInfoResponse> getAllCategories(
+            @RequestParam(required = false) UUID parentId) {
+        if (parentId != null) {
+            return categoryService.findByParentId(parentId);
+        }
+        return categoryService.findRootCategories();
     }
 
-    // ------------------- 단일 조회 -------------------
     @GetMapping("/{id}")
     public CategoryResponse getCategoryById(@PathVariable UUID id) {
         return categoryService.getCategoryById(id);
     }
 
-    // ------------------- 트리 조회 -------------------
     @GetMapping("/tree")
     public List<CategoryResponse> getCategoryTree() {
         return categoryService.findCategoryTree();
     }
 
-    // ------------------- 생성 -------------------
     @PostMapping
-    public CategoryResponse createCategory(@RequestBody CategoryCreateRequest request) {
+    public CategoryResponse createCategory(@Valid @RequestBody CategoryCreateRequest request) {
         return categoryService.createCategory(request);
     }
 
-    // ------------------- 수정 -------------------
     @PatchMapping("/{id}")
     public CategoryResponse updateCategory(
-            @PathVariable UUID id, @RequestBody Map<String, String> request) {
-        return categoryService.updateCategory(id, request.get("name"));
+            @PathVariable UUID id, @Valid @RequestBody CategoryUpdateRequest request) {
+        return categoryService.updateCategory(id, request);
     }
 
-    // ------------------- 삭제 -------------------
     @DeleteMapping("/{id}")
     public void deleteCategory(@PathVariable UUID id) {
         categoryService.deleteCategory(id);
