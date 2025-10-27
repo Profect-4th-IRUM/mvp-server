@@ -10,7 +10,7 @@ public record OrderDetailStatusResponse(
         AddressResponse address,
         String recipientName,
         OrderStatus orderStatus,
-        Integer trackingNumber,
+        String trackingNumber,
         String deliveryRequest) {
     public static OrderDetailStatusResponse from(OrderDetail orderDetail) {
         return new OrderDetailStatusResponse(
