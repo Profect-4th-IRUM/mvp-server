@@ -1,0 +1,14 @@
+=== 회원 로그인
+`POST /auth/login`
+
+요청 본문:
+include::{snippets}/member-login/request-fields.adoc[]
+
+응답 본문:
+include::{snippets}/member-login/response-fields.adoc[]
+
+응답 헤더 (쿠키):
+include::{snippets}/member-login/response-headers.adoc[]
+
+응답:
+include::{snippets}/member-login/http-response.adoc[]
