@@ -20,17 +20,15 @@ import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpd
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoListResponse;
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import com.irum.come2us.global.config.SecurityTestConfig;
+import com.irum.come2us.global.config.TestConfig;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,19 +36,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ManagerController.class)
 @AutoConfigureRestDocs
-@Import(SecurityTestConfig.class)
+@Import({SecurityTestConfig.class, TestConfig.class})
 public class ManagerControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ManagerService managerService;
     @Autowired private ObjectMapper objectMapper;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public ManagerService managerService() {
-            return Mockito.mock(ManagerService.class);
-        }
-    }
 
     @Test
     @DisplayName("매니저 회원가입 API")
