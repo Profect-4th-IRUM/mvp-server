@@ -1,0 +1,102 @@
+== 카테고리 (Category) API
+
+=== 1. 루트 카테고리 조회
+`GET /categories`
+
+응답 본문:
+include::{snippets}/categories/get-roots/response-fields.adoc[]
+
+응답:
+include::{snippets}/categories/get-roots/http-response.adoc[]
+
+
+=== 2. 특정 부모의 하위 카테고리 조회
+`GET /categories?parentId={parentId}`
+
+쿼리 파라미터 (Query Parameters):
+include::{snippets}/categories/get-by-parent/query-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/categories/get-by-parent/response-fields.adoc[]
+
+응답:
+include::{snippets}/categories/get-by-parent/http-response.adoc[]
+
+
+=== 3. 특정 카테고리 조회
+`GET /categories/{id}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/categories/get-by-id/path-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/categories/get-by-id/response-fields.adoc[]
+
+응답:
+include::{snippets}/categories/get-by-id/http-response.adoc[]
+
+
+=== 4. 카테고리 트리 조회
+`GET /categories/tree`
+
+응답 본문:
+include::{snippets}/categories/get-tree/response-fields.adoc[]
+
+응답:
+include::{snippets}/categories/get-tree/http-response.adoc[]
+
+
+=== 5. 카테고리 생성
+`POST /categories`
+
+요청 본문:
+include::{snippets}/categories/create/request-fields.adoc[]
+
+응답 본문:
+include::{snippets}/categories/create/response-fields.adoc[]
+
+응답:
+include::{snippets}/categories/create/http-response.adoc[]
+
+==== 루트 카테고리 생성
+`POST /categories`
+
+요청 본문:
+include::{snippets}/categories/create-root/request-fields.adoc[]
+
+응답 본문:
+include::{snippets}/categories/create-root/response-fields.adoc[]
+
+응답:
+include::{snippets}/categories/create-root/http-response.adoc[]
+
+==== 카테고리 생성 실패: 유효성 검사
+* `카테고리명 누락`
+include::{snippets}/categories/create-fail/http-response.adoc[]
+include::{snippets}/categories/create-fail/response-fields.adoc[]
+
+
+=== 6. 카테고리 수정
+`PATCH /categories/{id}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/categories/update/path-parameters.adoc[]
+
+요청 본문:
+include::{snippets}/categories/update/request-fields.adoc[]
+
+응답 본문:
+include::{snippets}/categories/update/response-fields.adoc[]
+
+응답:
+include::{snippets}/categories/update/http-response.adoc[]
+
+
+=== 7. 카테고리 삭제
+`DELETE /categories/{id}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/categories/delete/path-parameters.adoc[]
+
+응답:
+include::{snippets}/categories/delete/http-response.adoc[]
