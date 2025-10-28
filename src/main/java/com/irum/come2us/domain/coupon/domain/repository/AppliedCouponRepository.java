@@ -14,4 +14,7 @@ public interface AppliedCouponRepository extends JpaRepository<AppliedCoupon, UU
     boolean existsByCouponId(UUID couponId);
 
     void deleteByPayment(Payment payment);
+
+    List<AppliedCoupon> findByPayment_PaymentId(UUID paymentId);
+
 }

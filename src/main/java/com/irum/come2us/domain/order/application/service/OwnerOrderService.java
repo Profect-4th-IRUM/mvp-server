@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.order.application.service;
 
+import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.order.application.mapper.OrderMapper;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import com.irum.come2us.domain.order.domain.entity.OrderDetail;
@@ -9,9 +10,13 @@ import com.irum.come2us.domain.order.domain.repository.OrderRepository;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
+import com.irum.come2us.domain.order.presentation.dto.response.AddressResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OrderDetailResponse;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import com.irum.come2us.domain.payment.domain.repository.PaymentRepository;
+import com.irum.come2us.domain.refund.domain.entity.Refund;
+import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
+import com.irum.come2us.domain.refund.domain.repository.RefundRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.OrderErrorCode;
 import java.util.List;
@@ -31,8 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class OwnerOrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
     private final PaymentRepository paymentRepository;
+    private final RefundRepository refundRepository;
+    private final OrderMapper orderMapper;
+    private final AppliedCouponRepository appliedCouponRepository;
 
     @Transactional(readOnly = true)
     public OwnerOrderListResponse getPreparingOrderList(UUID storeId, UUID cursor, Integer size) {
@@ -235,16 +242,18 @@ public class OwnerOrderService {
                         .findByOrderId(orderId)
                         .orElseThrow(() -> new CommonException(OrderErrorCode.ORDER_NOT_FOUND));
 
-        List<OrderDetailResponse.ProductSummary> productList =
+        List<OrderDetailResponse.ProductResponse> productList =
                 order.getOrderDetails().stream()
-                        .map(
-                                od ->
-                                        new OrderDetailResponse.ProductSummary(
-                                                od.getOrderDetailId(),
-                                                od.getProductName(),
-                                                od.getPrice(),
-                                                od.getQuantity(),
-                                                od.getOptionName()))
+                        .map(od -> OrderDetailResponse.ProductResponse.builder()
+                                .productName(od.getProductName())
+                                .optionTitle(od.getOptionName())
+                                .quantity(od.getQuantity())
+                                .price(od.getPrice())
+                                .receivedDate(
+                                        od.getArrivedDate() != null
+                                                ? od.getArrivedDate().toLocalDate()
+                                                : null)
+                                .build())
                         .toList();
         String couponName = getCouponName(order.getPayment().getPaymentId());
         int discountAmount = getDiscountAmount(order.getPayment().getPaymentId());
@@ -265,30 +274,37 @@ public class OwnerOrderService {
                         .map(dt -> dt.toString())
                         .orElse(null);
 
-        Integer deliveryFee = order.getDeliveryFee() != null ? order.getDeliveryFee() : 0;
-        Integer totalProductPrice = order.getTotalPrice() != null ? order.getTotalPrice() : 0;
-        Integer payingAmount = totalProductPrice + deliveryFee - discountAmount;
+        int deliveryFee = order.getDeliveryFee() != null ? order.getDeliveryFee() : 0;
+        int totalProductPrice = order.getTotalPrice() != null ? order.getTotalPrice() : 0;
+        int totalPaymentPrice = totalProductPrice + deliveryFee - discountAmount;
+
+        RefundStatus refundStatus = refundRepository
+                .findFirstByOrderOrderByCreatedAtDesc(order)
+                .map(Refund::getRefundStatus)
+                .orElse(null);
+
+        AddressResponse address = AddressResponse.from(order.getDeliveryAddress().getAddress());
 
         return new OrderDetailResponse(
-                productList,
-                order.getDeliveryAddress().getRecipientName(),
-                order.getDeliveryAddress().getRecipientContact(),
-                order.getDeliveryAddress().getAddress().toString(),
-                order.getOrderStatusAll().name(),
-                order.getOrderStatusAll().name(),
-                order.getDeliveryRequest(),
-                trackingNumber,
-                arrivedDate,
-                couponName,
+                order.getCreatedAt(),
+                order.getPayment() != null ? order.getPayment().getPaymentStatus() : null,
+                order.getPayment() != null ? order.getPayment().getPaymentMethod() : null,
                 deliveryFee,
                 discountAmount,
-                payingAmount,
-                order.getCreatedAt().toString(),
-                totalProductPrice);
+                totalProductPrice,
+                totalPaymentPrice,
+                order.getOrderStatusAll(),
+                refundStatus,
+                order.getDeliveryRequest(),
+                address,
+                order.getDeliveryAddress().getRecipientContact(),
+                order.getDeliveryAddress().getRecipientName(),
+                productList
+        );
     }
 
     private String getCouponName(UUID paymentId) {
-        return paymentRepository.findByPayment_Id(paymentId).stream()
+        return appliedCouponRepository.findByPayment_PaymentId(paymentId).stream()
                 .findFirst()
                 .map(ac -> ac.getCoupon().getName())
                 .orElse(null);

@@ -18,7 +18,7 @@ public class SalesController {
 
     //   정산 내역
     @GetMapping("/{storeId}/sales")
-    public ResponseEntity<SalesResponse> salesResponse(@PathVariable UUID storeId) {
+    public ResponseEntity<SalesResponse> salesResponse(UUID storeId) {
         SalesResponse response = salesService.getSalesList(storeId);
         return ResponseEntity.ok(response);
     }
