@@ -1,6 +1,12 @@
+# syntax=docker/dockerfile:1.2
+
 FROM gradle:8.7-jdk21-alpine AS build
 
 WORKDIR /app
+
+RUN --mount=type=secret,id=app_env \
+    mkdir -p /app && \
+    cat /run/secrets/app_env > /app/.env
 
 COPY build.gradle settings.gradle gradlew ./
 COPY gradle gradle
