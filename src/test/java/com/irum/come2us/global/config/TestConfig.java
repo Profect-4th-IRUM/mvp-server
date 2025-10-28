@@ -7,6 +7,7 @@ import com.irum.come2us.domain.discount.application.service.DiscountService;
 import com.irum.come2us.domain.member.application.service.ManagerService;
 import com.irum.come2us.domain.member.application.service.MemberService;
 import com.irum.come2us.domain.refund.application.service.RefundService;
+import com.irum.come2us.domain.review.application.service.ReviewService;
 import com.irum.come2us.global.util.CookieUtil;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -52,5 +53,10 @@ public class TestConfig {
     @Bean
     public DiscountService discountService() {
         return Mockito.mock(DiscountService.class);
+    }
+
+    @Bean
+    public ReviewService reviewService() {
+        return Mockito.mock(ReviewService.class);
     }
 }
