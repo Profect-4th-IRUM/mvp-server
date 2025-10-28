@@ -86,7 +86,7 @@ public class SalesService {
     }
 
     @Transactional(readOnly = true)
-    public BalanceResponse getSettlement(UUID storeId) {
+    public BalanceResponse getBalance(UUID storeId) {
         // 1. 해당 스토어의 모든 주문 가져오기
         List<Order> orders = orderRepository.findAllByMember(memberUtil.getCurrentMember());
 
