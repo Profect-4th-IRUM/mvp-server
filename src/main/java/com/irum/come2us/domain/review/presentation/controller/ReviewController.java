@@ -3,11 +3,11 @@ package com.irum.come2us.domain.review.presentation.controller;
 import com.irum.come2us.domain.review.application.service.ReviewService;
 import com.irum.come2us.domain.review.presentation.dto.request.ReviewCreateRequest;
 import com.irum.come2us.domain.review.presentation.dto.request.ReviewUpdateRequest;
+import com.irum.come2us.domain.review.presentation.dto.response.ReviewListResponse;
 import com.irum.come2us.domain.review.presentation.dto.response.ReviewResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,19 +43,16 @@ public class ReviewController {
 
     /** 내 리뷰 목록 조회 */
     @GetMapping("/me")
-    public ResponseEntity<Page<ReviewResponse>> getMyReviews(Pageable pageable) {
-        log.info("내 리뷰 목록 조회 요청");
-        Page<ReviewResponse> response = reviewService.getMyReviews(pageable);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ReviewListResponse<ReviewResponse>> getMyReviews(Pageable pageable) {
+        return ResponseEntity.ok(ReviewListResponse.from(reviewService.getMyReviews(pageable)));
     }
 
     /** 상품별 리뷰 목록 조회 */
     @GetMapping("/products/{productId}")
-    public ResponseEntity<Page<ReviewResponse>> getProductReviews(
+    public ResponseEntity<ReviewListResponse<ReviewResponse>> getProductReviews(
             @PathVariable UUID productId, Pageable pageable) {
-        log.info("상품 리뷰 목록 조회 요청: productId={}", productId);
-        Page<ReviewResponse> response = reviewService.getProductReviews(productId, pageable);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ReviewListResponse.from(reviewService.getProductReviews(productId, pageable)));
     }
 
     /** 리뷰 삭제 */

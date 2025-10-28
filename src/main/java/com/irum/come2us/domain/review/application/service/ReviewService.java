@@ -74,9 +74,8 @@ public class ReviewService {
 
         memberUtil.assertMemberResourceAccess(review.getMember());
 
-        if (request.content() == null && request.rate() == null && request.imageUrls() == null) {
+        if (request.content() == null && request.rate() == null && request.imageUrls() == null)
             throw new CommonException(ReviewErrorCode.REVIEW_NOT_MODIFIED);
-        }
 
         review.updateReview(request.content(), request.rate());
 
@@ -94,9 +93,7 @@ public class ReviewService {
                         .map(ReviewImage::getImageUrl)
                         .toList();
 
-        if (request.rate() != null) {
-            updateProductRating(review.getProduct());
-        }
+        if (request.rate() != null) updateProductRating(review.getProduct());
 
         return ReviewResponse.from(review, imageUrls);
     }
