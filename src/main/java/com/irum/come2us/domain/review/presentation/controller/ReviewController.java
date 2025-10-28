@@ -22,8 +22,7 @@ public class ReviewController {
 
     @PostMapping
     public ReviewResponse createReview(@Valid @RequestBody ReviewCreateRequest request) {
-        // TODO: Security 적용 후 실제 memberId 추출
-        return reviewService.createReview(1L, request); // 임시 memberId
+        return reviewService.createReview(request);
     }
 
     @PatchMapping("/{reviewId}")
@@ -34,7 +33,7 @@ public class ReviewController {
 
     @GetMapping("/me")
     public Page<ReviewResponse> getMyReviews(Pageable pageable) {
-        return reviewService.getMyReviews(1L, pageable); // 임시 memberId
+        return reviewService.getMyReviews(pageable);
     }
 
     @GetMapping("/products/{productId}")

@@ -44,7 +44,7 @@ public class OrderDetail extends BaseEntity {
     @Column(nullable = false)
     private OrderStatus orderStatusIndi;
 
-    private Integer trackingNumber;
+    private String trackingNumber;
 
     private LocalDateTime arrivedDate;
 
@@ -65,12 +65,20 @@ public class OrderDetail extends BaseEntity {
         this.orderStatusIndi = OrderStatus.PREPARING;
     }
 
-    public void updateStatusToShipped(Integer trackingNumber) {
+    public void updateStatusToShipped(String trackingNumber) {
         this.orderStatusIndi = OrderStatus.SHIPPED;
         this.trackingNumber = trackingNumber;
     }
 
     public void updateStatusToDelivered() {
         this.orderStatusIndi = OrderStatus.DELIVERED;
+    }
+
+    public void updateStatus(OrderStatus orderStatusIndi) {
+        this.orderStatusIndi = orderStatusIndi;
+    }
+
+    public void updateOrder(Order order) {
+        this.order = order;
     }
 }

@@ -20,12 +20,14 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErro
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class DiscountService {
     private final DiscountRepository discountRepository;
     private final ProductRepository productRepository;
@@ -46,16 +48,20 @@ public class DiscountService {
 
     @Transactional(readOnly = true)
     public DiscountInfoListResponse findDiscountInfoListByStore(
-            UUID storeId, UUID cursor, int pageSize) {
+            UUID storeId, UUID cursor, Integer size) {
         Store store = assertOwnerStore(storeId);
-        int limit = pageSize + 1;
+        if (size == null || (size != 10 && size != 30 && size != 50)) {
+            log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
+            size = 10;
+        }
+        int limit = size + 1;
         List<DiscountInfoResponse> discountList =
                 discountRepository.findDiscountListByCursor(store.getId(), cursor, limit);
 
-        boolean hasNext = discountList.size() > pageSize;
+        boolean hasNext = discountList.size() > size;
         UUID nextCursor = null;
         List<DiscountInfoResponse> responseList =
-                hasNext ? discountList.subList(0, pageSize) : discountList;
+                hasNext ? discountList.subList(0, size) : discountList;
         if (!responseList.isEmpty()) {
             nextCursor = responseList.get(responseList.size() - 1).discountId();
         }

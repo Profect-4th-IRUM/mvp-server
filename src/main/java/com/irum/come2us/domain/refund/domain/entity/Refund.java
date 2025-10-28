@@ -6,7 +6,11 @@ import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
@@ -41,12 +45,11 @@ public class Refund extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    public static Refund createRefund(
-            RefundReason reason, String description, int price, Order order) {
+    public static Refund create(RefundReason reason, String description, Order order) {
         return Refund.builder()
                 .reason(reason)
                 .description(description)
-                .price(price)
+                .price(order.getPayment().getAmount())
                 .refundStatus(RefundStatus.REQUESTED)
                 .order(order)
                 .build();
