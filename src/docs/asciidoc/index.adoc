@@ -12,5 +12,6 @@ include::_auth.adoc[]
 include::_delivery_address.adoc[]
 include::_discount.adoc[]
 
+include::_deliverypolicy.adoc[]
 // include::_product.adoc[]
 
