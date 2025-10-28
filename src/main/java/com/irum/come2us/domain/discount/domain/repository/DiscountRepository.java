@@ -14,6 +14,6 @@ public interface DiscountRepository
             "SELECT CASE WHEN COUNT(d) > 0 THEN TRUE ELSE FALSE END FROM Discount d WHERE d.product.id = :productId")
     boolean existsByProductId(@Param("productId") UUID productId);
 
-    @Query("SELECT d FROM Discount d WHERE d.product.id = :productId")
+    @Query("SELECT d FROM Discount d JOIN FETCH d.product p WHERE d.product.id = :productId")
     Optional<Discount> findByProductId(@Param("productId") UUID productId);
 }

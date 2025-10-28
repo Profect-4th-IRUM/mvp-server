@@ -6,7 +6,6 @@ import com.irum.come2us.domain.order.domain.entity.OrderDetail;
 import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
 import com.irum.come2us.domain.order.domain.repository.OrderDetailRepository;
 import com.irum.come2us.domain.order.domain.repository.OrderRepository;
-import com.irum.come2us.domain.order.domain.repository.OrderRepositoryCustom;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderDetailRow;
 import com.irum.come2us.domain.order.infrastructure.repository.dto.OrderSummaryRow;
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class OwnerOrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
-    private final OrderRepositoryCustom orderRepositoryCustom;
     private final OrderMapper orderMapper;
     private final PaymentRepository paymentRepository;
 
@@ -83,8 +81,7 @@ public class OwnerOrderService {
             UUID storeId, OrderStatus orderStatus, UUID cursor, Integer size) {
 
         // 2. order list 검색
-        var headerList =
-                orderRepositoryCustom.fetchOrderHeaderList(storeId, orderStatus, cursor, size);
+        var headerList = orderRepository.fetchOrderHeaderList(storeId, orderStatus, cursor, size);
 
         boolean hasNext = headerList.size() > size;
         if (hasNext) {
@@ -93,7 +90,7 @@ public class OwnerOrderService {
 
         // 3. order detail 검색
         var orderIdList = headerList.stream().map(OrderSummaryRow::orderId).toList();
-        var orderDetailList = orderRepositoryCustom.fetchOrderDetailList(orderIdList);
+        List<OrderDetailRow> orderDetailList = orderRepository.fetchOrderDetailList(orderIdList);
 
         // 4. orderId로 그룹핑 : productSummary 제작
         Map<UUID, List<OwnerOrderListResponse.ProductSummary>> detailMap =

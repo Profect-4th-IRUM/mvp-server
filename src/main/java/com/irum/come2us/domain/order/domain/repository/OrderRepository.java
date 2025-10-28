@@ -1,5 +1,6 @@
 package com.irum.come2us.domain.order.domain.repository;
 
+import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.order.domain.entity.Order;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +13,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, UUID> {
+public interface OrderRepository extends JpaRepository<Order, UUID>, OrderRepositoryCustom {
+    Optional<Order> findByOrderIdAndMember(UUID orderId, Member member);
+
+    List<Order> findAllByMember(Member member);
+
     Optional<Order> findByOrderId(UUID orderId);
 
     @Query(
@@ -24,5 +29,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Query("UPDATE Order o SET o.orderStatusAll = 'FAILED' WHERE o.orderId IN :orderIds")
     int updateStatusToFailedByIds(@Param("orderIds") List<UUID> orderIds);
 
-    List<Order> findAllByStore_Id(@Param("storeId") UUID storeId);
+    @Query(
+            "SELECT o FROM Order o JOIN FETCH o.deliveryAddress da JOIN FETCH o.payment p WHERE o.orderId = :orderId")
+    Optional<Order> findOrderWithAddressAndPayment(@Param("orderId") UUID orderId);
 }

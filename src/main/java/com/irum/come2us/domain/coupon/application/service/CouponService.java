@@ -4,6 +4,7 @@ import com.irum.come2us.domain.coupon.domain.entity.Coupon;
 import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.coupon.domain.repository.CouponRepository;
 import com.irum.come2us.domain.coupon.presentation.dto.request.CouponGenerateRequest;
+import com.irum.come2us.domain.coupon.presentation.dto.response.CouponResponse;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -39,8 +40,10 @@ public class CouponService {
     }
 
     @Transactional(readOnly = true)
-    public List<Coupon> getCouponByMember(Long memberId) {
-        return couponRepository.findByMember_MemberId(memberId);
+    public List<CouponResponse> getCouponByMember(Long memberId) {
+        return couponRepository.findByMember_MemberId(memberId).stream()
+                .map(CouponResponse::from)
+                .toList();
     }
 
     public void deleteCoupon(UUID couponId, Long memberId) {

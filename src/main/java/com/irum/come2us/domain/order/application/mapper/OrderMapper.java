@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OrderMapper {
-    /** Repository DTO -> Response DTO로 변환 */
+
+    // TODO: builder로 리팩터링
     public OwnerOrderListResponse.ProductSummary toProductSummary(OrderDetailRow detail) {
         return new OwnerOrderListResponse.ProductSummary(
                 detail.orderDetailId(),
@@ -18,7 +19,6 @@ public class OrderMapper {
                 detail.optionTitle());
     }
 
-    /** Repository DTO -> Response DTO로 변환 */
     public OwnerOrderListResponse.OrderSummary toOrderSummary(
             OrderSummaryRow header, List<OwnerOrderListResponse.ProductSummary> products) {
         return new OwnerOrderListResponse.OrderSummary(

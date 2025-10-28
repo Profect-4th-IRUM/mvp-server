@@ -1,28 +1,36 @@
 package com.irum.come2us.domain.order.presentation.dto.response;
 
+import com.irum.come2us.domain.order.domain.entity.enums.OrderStatus;
+import com.irum.come2us.domain.payment.domain.entity.enums.PaymentMethod;
+import com.irum.come2us.domain.payment.domain.entity.enums.PaymentStatus;
+import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record OrderDetailResponse(
-        List<ProductSummary> productList,
-        String recipientName,
-        String recipientContact,
-        String recipientAddress,
-        String paymentStatus,
-        String deliveryStatus,
+        LocalDateTime orderAt,
+        PaymentStatus paymentStatus,
+        PaymentMethod paymentMethod,
+        int deliveryFee,
+        int discountAmount,
+        int totalProductPrice,
+        int totalPaymentPrice,
+        OrderStatus orderStatusAll,
+        RefundStatus refundStatus,
         String deliveryRequest,
-        String trackingNumber,
-        String arrivedDate,
-        String couponName,
-        Integer deliveryFee,
-        Integer discountAmount,
-        int payingAmount,
-        String orderDate,
-        int totalProductPrice) {
-    public record ProductSummary(
-            UUID orderDetailId,
+        AddressResponse address,
+        String recipientContact,
+        String recipientName,
+        List<ProductResponse> productResponseList) {
+
+    @Builder
+    public record ProductResponse(
             String productName,
-            int productPrice,
-            int productCounts,
-            String productOption) {}
+            String optionTitle,
+            int quantity,
+            int price,
+            LocalDate receivedDate) {}
 }

@@ -36,8 +36,8 @@ public class DiscountController {
     public DiscountInfoListResponse getDiscountListInfoByStore(
             @PathVariable UUID storeId,
             @RequestParam(required = false) UUID cursor,
-            @RequestParam(required = false) Integer pageSize) {
-        return discountService.findDiscountInfoListByStore(storeId, cursor, pageSize);
+            @RequestParam(required = false) Integer size) {
+        return discountService.findDiscountInfoListByStore(storeId, cursor, size);
     }
 
     @PatchMapping("/discounts/{discountId}")
