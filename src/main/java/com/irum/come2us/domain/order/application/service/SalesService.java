@@ -34,7 +34,7 @@ public class SalesService {
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
         memberUtil.assertMemberResourceAccess(store.getMember());
 
-        List<Order> orders = orderRepository.findAllByStore_Id(storeId);
+        List<Order> orders = orderRepository.findAllByMember(member);
         List<SalesResponse.OrderSummary> orderList =
                 orders.stream().map(this::toOrderSummary).toList();
         return new SalesResponse(orderList, null, false);
@@ -72,7 +72,7 @@ public class SalesService {
     // 환불 존재시 환불 상태 반환, 환불 존재하지 않으면 주문 상태 반환
     private String DisplayStatus(Order order) {
         Optional<Refund> latestRefundOpt =
-                refundRepository.findTopByOrderOrderByCreatedAtDesc(order);
+                refundRepository.findFirstByOrderOrderByCreatedAtDesc(order);
 
         if (latestRefundOpt.isPresent()) {
             Refund latestRefund = latestRefundOpt.get();
@@ -88,7 +88,7 @@ public class SalesService {
     @Transactional(readOnly = true)
     public BalanceResponse getSettlement(UUID storeId) {
         // 1. 해당 스토어의 모든 주문 가져오기
-        List<Order> orders = orderRepository.findAllByStore_Id(storeId);
+        List<Order> orders = orderRepository.findAllByMember(memberUtil.getCurrentMember());
 
         // 2. 총 결제 금액 계산
         int totalPaymentAmount =
