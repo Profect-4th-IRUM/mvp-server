@@ -10,7 +10,7 @@ public record CartResponse(
         UUID optionValueId,
         String productName,
         String optionValueName,
-        // String imageUrl,   // 상품 이미지 구현 후 주석 해제
+        String imageUrl,
         int quantity,
         int basePrice, // 상품 기본가
         int extraPrice, // 옵션 추가금
@@ -26,17 +26,17 @@ public record CartResponse(
         int unit = base + extra;
         int total = unit * cart.getQuantity();
 
-        // String imageUrl = (product.getProductImages() != null &&
-        //         !product.getProductImages().isEmpty())
-        //         ? product.getProductImages().get(0).getImageUrl()
-        //         : null;
+        String imageUrl =
+                (product.getProductImages() != null && !product.getProductImages().isEmpty())
+                        ? product.getProductImages().get(0).getImageUrl()
+                        : null;
 
         return CartResponse.builder()
                 .cartId(cart.getId())
                 .optionValueId(optionValue.getId())
                 .productName(product.getName())
                 .optionValueName(optionValue.getName())
-                // .imageUrl(imageUrl)
+                .imageUrl(imageUrl)
                 .quantity(cart.getQuantity())
                 .basePrice(base)
                 .extraPrice(extra)
