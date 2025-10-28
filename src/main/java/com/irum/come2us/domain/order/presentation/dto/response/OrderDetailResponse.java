@@ -33,6 +33,4 @@ public record OrderDetailResponse(
             int quantity,
             int price,
             LocalDate receivedDate) {}
-
-
 }

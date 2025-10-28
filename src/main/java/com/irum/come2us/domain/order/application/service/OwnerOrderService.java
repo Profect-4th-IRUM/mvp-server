@@ -244,16 +244,18 @@ public class OwnerOrderService {
 
         List<OrderDetailResponse.ProductResponse> productList =
                 order.getOrderDetails().stream()
-                        .map(od -> OrderDetailResponse.ProductResponse.builder()
-                                .productName(od.getProductName())
-                                .optionTitle(od.getOptionName())
-                                .quantity(od.getQuantity())
-                                .price(od.getPrice())
-                                .receivedDate(
-                                        od.getArrivedDate() != null
-                                                ? od.getArrivedDate().toLocalDate()
-                                                : null)
-                                .build())
+                        .map(
+                                od ->
+                                        OrderDetailResponse.ProductResponse.builder()
+                                                .productName(od.getProductName())
+                                                .optionTitle(od.getOptionName())
+                                                .quantity(od.getQuantity())
+                                                .price(od.getPrice())
+                                                .receivedDate(
+                                                        od.getArrivedDate() != null
+                                                                ? od.getArrivedDate().toLocalDate()
+                                                                : null)
+                                                .build())
                         .toList();
         String couponName = getCouponName(order.getPayment().getPaymentId());
         int discountAmount = getDiscountAmount(order.getPayment().getPaymentId());
@@ -278,10 +280,11 @@ public class OwnerOrderService {
         int totalProductPrice = order.getTotalPrice() != null ? order.getTotalPrice() : 0;
         int totalPaymentPrice = totalProductPrice + deliveryFee - discountAmount;
 
-        RefundStatus refundStatus = refundRepository
-                .findFirstByOrderOrderByCreatedAtDesc(order)
-                .map(Refund::getRefundStatus)
-                .orElse(null);
+        RefundStatus refundStatus =
+                refundRepository
+                        .findFirstByOrderOrderByCreatedAtDesc(order)
+                        .map(Refund::getRefundStatus)
+                        .orElse(null);
 
         AddressResponse address = AddressResponse.from(order.getDeliveryAddress().getAddress());
 
@@ -299,8 +302,7 @@ public class OwnerOrderService {
                 address,
                 order.getDeliveryAddress().getRecipientContact(),
                 order.getDeliveryAddress().getRecipientName(),
-                productList
-        );
+                productList);
     }
 
     private String getCouponName(UUID paymentId) {
