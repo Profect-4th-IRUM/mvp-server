@@ -116,6 +116,7 @@ asciidoctor {
     )
     configurations 'asciidoctorExt'
     dependsOn test
+    baseDirFollowsSourceDir()
 }
 
 bootJar {
