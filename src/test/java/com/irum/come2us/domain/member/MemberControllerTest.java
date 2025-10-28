@@ -19,14 +19,12 @@ import com.irum.come2us.domain.member.presentation.dto.request.MemberInfoUpdateR
 import com.irum.come2us.domain.member.presentation.dto.request.MemberPasswordUpdateRequest;
 import com.irum.come2us.domain.member.presentation.dto.response.MemberInfoResponse;
 import com.irum.come2us.global.config.SecurityTestConfig;
+import com.irum.come2us.global.config.TestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,20 +32,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MemberController.class)
 @AutoConfigureRestDocs
-@Import(SecurityTestConfig.class)
+@Import({SecurityTestConfig.class, TestConfig.class})
 public class MemberControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private MemberService memberService;
     @Autowired private ObjectMapper objectMapper;
-
-    @TestConfiguration
-    static class TestConfig {
-
-        @Bean
-        public MemberService memberService() {
-            return Mockito.mock(MemberService.class);
-        }
-    }
 
     @Test
     @DisplayName("고객 회원가입 API")
