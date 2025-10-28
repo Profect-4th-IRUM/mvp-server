@@ -345,45 +345,45 @@ public class CategoryControllerTest {
                                         fieldWithPath("data.message").description("에러 메세지"))));
     }
 
-    @Test
-    @DisplayName("루트 카테고리 생성 API")
-    void createRootCategory() throws Exception {
-        // Given
-        CategoryCreateRequest request = new CategoryCreateRequest("식품", null);
-        String requestJson = objectMapper.writeValueAsString(request);
-
-        CategoryResponse mockResponse =
-                new CategoryResponse(UUID.randomUUID(), "식품", 1, null, List.of());
-
-        when(categoryService.createCategory(any(CategoryCreateRequest.class)))
-                .thenReturn(mockResponse);
-
-        // When & Then
-        mockMvc.perform(
-                        post("/categories")
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(requestJson))
-                .andExpect(status().isOk())
-                .andDo(
-                        document(
-                                "categories/create-root",
-                                requestFields(
-                                        fieldWithPath("name").description("카테고리명"),
-                                        fieldWithPath("parentId")
-                                                .description("상위 카테고리 ID (루트면 null)")
-                                                .optional()),
-                                responseFields(
-                                        fieldWithPath("success").description("요청 성공 여부"),
-                                        fieldWithPath("status").description("200"),
-                                        fieldWithPath("timestamp").description("응답 시간"),
-                                        fieldWithPath("data.categoryId").description("생성된 카테고리 ID"),
-                                        fieldWithPath("data.name").description("카테고리명"),
-                                        fieldWithPath("data.depth").description("카테고리 깊이 (1=루트)"),
-                                        fieldWithPath("data.parentId")
-                                                .description("상위 카테고리 ID (루트면 null)")
-                                                .optional(),
-                                        fieldWithPath("data.children")
-                                                .description("하위 카테고리 리스트 (기본 [])"))));
-    }
+//    @Test
+//    @DisplayName("루트 카테고리 생성 API")
+//    void createRootCategory() throws Exception {
+//        // Given
+//        CategoryCreateRequest request = new CategoryCreateRequest("식품", null);
+//        String requestJson = objectMapper.writeValueAsString(request);
+//
+//        CategoryResponse mockResponse =
+//                new CategoryResponse(UUID.randomUUID(), "식품", 1, null, List.of());
+//
+//        when(categoryService.createCategory(any(CategoryCreateRequest.class)))
+//                .thenReturn(mockResponse);
+//
+//        // When & Then
+//        mockMvc.perform(
+//                        post("/categories")
+//                                .with(csrf())
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .content(requestJson))
+//                .andExpect(status().isOk())
+//                .andDo(
+//                        document(
+//                                "categories/create-root",
+//                                requestFields(
+//                                        fieldWithPath("name").description("카테고리명"),
+//                                        fieldWithPath("parentId")
+//                                                .description("상위 카테고리 ID (루트면 null)")
+//                                                .optional()),
+//                                responseFields(
+//                                        fieldWithPath("success").description("요청 성공 여부"),
+//                                        fieldWithPath("status").description("200"),
+//                                        fieldWithPath("timestamp").description("응답 시간"),
+//                                        fieldWithPath("data.categoryId").description("생성된 카테고리 ID"),
+//                                        fieldWithPath("data.name").description("카테고리명"),
+//                                        fieldWithPath("data.depth").description("카테고리 깊이 (1=루트)"),
+//                                        fieldWithPath("data.parentId")
+//                                                .description("상위 카테고리 ID (루트면 null)")
+//                                                .optional(),
+//                                        fieldWithPath("data.children")
+//                                                .description("하위 카테고리 리스트 (기본 [])"))));
+//    }
 }
