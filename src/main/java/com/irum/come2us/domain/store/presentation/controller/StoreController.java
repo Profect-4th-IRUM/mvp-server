@@ -25,10 +25,11 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public StoreCreateResponse createStore(@Valid @RequestBody StoreCreateRequest request) {
+    public ResponseEntity<StoreCreateResponse> createStore(
+            @Valid @RequestBody StoreCreateRequest request) {
         log.info("상점 생성 요청: {}", request);
-        return storeService.createStore(request);
+        StoreCreateResponse response = storeService.createStore(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{storeId}")
