@@ -5,7 +5,6 @@
 
 요청 본문:
 include::{snippets}/member-login/request-fields.adoc[]
-
 응답 본문:
 include::{snippets}/member-login/response-fields.adoc[]
 

@@ -1,0 +1,20 @@
+== 정산 (Sales) API
+
+
+=== 1. 총 주문 내역
+`GET /members/info`
+
+응답 본문:
+include::{snippets}/sales-list-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/sales-list-get/http-response.adoc[]
+
+=== 2. 정산 금액
+`GET /Sales/info`
+
+응답 본문:
+include::{snippets}/balance-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/balance-get/http-response.adoc[]

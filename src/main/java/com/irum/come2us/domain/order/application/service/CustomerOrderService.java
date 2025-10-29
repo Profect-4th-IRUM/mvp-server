@@ -270,8 +270,8 @@ public class CustomerOrderService {
         // 쿠폰 미리 차감
         appliedCouponService.createAppliedCouponList(payment, request.couponIdList());
 
-        // 주문 엔티티 생성 PENDING 상태
-        String orderNum = "ORD-" + (int) ((Math.random() * 10000000));
+        // 주문 엔티티 생성 PENDING 상태  8 자리 랜덤값
+        String orderNum = "ORD-" + (int) ((Math.random() * 100000000));
 
         Order order =
                 Order.builder()

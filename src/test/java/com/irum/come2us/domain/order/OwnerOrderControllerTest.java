@@ -15,6 +15,7 @@ import com.irum.come2us.domain.order.presentation.controller.OwnerOrderControlle
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import com.irum.come2us.global.config.SecurityTestConfig;
+import com.irum.come2us.global.config.TestConfig;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -24,28 +25,18 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(OwnerOrderController.class)
 @AutoConfigureRestDocs
-@Import(SecurityTestConfig.class)
+@Import({TestConfig.class, SecurityTestConfig.class})
 public class OwnerOrderControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private OwnerOrderService ownerOrderService;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public OwnerOrderService ownerOrderService() {
-            return Mockito.mock(OwnerOrderService.class);
-        }
-    }
 
     // 배송 준비중
     @Test
