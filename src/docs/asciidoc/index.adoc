@@ -14,5 +14,6 @@ include::_delivery_address.adoc[]
 include::_discount.adoc[]
 
 include::_deliverypolicy.adoc[]
+include::_payment.adoc[]
 // include::_product.adoc[]
 
