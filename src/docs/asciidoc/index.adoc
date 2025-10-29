@@ -16,3 +16,5 @@ include::_discount.adoc[]
 include::_deliverypolicy.adoc[]
 // include::_product.adoc[]
 
+include::_cart.adoc[]
+

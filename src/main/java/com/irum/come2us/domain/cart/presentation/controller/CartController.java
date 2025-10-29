@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,30 +22,35 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    public CartResponse createCart(@Valid @RequestBody CartCreateRequest request) {
+    public ResponseEntity<Void> createCart(@Valid @RequestBody CartCreateRequest request) {
         log.info(
                 "장바구니 추가 요청: optionValueId={}, quantity={}",
                 request.optionValueId(),
                 request.quantity());
-        return cartService.createCart(request);
+        cartService.createCart(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/{cartId}")
-    public CartResponse updateCart(
+    public ResponseEntity<Void> updateCart(
             @PathVariable UUID cartId, @Valid @RequestBody CartUpdateRequest request) {
         log.info("장바구니 수정 요청: cartId={}, quantity={}", cartId, request.quantity());
-        return cartService.updateCart(cartId, request);
+        cartService.updateCart(cartId, request);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public List<CartResponse> getMyCartList() {
-        log.info("본인 장바구니 조회 요청");
-        return cartService.getCartListByMember();
+    public ResponseEntity<List<CartResponse>> getMyCartList() {
+        log.info("장바구니 목록 조회 요청");
+        List<CartResponse> responses = cartService.getCartListByMember();
+        log.info("장바구니 조회 결과: {}개 항목", responses.size());
+        return ResponseEntity.ok(responses);
     }
 
     @DeleteMapping("/{cartId}")
-    public void deleteCart(@PathVariable UUID cartId) {
+    public ResponseEntity<Void> deleteCart(@PathVariable UUID cartId) {
         log.info("장바구니 삭제 요청: cartId={}", cartId);
         cartService.deleteCart(cartId);
+        return ResponseEntity.noContent().build();
     }
 }
