@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/refund")
+@RequestMapping("/refunds")
 @RequiredArgsConstructor
 public class RefundController {
     private final RefundService refundService;
@@ -41,7 +41,7 @@ public class RefundController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/list/{refundStatus}") // 환불 요청 목록
+    @GetMapping("/list") // 환불 요청 목록
     public StoreRefundListResponse getRefundList(
             @RequestParam(name = "status", required = false) RefundStatus status) {
         return refundService.findRefundListByStatus(status);

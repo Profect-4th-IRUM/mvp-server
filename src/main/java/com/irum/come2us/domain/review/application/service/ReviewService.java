@@ -1,4 +1,4 @@
-package com.irum.come2us.domain.review.application;
+package com.irum.come2us.domain.review.application.service;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.product.domain.entity.Product;
@@ -34,6 +34,7 @@ public class ReviewService {
     private final ProductRepository productRepository;
     private final MemberUtil memberUtil;
 
+    /** 리뷰 생성 */
     public ReviewResponse createReview(ReviewCreateRequest request) {
         Product product =
                 productRepository
@@ -51,7 +52,6 @@ public class ReviewService {
         Review review = Review.createReview(request.content(), request.rate(), member, product);
         Review saved = reviewRepository.save(review);
 
-        // 이미지 저장
         List<ReviewImage> images =
                 (request.imageUrls() == null)
                         ? List.of()
@@ -65,6 +65,7 @@ public class ReviewService {
         return ReviewResponse.from(saved, images.stream().map(ReviewImage::getImageUrl).toList());
     }
 
+    /** 리뷰 수정 */
     public ReviewResponse updateReview(UUID reviewId, ReviewUpdateRequest request) {
         Review review =
                 reviewRepository
@@ -73,9 +74,8 @@ public class ReviewService {
 
         memberUtil.assertMemberResourceAccess(review.getMember());
 
-        if (request.content() == null && request.rate() == null && request.imageUrls() == null) {
+        if (request.content() == null && request.rate() == null && request.imageUrls() == null)
             throw new CommonException(ReviewErrorCode.REVIEW_NOT_MODIFIED);
-        }
 
         review.updateReview(request.content(), request.rate());
 
@@ -93,17 +93,15 @@ public class ReviewService {
                         .map(ReviewImage::getImageUrl)
                         .toList();
 
-        if (request.rate() != null) {
-            updateProductRating(review.getProduct());
-        }
+        if (request.rate() != null) updateProductRating(review.getProduct());
 
         return ReviewResponse.from(review, imageUrls);
     }
 
+    /** 내 리뷰 목록 조회 */
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getMyReviews(Pageable pageable) {
         Member member = memberUtil.getCurrentMember();
-
         log.info("내 리뷰 목록 조회 요청: memberId={}", member.getMemberId());
 
         return reviewRepository
@@ -118,6 +116,7 @@ public class ReviewService {
                         });
     }
 
+    /** 상품 리뷰 목록 조회 */
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getProductReviews(UUID productId, Pageable pageable) {
         log.info("상품 리뷰 목록 조회 요청: productId={}", productId);
@@ -134,6 +133,7 @@ public class ReviewService {
                         });
     }
 
+    /** 리뷰 삭제 */
     public void deleteReview(UUID reviewId) {
         Review review =
                 reviewRepository
@@ -142,12 +142,12 @@ public class ReviewService {
 
         reviewImageRepository.deleteAll(reviewImageRepository.findAllByReview(review));
         reviewRepository.delete(review);
-
         updateProductRating(review.getProduct());
 
         log.info("리뷰 삭제 완료: reviewId={}", reviewId);
     }
 
+    /** 상품 평점 갱신 */
     private void updateProductRating(Product product) {
         Double avg = reviewRepository.findAverageByProductId(product.getId());
         Integer count = reviewRepository.findCountByProductId(product.getId());

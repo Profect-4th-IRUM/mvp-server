@@ -106,9 +106,12 @@ asciidoctor.doFirst {
 }
 
 asciidoctor {
+    baseDirFollowsSourceFile()            // include 기준을 index.adoc 위치로 고정
+    sources { include 'index.adoc' }      // index.adoc을 진입점으로
     attributes('snippets': snippetsDir.get().asFile)
     configurations 'asciidoctorExt'
     dependsOn test
+    baseDirFollowsSourceDir()
 }
 
 bootJar {
