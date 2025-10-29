@@ -15,6 +15,7 @@ import com.irum.come2us.domain.order.presentation.controller.OwnerOrderControlle
 import com.irum.come2us.domain.order.presentation.dto.request.OwnerOrderShippedRequest;
 import com.irum.come2us.domain.order.presentation.dto.response.OwnerOrderListResponse;
 import com.irum.come2us.global.config.SecurityTestConfig;
+import com.irum.come2us.global.config.TestConfig;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(OwnerOrderController.class)
 @AutoConfigureRestDocs
-@Import(SecurityTestConfig.class)
+@Import({TestConfig.class, SecurityTestConfig.class})
 public class OwnerOrderControllerTest {
 
     @Autowired private MockMvc mockMvc;

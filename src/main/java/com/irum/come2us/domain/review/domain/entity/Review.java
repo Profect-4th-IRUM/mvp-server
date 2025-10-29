@@ -40,24 +40,23 @@ public class Review extends BaseEntity {
     private Product product;
 
     @Builder
-    private Review(String content, Integer rate, Member member, Product product) {
+    private Review(String content, Short rate, Member member, Product product) {
         this.content = content;
-        this.rate = rate == null ? null : rate.shortValue();
+        this.rate = rate;
         this.member = member;
         this.product = product;
     }
 
-    public static Review createReview(
-            String content, Integer rate, Member member, Product product) {
+    public static Review createReview(String content, Short rate, Member member, Product product) {
         return Review.builder().content(content).rate(rate).member(member).product(product).build();
     }
 
-    public void updateReview(String content, Integer rate) {
+    public void updateReview(String content, Short rate) {
         if (content != null) {
             this.content = content;
         }
         if (rate != null) {
-            this.rate = rate.shortValue();
+            this.rate = rate;
         }
     }
 }
