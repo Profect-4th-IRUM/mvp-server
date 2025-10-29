@@ -62,6 +62,8 @@ public class TestConfig {
     @Bean
     public CartService cartService() {
         return Mockito.mock(CartService.class);
+    }
+
     public OwnerOrderService ownerOrderService() {
         return Mockito.mock(OwnerOrderService.class);
     }
