@@ -6,6 +6,7 @@ import com.irum.come2us.domain.deliveryaddress.application.service.DeliveryAddre
 import com.irum.come2us.domain.discount.application.service.DiscountService;
 import com.irum.come2us.domain.member.application.service.ManagerService;
 import com.irum.come2us.domain.member.application.service.MemberService;
+import com.irum.come2us.domain.product.application.service.ProductImageService;
 import com.irum.come2us.domain.refund.application.service.RefundService;
 import com.irum.come2us.domain.review.application.service.ReviewService;
 import com.irum.come2us.global.util.CookieUtil;
@@ -58,5 +59,7 @@ public class TestConfig {
     @Bean
     public ReviewService reviewService() {
         return Mockito.mock(ReviewService.class);
+    public ProductImageService productImageService() {
+        return Mockito.mock(ProductImageService.class);
     }
 }

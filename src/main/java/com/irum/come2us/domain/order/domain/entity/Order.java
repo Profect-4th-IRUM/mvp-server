@@ -7,6 +7,8 @@ import com.irum.come2us.domain.payment.domain.entity.Payment;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -55,6 +57,11 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_address_id")
     private DeliveryAddress deliveryAddress;
+
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+
+    // 한 주문당 여러 상품이 담겨있기 때문에 List 추가
 
     public void updateOrderStatus(OrderStatus os) {
         this.orderStatusAll = os;
