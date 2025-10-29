@@ -13,7 +13,11 @@ include::_auth.adoc[]
 include::_delivery_address.adoc[]
 include::_discount.adoc[]
 include::_sales.adoc[]
-
+include::_coupon.adoc[]
 include::_deliverypolicy.adoc[]
+include::_customer_order.adoc[]
+include::_owner_order.adoc[]
+
 // include::_product.adoc[]
+include::_product_image.adoc[]
 

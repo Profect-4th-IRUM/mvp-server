@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SalesController {
     private final SalesService salesService;
 
-    //   정산 내역
+    //   총 주문 내역
     @GetMapping("/{storeId}/sales")
     public ResponseEntity<SalesResponse> salesResponse(@PathVariable UUID storeId) {
         SalesResponse response = salesService.getSalesList(storeId);
