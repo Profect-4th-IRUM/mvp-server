@@ -1,0 +1,11 @@
+== 결제 API
+
+=== 1. 결제 요청
+`POST /payment`
+
+요청 본문:
+include::{snippets}/payment-create/request-fields.adoc[]
+응답 본문:
+include::{snippets}/payment-create/response-fields.adoc[]
+응답:
+include::{snippets}/payment-create/http-response.adoc[]

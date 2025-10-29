@@ -11,9 +11,15 @@ include::_manager.adoc[]
 include::_store.adoc[]
 include::_auth.adoc[]
 include::_delivery_address.adoc[]
+include::_refund.adoc[]
 include::_discount.adoc[]
-
+include::_coupon.adoc[]
 include::_deliverypolicy.adoc[]
+include::_payment.adoc[]
+include::_customer_order.adoc[]
+include::_owner_order.adoc[]
+
 // include::_product.adoc[]
 include::_category.adoc[]
+include::_product_image.adoc[]
 

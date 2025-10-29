@@ -1,0 +1,55 @@
+== 환불 (Refund) API
+
+=== 1. 환불 등록
+`POST /refunds/{orderId}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/refund-register/path-parameters.adoc[]
+
+요청 본문:
+include::{snippets}/refund-register/request-fields.adoc[]
+
+응답:
+include::{snippets}/refund-register/http-response.adoc[]
+
+---
+
+=== 2. 환불 상세 조회
+`GET /refunds/{orderId}/detail`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/refund-detail-get/path-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/refund-detail-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/refund-detail-get/http-response.adoc[]
+
+---
+
+=== 3. 환불 상태 변경
+`PATCH /refunds/{refund-id}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/refund-status-patch/path-parameters.adoc[]
+
+요청 본문:
+include::{snippets}/refund-status-patch/request-fields.adoc[]
+
+응답:
+include::{snippets}/refund-status-patch/http-response.adoc[]
+
+---
+
+=== 4. 환불 요청 목록 조회
+`GET /refunds/list`
+
+쿼리 파라미터 (Query Parameters):
+include::{snippets}/refund-list-get/query-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/refund-list-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/refund-list-get/http-response.adoc[]

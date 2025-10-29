@@ -1,0 +1,77 @@
+== 상점주 주문 (Owner Order) API
+
+=== 1. [상점] 배송 준비 중 목록 조회 API
+`GET /orders/owner/{storeId}/preparing`
+
+경로 변수:
+include::{snippets}/owner-order-preparing-get/path-parameters.adoc[]
+
+요청 파라미터:
+include::{snippets}/owner-order-preparing-get/query-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/owner-order-preparing-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/owner-order-preparing-get/http-response.adoc[]
+
+=== 2. [상점] 부분 배송 중 목록 조회 API
+`GET /orders/owner/{storeId}/partially-shipped`
+
+경로 변수:
+include::{snippets}/owner-order-partially-shipped-get/path-parameters.adoc[]
+
+요청 파라미터:
+include::{snippets}/owner-order-partially-shipped-get/query-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/owner-order-partially-shipped-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/owner-order-partially-shipped-get/http-response.adoc[]
+
+=== 3. [상점] 부분 배송 완료 목록 조회 API
+`GET /orders/owner/{storeId}/partially-delivered`
+
+경로 변수:
+include::{snippets}/owner-order-partially-delivered-get/path-parameters.adoc[]
+
+요청 파라미터:
+include::{snippets}/owner-order-partially-delivered-get/query-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/owner-order-partially-delivered-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/owner-order-partially-delivered-get/http-response.adoc[]
+
+=== 4. [상점] 주문 상태 변경 (배송준비중) API
+`PATCH /orders/owner/order-details/{orderDetailId}/preparing`
+
+경로 변수:
+include::{snippets}/owner-order-status-to-preparing-update/path-parameters.adoc[]
+
+응답:
+include::{snippets}/owner-order-status-to-preparing-update/http-response.adoc[]
+
+
+=== 5. [상점] 주문 상태 변경 (배송중) API
+`PATCH /orders/owner/order-details/{orderDetailId}/shipped`
+
+경로 변수:
+include::{snippets}/owner-order-status-to-shipped-update/path-parameters.adoc[]
+
+요청 본문:
+include::{snippets}/owner-order-status-to-shipped-update/request-fields.adoc[]
+
+응답:
+include::{snippets}/owner-order-status-to-shipped-update/http-response.adoc[]
+
+=== 6.[상점] 주문 상태 변경 (배송완료) API
+`PATCH /orders/owner/order-details/{orderDetailId}/delivered`
+
+경로 변수:
+include::{snippets}/owner-order-status-to-delivered-update/path-parameters.adoc[]
+
+응답:
+include::{snippets}/owner-order-status-to-delivered-update/http-response.adoc[]
