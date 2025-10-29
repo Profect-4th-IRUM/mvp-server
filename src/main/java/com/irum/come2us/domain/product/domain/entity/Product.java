@@ -132,8 +132,5 @@ public class Product extends BaseEntity {
         this.category = category;
     }
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> productImages = new ArrayList<>();
-
-    // TODO: 리뷰 매핑
+    // TODO: 이미지 매핑, 리뷰 매핑
 }

@@ -23,5 +23,3 @@ include::_owner_order.adoc[]
 // include::_product.adoc[]
 include::_product_image.adoc[]
 
-include::_cart.adoc[]
-
