@@ -111,6 +111,7 @@ asciidoctor {
     attributes('snippets': snippetsDir.get().asFile)
     configurations 'asciidoctorExt'
     dependsOn test
+    baseDirFollowsSourceDir()
 }
 
 bootJar {
