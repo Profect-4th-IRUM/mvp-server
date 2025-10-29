@@ -23,8 +23,10 @@ public interface CartRepository extends JpaRepository<Cart, UUID> {
     Cart findByMemberIdAndOptionValueId(
             @Param("memberId") @NotNull Long memberId, @Param("optionValueId") UUID optionValueId);
 
-    // 특정 회원의 장바구니 + 상품/옵션 통합 조회
-    // TODO: 이미지 조인 추후 추가 예정
+    /**
+     * 특정 회원의 장바구니 + 상품/옵션/이미지 통합 조회 - Cart → OptionValue → OptionGroup → Product → ProductImage -
+     * LEFT JOIN FETCH 로 대표 이미지까지 미리 로딩
+     */
     @Query(
             """
         SELECT DISTINCT c
@@ -32,6 +34,7 @@ public interface CartRepository extends JpaRepository<Cart, UUID> {
         JOIN FETCH c.optionValue ov
         JOIN FETCH ov.optionGroup og
         JOIN FETCH og.product p
+        LEFT JOIN FETCH p.productImages pi
         WHERE c.member.memberId = :memberId
     """)
     List<Cart> findAllWithProductByMemberId(@Param("memberId") Long memberId);
