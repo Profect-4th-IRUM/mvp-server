@@ -53,7 +53,7 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AppliedCoupon> appliedCoupons = new ArrayList<>();
 
     public void updateStatus(PaymentStatus paymentStatus) {
