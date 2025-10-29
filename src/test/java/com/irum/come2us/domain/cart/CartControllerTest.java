@@ -46,10 +46,23 @@ class CartControllerTest {
     @Test
     @DisplayName("장바구니 추가 API (CUSTOMER)")
     void createCartApiTest() throws Exception {
-        CartCreateRequest request = new CartCreateRequest(1L, mockOptionValueId, 2);
+        CartCreateRequest request = new CartCreateRequest(mockOptionValueId, 2);
         String requestJson = objectMapper.writeValueAsString(request);
 
-        doNothing().when(cartService).createCart(any(CartCreateRequest.class));
+        CartResponse response =
+                new CartResponse(
+                        mockCartId,
+                        mockOptionValueId,
+                        "테스트 상품",
+                        "옵션A",
+                        "https://example.com/image.jpg",
+                        2,
+                        10000,
+                        500,
+                        10500,
+                        21000);
+
+        when(cartService.createCart(any(CartCreateRequest.class))).thenReturn(response);
 
         mockMvc.perform(
                         RestDocumentationRequestBuilders.post("/carts")
@@ -62,9 +75,22 @@ class CartControllerTest {
                         document(
                                 "cart-create",
                                 requestFields(
-                                        fieldWithPath("memberId").description("회원 ID"),
                                         fieldWithPath("optionValueId").description("옵션 값 ID"),
-                                        fieldWithPath("quantity").description("상품 수량"))));
+                                        fieldWithPath("quantity").description("상품 수량")),
+                                responseFields(
+                                        fieldWithPath("success").description("true"),
+                                        fieldWithPath("status").description("201"),
+                                        fieldWithPath("timestamp").description("응답 시간"),
+                                        fieldWithPath("data.cartId").description("장바구니 ID"),
+                                        fieldWithPath("data.optionValueId").description("옵션 값 ID"),
+                                        fieldWithPath("data.productName").description("상품 이름"),
+                                        fieldWithPath("data.optionValueName").description("옵션 이름"),
+                                        fieldWithPath("data.imageUrl").description("대표 이미지 URL"),
+                                        fieldWithPath("data.quantity").description("수량"),
+                                        fieldWithPath("data.basePrice").description("상품 기본가"),
+                                        fieldWithPath("data.extraPrice").description("옵션 추가금"),
+                                        fieldWithPath("data.unitPrice").description("단가"),
+                                        fieldWithPath("data.lineTotal").description("총 금액"))));
     }
 
     @Test

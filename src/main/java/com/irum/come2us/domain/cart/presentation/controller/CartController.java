@@ -22,13 +22,13 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    public ResponseEntity<Void> createCart(@Valid @RequestBody CartCreateRequest request) {
+    public ResponseEntity<CartResponse> createCart(@Valid @RequestBody CartCreateRequest request) {
         log.info(
                 "장바구니 추가 요청: optionValueId={}, quantity={}",
                 request.optionValueId(),
                 request.quantity());
-        cartService.createCart(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        CartResponse response = cartService.createCart(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{cartId}")

@@ -27,7 +27,8 @@ public class CartService {
     private final ProductOptionValueRepository productOptionValueRepository;
     private final MemberUtil memberUtil;
 
-    public void createCart(CartCreateRequest request) {
+    @Transactional
+    public CartResponse createCart(CartCreateRequest request) {
         Member currentMember = memberUtil.getCurrentMember();
 
         ProductOptionValue optionValue =
@@ -40,13 +41,17 @@ public class CartService {
                 cartRepository.findByMemberIdAndOptionValueId(
                         currentMember.getMemberId(), request.optionValueId());
 
+        Cart target;
         if (existing != null) {
             int updatedQuantity = existing.getQuantity() + request.quantity();
             existing.updateQuantity(updatedQuantity);
+            target = existing;
         } else {
-            Cart newCart = Cart.createCart(currentMember, optionValue, request.quantity());
-            cartRepository.save(newCart);
+            target = Cart.createCart(currentMember, optionValue, request.quantity());
+            cartRepository.save(target);
         }
+
+        return CartResponse.from(target);
     }
 
     public void updateCart(UUID cartId, CartUpdateRequest request) {
