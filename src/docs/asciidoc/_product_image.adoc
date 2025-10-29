@@ -1,0 +1,46 @@
+== 상품 이미지 (Product Image) API
+
+=== 1. 상품 이미지 업로드
+`POST /products/{productId}/images`
+
+요청 경로 파라미터:
+include::{snippets}/product-image-upload/path-parameters.adoc[]
+
+요청 본문 (Multipart):
+include::{snippets}/product-image-upload/request-parts.adoc[]
+
+응답:
+include::{snippets}/product-image-upload/http-response.adoc[]
+
+
+=== 2. 상품 이미지 조회
+`GET /products/{productId}/images`
+
+요청 경로 파라미터:
+include::{snippets}/product-image-list-get/path-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/product-image-list-get/response-fields.adoc[]
+
+응답:
+include::{snippets}/product-image-list-get/http-response.adoc[]
+
+
+=== 3. 대표 이미지 변경
+`PATCH /products/{productId}/images/{imageId}/default`
+
+요청 경로 파라미터:
+include::{snippets}/product-image-change-default/path-parameters.adoc[]
+
+응답:
+include::{snippets}/product-image-change-default/http-response.adoc[]
+
+
+=== 4. 상품 이미지 삭제
+`DELETE /products/{productId}/images/{imageId}`
+
+요청 경로 파라미터:
+include::{snippets}/product-image-delete/path-parameters.adoc[]
+
+응답:
+include::{snippets}/product-image-delete/http-response.adoc[]
