@@ -1,0 +1,59 @@
+== 배송비 정책 (DeliveryPolicy) API
+
+=== 1. 배송비 정책 생성
+`POST /delivery-policies`
+
+요청 본문:
+include::{snippets}/delivery-policy-create/request-fields.adoc[]
+
+응답:
+include::{snippets}/delivery-policy-create/http-response.adoc[]
+
+==== 배송비 정책 생성 실패: 유효성 검사
+* `기본 배송비 음수`
+include::{snippets}/delivery-policy-create-fail-invalid-fee/http-response.adoc[]
+include::{snippets}/delivery-policy-create-fail-invalid-fee/response-fields.adoc[]
+
+* `최소 주문 수량 1미만`
+include::{snippets}/delivery-policy-create-fail-invalid-quantity/http-response.adoc[]
+include::{snippets}/delivery-policy-create-fail-invalid-quantity/response-fields.adoc[]
+
+* `최소 주문 금액 0미만`
+include::{snippets}/delivery-policy-create-fail-invalid-amount/http-response.adoc[]
+include::{snippets}/delivery-policy-create-fail-invalid-amount/response-fields.adoc[]
+
+
+=== 2. 배송비 정책 조회
+`GET /delivery-policies/{deliveryPolicyId}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/delivery-policy-detail/path-parameters.adoc[]
+
+응답 본문:
+include::{snippets}/delivery-policy-detail/response-fields.adoc[]
+
+응답:
+include::{snippets}/delivery-policy-detail/http-response.adoc[]
+
+
+=== 3. 배송비 정책 수정
+`PATCH /delivery-policies/{deliveryPolicyId}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/delivery-policy-update/path-parameters.adoc[]
+
+요청 본문:
+include::{snippets}/delivery-policy-update/request-fields.adoc[]
+
+응답:
+include::{snippets}/delivery-policy-update/http-response.adoc[]
+
+
+=== 4. 배송비 정책 삭제
+`DELETE /delivery-policies/{deliveryPolicyId}`
+
+경로 파라미터 (Path Parameters):
+include::{snippets}/delivery-policy-delete/path-parameters.adoc[]
+
+응답:
+include::{snippets}/delivery-policy-delete/http-response.adoc[]

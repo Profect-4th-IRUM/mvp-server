@@ -29,8 +29,8 @@ jobs:
 
       - name: Create .env file from secrets
         run: |
-          echo "${{ secrets.APP_ENV }}" > .env
-          echo ".env file created"
+          echo "${{ secrets.APP_ENV }}" > app.env
+          echo "app.env file created"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -43,8 +43,10 @@ jobs:
           COMMIT_TAG=${SHORT_SHA::7}
           echo "Building image with tags: latest, $COMMIT_TAG"
 
-          docker build -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest \
-                       -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$COMMIT_TAG .
+          docker build \
+            --secret id=app_env,src=app.env \
+            -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest \
+            -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$COMMIT_TAG .
 
       - name: Push image to Docker Hub
         run: |

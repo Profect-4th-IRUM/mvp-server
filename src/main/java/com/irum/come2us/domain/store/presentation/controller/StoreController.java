@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +25,11 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping
-    public ResponseEntity<StoreCreateResponse> registerStore(
+    public ResponseEntity<StoreCreateResponse> createStore(
             @Valid @RequestBody StoreCreateRequest request) {
         log.info("상점 생성 요청: {}", request);
-        UUID storeId = storeService.createStore(request);
-        return ResponseEntity.ok(new StoreCreateResponse(storeId));
+        StoreCreateResponse response = storeService.createStore(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{storeId}")
