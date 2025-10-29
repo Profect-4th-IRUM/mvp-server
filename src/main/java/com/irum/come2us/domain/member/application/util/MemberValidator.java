@@ -5,6 +5,7 @@ import com.irum.come2us.domain.member.domain.entity.enums.Role;
 import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.AuthErrorCode;
+import com.irum.come2us.global.presentation.advice.exception.errorcode.GlobalErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.security.MemberDetails;
 import java.util.Optional;
@@ -108,7 +109,7 @@ public class MemberValidator {
 
     public void applyValidUpdate(Member member, String newName, String newContact) {
         if (!StringUtils.hasText(newName) && !StringUtils.hasText(newContact))
-            throw new CommonException(MemberErrorCode.EMPTY_REQUEST);
+            throw new CommonException(GlobalErrorCode.EMPTY_REQUEST);
         if (StringUtils.hasText(newName)) member.updateName(newName);
         if (StringUtils.hasText(newContact)) member.updateContact(newContact);
     }

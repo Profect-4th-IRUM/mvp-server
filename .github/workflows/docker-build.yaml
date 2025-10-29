@@ -1,0 +1,63 @@
+name: Build & Push Docker Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    env:
+      REGISTRY: docker.io
+      IMAGE_NAME: come2us
+      SHORT_SHA: ${{ github.sha }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
+
+      - name: Create .env file from secrets
+        run: |
+          echo "${{ secrets.APP_ENV }}" > app.env
+          echo "app.env file created"
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          COMMIT_TAG=${SHORT_SHA::7}
+          echo "Building image with tags: latest, $COMMIT_TAG"
+
+          docker build \
+            --secret id=app_env,src=app.env \
+            -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest \
+            -t $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$COMMIT_TAG .
+
+      - name: Push image to Docker Hub
+        run: |
+          COMMIT_TAG=${SHORT_SHA::7}
+          docker push $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest
+          docker push $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$COMMIT_TAG
+
+      - name: Show pushed image info
+        run: |
+          COMMIT_TAG=${SHORT_SHA::7}
+          echo "Images pushed:"
+          echo " - $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest"
+          echo " - $REGISTRY/${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:$COMMIT_TAG"
+

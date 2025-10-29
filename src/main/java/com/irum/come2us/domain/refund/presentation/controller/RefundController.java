@@ -1,35 +1,50 @@
 package com.irum.come2us.domain.refund.presentation.controller;
 
-import com.irum.come2us.domain.refund.application.service.StoreRefundService;
+import com.irum.come2us.domain.refund.application.service.RefundService;
 import com.irum.come2us.domain.refund.domain.entity.enums.RefundStatus;
-import com.irum.come2us.domain.refund.presentation.dto.request.StoreRefundCreateRequest;
+import com.irum.come2us.domain.refund.presentation.dto.request.RefundCreateRequest;
 import com.irum.come2us.domain.refund.presentation.dto.request.StoreRefundStatusRequest;
-import com.irum.come2us.domain.refund.presentation.dto.response.StoreRefundDetailResponse;
+import com.irum.come2us.domain.refund.presentation.dto.response.RefundDetailResponse;
 import com.irum.come2us.domain.refund.presentation.dto.response.StoreRefundListResponse;
-import com.irum.come2us.domain.refund.presentation.dto.response.StoreRefundResponse;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/refund/owner")
+@RequestMapping("/refund")
 @RequiredArgsConstructor
-public class StoreRefundController {
-    private final StoreRefundService refundService;
+public class RefundController {
+    private final RefundService refundService;
 
+    // Common
+    @PostMapping("/{orderId}")
+    public ResponseEntity<Void> registerRefund(
+            @PathVariable UUID orderId, @Valid @RequestBody RefundCreateRequest request) {
+        refundService.createRefund(orderId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{orderId}/detail")
+    public RefundDetailResponse getRefundDetail(@PathVariable UUID orderId) {
+        return refundService.findRefundDetail(orderId);
+    }
+
+    // Owner
     @PatchMapping("/{refund-id}") // 환불 상태 변경
     public ResponseEntity<Void> patchRefundStatus(
             @PathVariable("refund-id") UUID refundId,
             @RequestBody StoreRefundStatusRequest request) {
-        refundService.patchRefundStatus(refundId, request);
-        return ResponseEntity.ok().build();
+        refundService.changeRefundStatus(refundId, request);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/list/{refundStatus}") // 환불 요청 목록
-    public ResponseEntity<StoreRefundListResponse> getRefundList(
+    public StoreRefundListResponse getRefundList(
             @RequestParam(name = "status", required = false) RefundStatus status) {
-        return ResponseEntity.ok(refundService.getRefundListByStatus(status));
+        return refundService.findRefundListByStatus(status);
     }
 
     //    @GetMapping("/list/processing") // 환불 진행중 목록
@@ -42,17 +57,4 @@ public class StoreRefundController {
     //        return ResponseEntity.ok(refundService.getRefundListByStatus(RefundStatus.COMPLETED));
     //    }
 
-    @PostMapping("/{order-id}") // 환불 요청
-    public ResponseEntity<StoreRefundResponse> createRefund(
-            @PathVariable("order-id") UUID orderId, @RequestBody StoreRefundCreateRequest request) {
-        StoreRefundResponse response = refundService.createRefund(orderId, request);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/{refund-id}") // 환불 상세 보기
-    public ResponseEntity<StoreRefundDetailResponse> getRefundDatil(
-            @PathVariable("refund-id") UUID refundId) {
-        StoreRefundDetailResponse response = refundService.getRefundDetail(refundId);
-        return ResponseEntity.ok(response);
-    }
 }
