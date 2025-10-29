@@ -21,6 +21,7 @@ include::_payment.adoc[]
 include::_customer_order.adoc[]
 include::_owner_order.adoc[]
 
+include::_product.adoc[]
 // include::_product.adoc[]
 include::_product_image.adoc[]
 
