@@ -23,9 +23,12 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -42,6 +45,14 @@ class CartControllerTest {
 
     private final UUID mockCartId = UUID.randomUUID();
     private final UUID mockOptionValueId = UUID.randomUUID();
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public CartService cartService() {
+            return Mockito.mock(CartService.class);
+        }
+    }
 
     @Test
     @DisplayName("장바구니 추가 API (CUSTOMER)")

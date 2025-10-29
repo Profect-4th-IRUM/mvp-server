@@ -12,6 +12,7 @@ import com.irum.come2us.domain.order.application.service.OwnerOrderService;
 import com.irum.come2us.domain.order.application.service.SalesService;
 import com.irum.come2us.domain.product.application.service.ProductImageService;
 import com.irum.come2us.domain.refund.application.service.RefundService;
+import com.irum.come2us.domain.review.application.service.ReviewService;
 import com.irum.come2us.global.util.CookieUtil;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -60,8 +61,14 @@ public class TestConfig {
     }
 
     @Bean
+    public ReviewService reviewService() {
+        return Mockito.mock(ReviewService.class);
+    }
+
     public CartService cartService() {
         return Mockito.mock(CartService.class);
+    }
+
     public OwnerOrderService ownerOrderService() {
         return Mockito.mock(OwnerOrderService.class);
     }

@@ -25,6 +25,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +39,14 @@ public class OwnerOrderControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private OwnerOrderService ownerOrderService;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public OwnerOrderService ownerOrderService() {
+            return Mockito.mock(OwnerOrderService.class);
+        }
+    }
 
     // 배송 준비중
     @Test
