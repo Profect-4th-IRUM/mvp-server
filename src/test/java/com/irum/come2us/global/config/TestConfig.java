@@ -59,6 +59,9 @@ public class TestConfig {
     @Bean
     public SalesService salesService() {
         return Mockito.mock(SalesService.class);
+    }
+
+    @Bean
     public ProductImageService productImageService() {
         return Mockito.mock(ProductImageService.class);
     }
