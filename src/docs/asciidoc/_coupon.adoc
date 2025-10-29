@@ -1,0 +1,27 @@
+== 쿠폰 (Coupons) API
+
+=== 1. 쿠폰 생성
+`POST /coupons`
+
+요청 본문:
+include::{snippets}/coupon-create/request-fields.adoc[]
+
+응답:
+include::{snippets}/coupon-create/http-response.adoc[]
+
+
+=== 2. 쿠폰 조회
+`GET /coupons`
+
+응답 본문:
+include::{snippets}/coupon-list/response-fields.adoc[]
+
+응답:
+include::{snippets}/coupon-list/http-response.adoc[]
+
+
+=== 3. 쿠폰 삭제
+`DELETE /coupons`
+
+응답:
+include::{snippets}/coupon-delete/http-response.adoc[]
