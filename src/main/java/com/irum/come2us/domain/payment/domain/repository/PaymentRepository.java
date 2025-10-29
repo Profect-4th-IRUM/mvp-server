@@ -15,4 +15,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Payment p SET p.paymentStatus = 'FAILED' WHERE p.paymentId IN :paymentIds")
     int updateStatusToFailedByIds(@Param("paymentIds") List<UUID> paymentIds);
+
+    @Query("SELECT p.totalDiscountAmount FROM Payment p WHERE p.paymentId = :paymentId")
+    Integer getTotalDiscountByPaymentId(@Param("paymentId") UUID paymentId);
 }
