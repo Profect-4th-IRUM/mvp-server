@@ -20,7 +20,7 @@ include::{snippets}/coupon-list/response-fields.adoc[]
 include::{snippets}/coupon-list/http-response.adoc[]
 
 
-=== 7. 쿠폰 삭제
+=== 3. 쿠폰 삭제
 `DELETE /coupons`
 
 응답:
