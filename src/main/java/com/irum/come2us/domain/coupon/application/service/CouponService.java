@@ -13,6 +13,8 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErr
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
     private final AppliedCouponRepository appliedCouponRepository;
+    private final MemberUtil memberUtil;
 
     public void createCoupon(CouponGenerateRequest request, Long memberId) {
 
@@ -55,7 +58,8 @@ public class CouponService {
         if (!coupon.getMember().getMemberId().equals(memberId)) {
             throw new CommonException(CouponErrorCode.ONLY_OWNER_CAN_DELETE);
         }
-        couponRepository.delete(coupon);
+        memberUtil.assertMemberResourceAccess(coupon.getMember());
+        coupon.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 
     /** 쿠폰 유효성 검증 및 할인 금액 계산 */

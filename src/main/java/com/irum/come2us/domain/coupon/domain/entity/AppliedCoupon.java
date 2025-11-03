@@ -20,7 +20,6 @@ import org.hibernate.annotations.Where;
 @Getter
 @Builder
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE p_applied_coupon SET deleted_at = NOW() WHERE applied_coupon_id = ?")
 @Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AppliedCoupon extends BaseEntity {
