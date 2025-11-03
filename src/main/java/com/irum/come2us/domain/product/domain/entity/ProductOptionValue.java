@@ -9,7 +9,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Where;
 
@@ -17,7 +16,6 @@ import org.hibernate.annotations.Where;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_product_option_value")
-@SQLDelete(sql = "UPDATE p_product_option_value SET deleted_at = NOW() WHERE option_value_id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class ProductOptionValue extends BaseEntity {
     @Id

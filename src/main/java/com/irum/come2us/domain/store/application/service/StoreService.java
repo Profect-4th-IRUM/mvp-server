@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.store.application.service;
 
-import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;
@@ -28,7 +27,6 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final ProductRepository productRepository;
-    private final MemberValidator memberValidator;
     private final MemberUtil memberUtil;
 
     public StoreCreateResponse createStore(StoreCreateRequest request) {
@@ -54,7 +52,6 @@ public class StoreService {
 
     public void changeStore(UUID storeId, StoreUpdateRequest request) {
         Store store = getStoreById(storeId);
-        Member currentMember = memberUtil.getCurrentMember();
 
         memberUtil.assertMemberResourceAccess(store.getMember());
 
@@ -64,7 +61,7 @@ public class StoreService {
     public void withdrawStore(UUID storeId) {
         Store store = getStoreById(storeId);
         memberUtil.assertMemberResourceAccess(store.getMember());
-        storeRepository.delete(store);
+        store.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 
     @Transactional(readOnly = true)

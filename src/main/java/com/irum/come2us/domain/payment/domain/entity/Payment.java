@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UuidGenerator;
 
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_payment SET deleted_at = NOW() WHERE payment_id=?")
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Entity

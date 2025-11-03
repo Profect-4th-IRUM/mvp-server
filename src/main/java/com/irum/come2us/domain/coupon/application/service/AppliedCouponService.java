@@ -5,6 +5,7 @@ import com.irum.come2us.domain.coupon.domain.entity.Coupon;
 import com.irum.come2us.domain.coupon.domain.repository.AppliedCouponRepository;
 import com.irum.come2us.domain.coupon.domain.repository.CouponRepository;
 import com.irum.come2us.domain.payment.domain.entity.Payment;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AppliedCouponService {
     private final AppliedCouponRepository appliedCouponRepository;
     private final CouponRepository couponRepository;
+    private final MemberUtil memberUtil;
 
     /** 쿠폰 사용 처리 */
     public void createAppliedCouponList(Payment payment, List<UUID> couponIdList) {

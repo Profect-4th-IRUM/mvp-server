@@ -61,11 +61,9 @@ public class DeliveryPolicyService {
     public void withdrawDeliveryPolicy(UUID deliveryPolicyId) {
         DeliveryPolicy deliveryPolicy = validDeliveryPolicy(deliveryPolicyId);
         Store store = deliveryPolicy.getStore();
-
         store.setDeliveryPolicy(null);
         deliveryPolicy.setStore(null);
-
-        deliveryPolicyRepository.delete(deliveryPolicy);
+        deliveryPolicy.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 
     @Transactional(readOnly = true)

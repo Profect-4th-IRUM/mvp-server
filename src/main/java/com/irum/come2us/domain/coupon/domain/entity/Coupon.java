@@ -1,12 +1,14 @@
 package com.irum.come2us.domain.coupon.domain.entity;
 
 import com.irum.come2us.domain.member.domain.entity.Member;
+import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 // 1. 엔티티
 
@@ -14,7 +16,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "p_coupon")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Coupon {
+@Where(clause = "deleted_at IS NULL")
+public class Coupon extends BaseEntity {
 
     @Id // 쿠폰 아이디
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)

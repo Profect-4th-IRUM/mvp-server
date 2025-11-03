@@ -11,7 +11,6 @@ import jakarta.persistence.Entity;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Where;
 
@@ -20,7 +19,6 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_store")
-@SQLDelete(sql = "UPDATE p_store SET deleted_at = NOW() WHERE store_id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class Store extends BaseEntity {
 

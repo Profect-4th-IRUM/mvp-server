@@ -74,6 +74,6 @@ public class ManagerService {
     public void removeManager(Long memberId) {
         Member member = memberValidator.getMemberById(memberId);
         memberValidator.assertMemberIsManager(member);
-        memberRepository.delete(member);
+        member.updateDeletedAt();
     }
 }

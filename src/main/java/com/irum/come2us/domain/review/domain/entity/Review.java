@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.Check;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Where;
 
@@ -15,7 +14,6 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(name = "p_review")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_review SET deleted_at = NOW() WHERE review_id = ?")
 @Where(clause = "deleted_at IS NULL")
 @Check(constraints = "rate BETWEEN 1 AND 5")
 public class Review extends BaseEntity {

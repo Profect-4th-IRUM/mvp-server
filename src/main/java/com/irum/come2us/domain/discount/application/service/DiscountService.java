@@ -7,16 +7,15 @@ import com.irum.come2us.domain.discount.presentation.dto.request.DiscountRegiste
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoListResponse;
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoResponse;
 import com.irum.come2us.domain.member.application.util.MemberValidator;
-import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DiscountErrorCode;
-import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,7 @@ public class DiscountService {
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
     private final MemberValidator memberValidator;
+    private final MemberUtil memberUtil;
 
     public void createDiscount(DiscountRegisterRequest request) {
         Product product = assertOwnerProduct(request.productId());
@@ -76,7 +76,7 @@ public class DiscountService {
 
     public void removeDiscount(UUID discountId) {
         Discount discount = getValidDiscount(discountId);
-        discountRepository.delete(discount);
+        discount.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 
     private void checkDuplicateDiscount(UUID productId) {
@@ -91,7 +91,7 @@ public class DiscountService {
                         .findById(discountId)
                         .orElseThrow(
                                 () -> new CommonException(DiscountErrorCode.DISCOUNT_NOT_FOUND));
-        assertMember(discount.getProduct().getStore().getMember());
+        memberUtil.assertMemberResourceAccess(discount.getProduct().getStore().getMember());
         return discount;
     }
 
@@ -101,7 +101,7 @@ public class DiscountService {
                         .findByProductId(productId)
                         .orElseThrow(
                                 () -> new CommonException(DiscountErrorCode.DISCOUNT_NOT_FOUND));
-        assertMember(discount.getProduct().getStore().getMember());
+        memberUtil.assertMemberResourceAccess(discount.getProduct().getStore().getMember());
         return discount;
     }
 
@@ -110,7 +110,7 @@ public class DiscountService {
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new CommonException(ProductErrorCode.PRODUCT_NOT_FOUND));
-        assertMember(product.getStore().getMember());
+        memberUtil.assertMemberResourceAccess(product.getStore().getMember());
         return product;
     }
 
@@ -119,13 +119,7 @@ public class DiscountService {
                 storeRepository
                         .findById(storeId)
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
-        assertMember(store.getMember());
+        memberUtil.assertMemberResourceAccess(store.getMember());
         return store;
-    }
-
-    private void assertMember(Member member) {
-        Member currentMember = memberValidator.getCurrentMember();
-        if (!member.getMemberId().equals(currentMember.getMemberId()))
-            throw new CommonException(MemberErrorCode.UNAUTHORIZED_ACCESS);
     }
 }

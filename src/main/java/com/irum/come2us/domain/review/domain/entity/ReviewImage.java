@@ -4,7 +4,6 @@ import com.irum.come2us.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Where;
 
@@ -12,7 +11,6 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(name = "p_review_image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_review_image SET deleted_at = NOW() WHERE review_image_id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class ReviewImage extends BaseEntity {
 

@@ -77,6 +77,6 @@ public class CartService {
                         .findById(cartId)
                         .orElseThrow(() -> new CommonException(CartErrorCode.CART_NOT_FOUND));
         memberUtil.assertMemberResourceAccess(cart.getMember());
-        cartRepository.delete(cart);
+        cart.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 }

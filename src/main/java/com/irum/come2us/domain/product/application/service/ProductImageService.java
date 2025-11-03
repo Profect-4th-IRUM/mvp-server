@@ -115,8 +115,7 @@ public class ProductImageService {
 
         fileStorageService.delete(image.getImageUrl());
         image.unmarkAsDefault();
-        productImageRepository.delete(image);
-        productImageRepository.flush();
+        image.softDelete(memberUtil.getCurrentMember().getMemberId());
 
         if (wasDefault) {
             productImageRepository
