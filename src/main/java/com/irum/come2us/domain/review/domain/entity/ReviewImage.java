@@ -12,7 +12,6 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(name = "p_review_image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_review_image SET deleted_at = NOW() WHERE review_image_id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class ReviewImage extends BaseEntity {
 
