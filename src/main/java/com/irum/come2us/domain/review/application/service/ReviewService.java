@@ -140,7 +140,8 @@ public class ReviewService {
                         .findById(reviewId)
                         .orElseThrow(() -> new CommonException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
-        reviewImageRepository.deleteAll(reviewImageRepository.findAllByReview(review)); //soft delete 적용 필요
+        reviewImageRepository.deleteAll(
+                reviewImageRepository.findAllByReview(review)); // soft delete 적용 필요
         review.softDelete(memberUtil.getCurrentMember().getMemberId());
         updateProductRating(review.getProduct());
 

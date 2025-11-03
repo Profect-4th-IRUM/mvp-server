@@ -8,11 +8,10 @@ import com.irum.come2us.domain.category.presentation.dto.response.CategoryInfoRe
 import com.irum.come2us.domain.category.presentation.dto.response.CategoryResponse;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

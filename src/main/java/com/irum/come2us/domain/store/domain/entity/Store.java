@@ -11,7 +11,6 @@ import jakarta.persistence.Entity;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.Where;
 

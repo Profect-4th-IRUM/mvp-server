@@ -1,6 +1,5 @@
 package com.irum.come2us.domain.store.application.service;
 
-import com.irum.come2us.domain.member.application.util.MemberValidator;
 import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.product.presentation.dto.request.ProductCursorResponse;

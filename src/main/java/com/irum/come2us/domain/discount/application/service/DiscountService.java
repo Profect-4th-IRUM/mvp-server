@@ -7,20 +7,17 @@ import com.irum.come2us.domain.discount.presentation.dto.request.DiscountRegiste
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoListResponse;
 import com.irum.come2us.domain.discount.presentation.dto.response.DiscountInfoResponse;
 import com.irum.come2us.domain.member.application.util.MemberValidator;
-import com.irum.come2us.domain.member.domain.entity.Member;
 import com.irum.come2us.domain.product.domain.entity.Product;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.DiscountErrorCode;
-import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.ProductErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.StoreErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.util.List;
 import java.util.UUID;
-
-import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -125,5 +122,4 @@ public class DiscountService {
         memberUtil.assertMemberResourceAccess(store.getMember());
         return store;
     }
-
 }

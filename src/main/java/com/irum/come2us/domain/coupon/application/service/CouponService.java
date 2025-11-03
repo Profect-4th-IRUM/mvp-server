@@ -10,11 +10,10 @@ import com.irum.come2us.domain.member.domain.repository.MemberRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.CouponErrorCode;
 import com.irum.come2us.global.presentation.advice.exception.errorcode.MemberErrorCode;
+import com.irum.come2us.global.util.MemberUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
