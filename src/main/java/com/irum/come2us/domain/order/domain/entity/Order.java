@@ -20,7 +20,6 @@ import org.hibernate.annotations.UuidGenerator;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_order SET deleted_at = NOW() WHERE order_id=?")
 @SQLRestriction("deleted_at is null")
 @Table(name = "p_order")
 public class Order extends BaseEntity {
