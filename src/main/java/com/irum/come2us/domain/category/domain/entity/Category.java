@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
 @Table(name = "p_category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Where(clause = "deleted_at IS NULL")
 @Builder(access = AccessLevel.PRIVATE)
 public class Category extends BaseEntity {
 

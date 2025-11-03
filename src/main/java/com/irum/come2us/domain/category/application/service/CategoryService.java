@@ -11,6 +11,8 @@ import com.irum.come2us.global.presentation.advice.exception.errorcode.CategoryE
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.irum.come2us.global.util.MemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final MemberUtil memberUtil;
 
     @Transactional(readOnly = true)
     public List<CategoryInfoResponse> findRootCategories() {
@@ -90,6 +93,6 @@ public class CategoryService {
                         .findById(id)
                         .orElseThrow(
                                 () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
-        categoryRepository.delete(category);
+        category.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 }
