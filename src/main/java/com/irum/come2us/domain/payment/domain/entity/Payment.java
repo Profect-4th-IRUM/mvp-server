@@ -18,7 +18,6 @@ import org.hibernate.annotations.UuidGenerator;
 
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_payment SET deleted_at = NOW() WHERE payment_id=?")
 @SQLRestriction("deleted_at is null")
 @NoArgsConstructor
 @Entity
