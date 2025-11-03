@@ -64,8 +64,8 @@ public class DeliveryPolicyService {
 
         store.setDeliveryPolicy(null);
         deliveryPolicy.setStore(null);
-
-        deliveryPolicyRepository.delete(deliveryPolicy);
+        memberUtil.assertMemberResourceAccess(store.getMember());
+        deliveryPolicy.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 
     @Transactional(readOnly = true)
