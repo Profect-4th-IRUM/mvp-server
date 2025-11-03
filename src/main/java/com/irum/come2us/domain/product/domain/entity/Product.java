@@ -21,7 +21,6 @@ import org.hibernate.annotations.Where;
 @Getter
 @Table(name = "p_product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_product SET deleted_at = NOW() WHERE product_id = ?")
 @Where(clause = "deleted_at IS NULL")
 public class Product extends BaseEntity {
     @Id
