@@ -15,7 +15,6 @@ import org.hibernate.annotations.Where;
 @Getter
 @Entity
 @Table(name = "p_delivery_address")
-@SQLDelete(sql = "UPDATE p_delivery_address SET deleted_at = NOW() WHERE delivery_address_id = ?")
 @Where(clause = "deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DeliveryAddress extends BaseEntity {

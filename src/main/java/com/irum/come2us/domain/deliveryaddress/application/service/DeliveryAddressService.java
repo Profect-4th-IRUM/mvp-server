@@ -100,7 +100,8 @@ public class DeliveryAddressService {
                     .findTopByMemberOrderByCreatedAtDesc(member)
                     .ifPresent(DeliveryAddress::markAsDefault);
         }
-        deliveryAddressRepository.delete(address);
+        memberUtil.assertMemberResourceAccess(address.getMember());
+        address.softDelete(memberUtil.getCurrentMember().getMemberId());
     }
 
     private DeliveryAddress validDeliveryAddress(UUID deliveryAddressId) {
@@ -130,6 +131,6 @@ public class DeliveryAddressService {
         if (!StringUtils.hasText(newName) && !StringUtils.hasText(newContact))
             throw new CommonException(GlobalErrorCode.EMPTY_REQUEST);
         if (StringUtils.hasText(newName)) address.updateRecipientName(newName);
-        if (StringUtils.hasText(newContact)) address.updateAddressDetail(newContact);
+        if (StringUtils.hasText(newContact)) address.updateRecipientContact(newContact);
     }
 }
