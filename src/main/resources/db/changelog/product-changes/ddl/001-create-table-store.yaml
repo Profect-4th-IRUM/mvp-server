@@ -1,0 +1,91 @@
+
+databaseChangeLog:
+        - changeSet:
+                  id: create-table-1-store
+                  author: isak-kang
+                  comment: "p_store 테이블 생성 및 기본 컬럼 정의"
+
+                  changes:
+                          - createTable:
+                                    tableName: p_store
+                                    columns:
+                                            - column:
+                                                      name: store_id
+                                                      type: UUID
+                                                      constraints:
+                                                              primaryKey: true
+                                                              nullable: false
+
+                                            - column:
+                                                      name: store_name
+                                                      type: VARCHAR(255)
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: contact
+                                                      type: VARCHAR(255)
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: address
+                                                      type: VARCHAR(255)
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: business_registration_number
+                                                      type: VARCHAR(10)
+                                                      constraints:
+                                                              nullable: false
+                                                              unique: true
+
+                                            - column:
+                                                      name: telemarketing_registration_number
+                                                      type: VARCHAR(10)
+                                                      constraints:
+                                                              nullable: false
+                                                              unique: true
+
+                                            - column:
+                                                      name : member_id
+                                                      type : BIGINT
+                                                      constraints:
+                                                              nullable: false
+                                                              unique: true
+
+                                            - column:
+                                                      name: created_at
+                                                      type: TIMESTAMP WITH TIME ZONE
+
+                                            - column:
+                                                      name: created_by
+                                                      type: BIGINT
+
+                                            - column:
+                                                      name: updated_at
+                                                      type: TIMESTAMP WITH TIME ZONE
+
+                                            - column:
+                                                      name: updated_by
+                                                      type: BIGINT
+
+                                            - column:
+                                                      name: deleted_at
+                                                      type: TIMESTAMP WITH TIME ZONE
+
+                                            - column:
+                                                      name: deleted_by
+                                                      type: BIGINT
+
+                                            - addForeignKeyConstraint:
+                                                baseTableName: p_refund
+                                                baseColumnNames: member_id
+                                                referencedTableName: p_member
+                                                referencedColumnNames: member_id
+                                                constraintName: fk_member
+
+                  rollback:
+                          - dropTable:
+                                    tableName: p_store

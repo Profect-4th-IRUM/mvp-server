@@ -1,0 +1,121 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-order-data-1
+      author: hyeonji91
+      comment: "기본 주문 데이터 삽입 (배송중/실패)"
+
+      changes:
+        - insert:
+            tableName: p_order
+            columns:
+              - column:
+                  name: order_id
+                  value: "44444444-1111-1111-1111-111111111111"
+              - column:
+                  name: order_num
+                  value: "ORD-20251117"
+              - column:
+                  name: total_price
+                  valueNumeric: 30000
+              - column:
+                  name: delivery_fee
+                  valueNumeric: 3000
+              - column:
+                  name: delivery_request
+                  value: "문 앞에 놓아주세요."
+              - column:
+                  name: order_status_all
+                  value: "SHIPPED"
+              - column:
+                  name: payment_id
+                  value: "33333333-3333-3333-3333-333333333333" # payment service paymentId반영 (failed)
+              - column:
+                  name: member_id
+                  valueNumeric: 1
+              - column:
+                  name: store_id
+                  value: "7f000001-9a8c-1ca8-819a-8cfdb1f20000" # product service storeId 반영
+              - column:
+                  name: total_discount_amount
+                  valueNumeric: 3000
+              - column:
+                  name: paying_amount
+                  valueNumeric: 30000
+              - column:
+                  name: delivery_address_id
+                  value: "33333333-1111-1111-1111-111111111111"
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+        - insert:
+            tableName: p_order
+            columns:
+              - column:
+                  name: order_id
+                  value: "44444444-2222-2222-2222-222222222222"
+              - column:
+                  name: order_num
+                  value: "ORD-20251118"
+              - column:
+                  name: total_price
+                  valueNumeric: 9000
+              - column:
+                  name: delivery_fee
+                  valueNumeric: 2000
+              - column:
+                  name: delivery_request
+                  value: "문 앞에 놓아주세요."
+              - column:
+                  name: order_status_all
+                  value: "FAILED"
+              - column:
+                  name: payment_id
+                  value: "11111111-1111-1111-1111-111111111111" # payment service paymentId반영 (failed)
+              - column:
+                  name: member_id
+                  valueNumeric: 1
+              - column:
+                  name: store_id
+                  value: "7f000001-9a8c-1ca8-819a-8cfdb1f20000" # product service storeId 반영
+              - column:
+                  name: total_discount_amount
+                  valueNumeric: 1000
+              - column:
+                  name: paying_amount
+                  valueNumeric: 10000
+              - column:
+                  name: delivery_address_id
+                  value: "33333333-1111-1111-1111-111111111111"
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+      rollback:
+        - delete:
+            tableName: p_order
+            where: "order_id = '44444444-1111-1111-1111-111111111111'"

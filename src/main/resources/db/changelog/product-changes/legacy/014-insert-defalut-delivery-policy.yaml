@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-7
+      author: isak-kang
+      comment: "기본 배송비 정책 데이터 삽입"
+
+      changes:
+        - insert:
+            tableName: p_delivery_policy
+            columns:
+              - column: { name: delivery_policy_id, value: "40000000-0000-0000-0000-000000000001" }
+              - column: { name: default_delivery_fee, valueNumeric: 3000 }      # 기본 배송비 3,000원
+              - column: { name: minimum_quantity, valueNumeric: 1 }             # 최소 수량 1개
+              - column: { name: minimum_amount, valueNumeric: 30000 }           # 무료배송 기준 30,000원
+              - column: { name: store_id, value: "00000000-0000-0000-0000-000000000001" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+      rollback:
+        - delete:
+            tableName: p_delivery_policy
+            where: "delivery_policy_id IN (
+              '40000000-0000-0000-0000-000000000001'
+            )"

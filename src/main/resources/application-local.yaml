@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${LOCAL_POSTGRESQL_HOST:localhost}:${LOCAL_POSTGRESQL_PORT:5432}/${LOCAL_DB_NAME:come2us}
+    url: jdbc:postgresql://${LOCAL_POSTGRESQL_HOST:localhost}:${LOCAL_POSTGRESQL_PORT:5432}/${LOCAL_DB_NAME:come2us_monolithic}
     username: ${LOCAL_POSTGRESQL_USERNAME:developer}
     password: ${LOCAL_POSTGRESQL_PASSWORD:1234}
     driver-class-name: org.postgresql.Driver
@@ -13,13 +13,17 @@ spring:
         hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS: 200
         default_batch_fetch_size: 100
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: false
   sql:
     init:
       mode: never
       encoding: UTF-8
+  liquibase:
+    enabled: true
+    change-log: "classpath:db/changelog/db.changelog-master.yaml"
+    parameters:
+      searchPath: "classpath:db/changelog"
 
 file:
   storage: local

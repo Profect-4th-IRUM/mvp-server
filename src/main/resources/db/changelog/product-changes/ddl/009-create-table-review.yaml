@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-9-review
+      author: isak-kang
+      comment: "p_review 테이블 생성"
+
+      changes:
+        - createTable:
+            tableName: p_review
+            columns:
+              - column:
+                  name: review_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: content
+                  type: TEXT
+
+              - column:
+                  name: rate
+                  type: SMALLINT
+                  constraints:
+                    nullable: false
+                    checkConstraint: "rate BETWEEN 1 AND 5"
+
+              - column:
+                  name: member_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: order_detail_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: true
+
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        # FK: Review → Product
+        - addForeignKeyConstraint:
+            baseTableName: p_review
+            baseColumnNames: product_id
+            referencedTableName: p_product
+            referencedColumnNames: product_id
+            constraintName: fk_review_on_product
+
+        - addForeignKeyConstraint:
+            baseTableName: p_review
+            baseColumnNames: member_id
+            referencedTableName: p_member
+            referencedColumnNames: member_id
+            constraintName: fk_review_on_member
+
+      rollback:
+        - dropTable:
+            tableName: p_review

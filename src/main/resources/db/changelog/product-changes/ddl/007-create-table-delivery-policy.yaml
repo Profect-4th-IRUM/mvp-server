@@ -1,0 +1,76 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-7-delivery_policy
+      author: isak-kang
+      comment: "p_delivery_policy 테이블 생성"
+
+      changes:
+        - createTable:
+            tableName: p_delivery_policy
+            columns:
+              - column:
+                  name: delivery_policy_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: default_delivery_fee
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: minimum_quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: minimum_amount
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: store_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              # BaseEntity 공통 필드
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: p_delivery_policy
+            baseColumnNames: store_id
+            referencedTableName: p_store
+            referencedColumnNames: store_id
+            constraintName: fk_delivery_policy_store
+
+      rollback:
+        - dropTable:
+            tableName: p_delivery_policy

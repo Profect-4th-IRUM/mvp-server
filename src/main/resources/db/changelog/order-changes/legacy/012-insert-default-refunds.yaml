@@ -1,0 +1,86 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-refund-data-1
+      author: hyeonji91
+      comment: "기본 환불 데이터 삽입 (환불 반려/ 환불 승인)"
+
+      changes:
+        - insert:
+            tableName: p_refund
+            columns:
+              - column:
+                  name: refund_id
+                  value: "66666666-1111-1111-1111-111111111111" # 요청하신 샘플 UUID
+              - column:
+                  name: reason
+                  value: "CUSTOMER_REMORSE"
+              - column:
+                  name: description
+                  value: "단순 변심으로 환불 요청합니다."
+              - column:
+                  name: price
+                  valueNumeric: 30000
+              - column:
+                  name: refund_status
+                  value: "FAILED"
+              - column:
+                  name: order_id
+                  value: "44444444-1111-1111-1111-111111111111" # order id 반영 (failed상태)
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+        - insert:
+            tableName: p_refund
+            columns:
+              - column:
+                  name: refund_id
+                  value: "66666666-2222-2222-2222-222222222222" # 요청하신 샘플 UUID
+              - column:
+                  name: reason
+                  value: "CUSTOMER_REMORSE"
+              - column:
+                  name: description
+                  value: "단순 변심으로 환불 요청합니다."
+              - column:
+                  name: price
+                  valueNumeric: 10000
+              - column:
+                  name: refund_status
+                  value: "APPROVED"
+              - column:
+                  name: order_id
+                  value: "44444444-2222-2222-2222-222222222222" # order id 반영 (failed상태)
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+
+      rollback:
+        - delete:
+            tableName: p_refund
+            where: "refund_id IN ('66666666-1111-1111-1111-111111111111', '66666666-2222-2222-2222-222222222222')"

@@ -1,0 +1,98 @@
+databaseChangeLog:
+  ## member ##
+  - include:
+      file: member-changes/ddl/001-create-table-member.yaml
+      relativeToChangelogFile: true
+
+  ## product ##
+  - include:
+      file: product-changes/ddl/001-create-table-store.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/002-create-table-category.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/003-create-table-product.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/004-create-table-product-option-group.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/005-create-table-product-option-value.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/006-create-table-product-image.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/007-create-table-delivery-policy.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/008-create-table-discount.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/009-create-table-review.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/010-create-table-review-image.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/011-create-table-cart.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/ddl/012-create-index-category-depth.yaml
+      relativeToChangelogFile: true
+  ## order ##
+  - include:
+      file: order-changes/ddl/001-create-table-coupon.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: order-changes/ddl/002-create-table-applied-coupon.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: order-changes/ddl/003-create-table-delivery-address.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: order-changes/ddl/004-create-table-order.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: order-changes/ddl/005-create-table-order-detail.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: order-changes/ddl/006-create-table-refund.yaml
+      relativeToChangelogFile: true
+  ## payment ##
+  - include:
+      file: payment-changes/ddl/001-create-table-payment.yaml
+      relativeToChangelogFile: true
+
+#### test data ###
+
+# 테스트 데이터 ##
+# member
+  - include:
+      file: member-changes/dml/011-insert-default-master.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: member-changes/dml/012-insert-default-customers.sql
+      relativeToChangelogFile: true
+  - include:
+      file: member-changes/dml/013-insert-default-owners.sql
+      relativeToChangelogFile: true
+
+# product
+  - include:
+      file: product-changes/dml/021-insert-default-stores.sql
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/dml/022-insert-default-categories.sql
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/dml/023-insert-default-products.sql
+      relativeToChangelogFile: true
+  - include:
+      file: product-changes/dml/024-insert-default-product_option_groups_and_values.sql
+      relativeToChangelogFile: true
+# order
+  - include:
+      file: order-changes/dml/011-insert-default-delivery-address.sql
+      relativeToChangelogFile: true

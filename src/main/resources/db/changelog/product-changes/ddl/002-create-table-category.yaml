@@ -1,0 +1,68 @@
+
+databaseChangeLog:
+  - changeSet:
+      id: create-table-2-category
+      author: isak-kang
+      comment: "p_category 테이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_category
+            columns:
+              - column:
+                  name: category_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: parent_id
+                  type: UUID
+
+              - column:
+                  name: depth
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: p_category
+            baseColumnNames: parent_id
+            referencedTableName: p_category
+            referencedColumnNames: category_id
+            constraintName: fk_category_parent
+
+      rollback:
+        - dropTable:
+            tableName: p_category

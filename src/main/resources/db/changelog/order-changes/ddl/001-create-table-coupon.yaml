@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-1-coupon
+      author: hyeonji91
+      comment: "p_coupon 테이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_coupon
+            columns:
+              - column:
+                  name: coupon_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(20)
+              - column:
+                  name: discount_amount
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expiration
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: member_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: FK_COUPON_ON_MEMBER
+                    references: p_member(member_id)
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+      rollback:
+        - dropTable:
+            tableName: p_coupon
+

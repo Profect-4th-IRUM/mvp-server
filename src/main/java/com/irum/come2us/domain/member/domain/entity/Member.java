@@ -111,6 +111,6 @@ public class Member extends BaseTimeEntity {
         if (!PHONE_NUMBER_PATTERN.matcher(contact).matches()) {
             throw new CommonException(MemberErrorCode.INVALID_CONTACT);
         }
-        return email;
+        return contact;
     }
 }

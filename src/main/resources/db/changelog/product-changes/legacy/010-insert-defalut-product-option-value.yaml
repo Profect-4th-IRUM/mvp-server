@@ -1,0 +1,131 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-5
+      author: isak-kang
+      comment: "기본 옵션값 데이터 삽입"
+
+      changes:
+        # --------------------------
+        # 상품 1 - 색상 옵션
+        # option_group_id: 10000000-...-0001 ~ 0003
+        # --------------------------
+        - insert:
+            tableName: p_product_option_value
+            columns:
+              - column: { name: option_value_id, value: "20000000-0000-0000-0000-000000000001" }
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000001" }
+              - column: { name: name, value: "화이트" }
+              - column: { name: stock_quantity, valueNumeric: 50 }
+              - column: { name: extra_price, valueNumeric: 0 }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product_option_value
+            columns:
+              - column: { name: option_value_id, value: "20000000-0000-0000-0000-000000000002" }
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000002" }
+              - column: { name: name, value: "블랙" }
+              - column: { name: stock_quantity, valueNumeric: 50 }
+              - column: { name: extra_price, valueNumeric: 0 }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product_option_value
+            columns:
+              - column: { name: option_value_id, value: "20000000-0000-0000-0000-000000000003" }
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000003" }
+              - column: { name: name, value: "네이비" }
+              - column: { name: stock_quantity, valueNumeric: 50 }
+              - column: { name: extra_price, valueNumeric: 0 }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+
+        # --------------------------
+        # 상품 2 - 용량 옵션
+        # option_group_id: 10000000-...-0004, 0005
+        # --------------------------
+        - insert:
+            tableName: p_product_option_value
+            columns:
+              - column: { name: option_value_id, value: "20000000-0000-0000-0000-000000000004" }
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000004" }
+              - column: { name: name, value: "30ml" }
+              - column: { name: stock_quantity, valueNumeric: 30 }
+              - column: { name: extra_price, valueNumeric: 0 }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product_option_value
+            columns:
+              - column: { name: option_value_id, value: "20000000-0000-0000-0000-000000000005" }
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000005" }
+              - column: { name: name, value: "50ml" }
+              - column: { name: stock_quantity, valueNumeric: 20 }
+              - column: { name: extra_price, valueNumeric: 2000 }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+
+        # --------------------------
+        # 상품 3 - 컬러톤 옵션
+        # option_group_id: 10000000-...-0006
+        # --------------------------
+        - insert:
+            tableName: p_product_option_value
+            columns:
+              - column: { name: option_value_id, value: "20000000-0000-0000-0000-000000000006" }
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000006" }
+              - column: { name: name, value: "로즈" }
+              - column: { name: stock_quantity, valueNumeric: 40 }
+              - column: { name: extra_price, valueNumeric: 0 }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product_option_value
+            columns:
+              - column: { name: option_value_id, value: "20000000-0000-0000-0000-000000000007" }
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000006" }
+              - column: { name: name, value: "레드" }
+              - column: { name: stock_quantity, valueNumeric: 40 }
+              - column: { name: extra_price, valueNumeric: 1000 }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+      rollback:
+        - delete:
+            tableName: p_product_option_value
+            where: "option_value_id IN (
+              '20000000-0000-0000-0000-000000000001',
+              '20000000-0000-0000-0000-000000000002',
+              '20000000-0000-0000-0000-000000000003',
+              '20000000-0000-0000-0000-000000000004',
+              '20000000-0000-0000-0000-000000000005',
+              '20000000-0000-0000-0000-000000000006',
+              '20000000-0000-0000-0000-000000000007'
+            )"

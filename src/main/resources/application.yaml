@@ -6,7 +6,7 @@ spring:
     include:
       - redis
       - toss
-logback:
-  log-path: ./logs
-
-
+#logback:
+#  log-path: ./logs
+#
+#

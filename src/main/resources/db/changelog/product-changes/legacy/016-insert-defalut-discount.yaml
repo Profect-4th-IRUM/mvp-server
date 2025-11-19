@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-8
+      author: isak-kang
+      comment: "기본 할인 데이터 3개 삽입"
+
+      changes:
+        - insert:
+            tableName: p_discount
+            columns:
+              - column: { name: discount_id, value: "50000000-0000-0000-0000-000000000001" }
+              - column: { name: name, value: "신규회원 웰컴 할인" }
+              - column: { name: amount, valueNumeric: 1000 }     # 1,000원 할인
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000001" }  # 상품1
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_discount
+            columns:
+              - column: { name: discount_id, value: "50000000-0000-0000-0000-000000000002" }
+              - column: { name: name, value: "겨울 보습 시즌 할인" }
+              - column: { name: amount, valueNumeric: 1500 }     # 1,500원 할인
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000002" }  # 상품2
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_discount
+            columns:
+              - column: { name: discount_id, value: "50000000-0000-0000-0000-000000000003" }
+              - column: { name: name, value: "봄 메이크업 할인" }
+              - column: { name: amount, valueNumeric: 2000 }     # 2,000원 할인
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000003" }  # 상품3
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+      rollback:
+        - delete:
+            tableName: p_discount
+            where: "discount_id IN (
+              '50000000-0000-0000-0000-000000000001',
+              '50000000-0000-0000-0000-000000000002',
+              '50000000-0000-0000-0000-000000000003'
+            )"

@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-1
+      author: isak-kang
+      comment: "상점 데이터 삽입"
+
+      changes:
+        - insert:
+            tableName: p_store
+            columns:
+              - column:
+                  name: store_id
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: store_name
+                  value: "홍콩반점"
+              - column:
+                  name: contact
+                  value: "010-0000-0000"
+              - column:
+                  name: address
+                  value: "서울시 강남구 테헤란로 145"
+              - column:
+                  name: business_registration_number
+                  value: "0123456789"
+              - column:
+                  name: telemarketing_registration_number
+                  value: "1234567890"
+              - column:
+                  name: member
+                  value: "1"
+              - column:
+                  name: created_at
+                  valueComputed: now()
+              - column:
+                  name: created_by
+                  value: "1"
+              - column:
+                  name: updated_at
+                  valueComputed: now()
+              - column:
+                  name : updated_by
+                  value: "1"
+
+      rollback:
+        - delete:
+            tableName: p_store
+            where: " business_registration_number IN ('0123456789')"
