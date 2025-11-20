@@ -12,3 +12,5 @@ spring:
     init:
       mode: never
       encoding: UTF-8
+  liquibase:
+    enabled: false
