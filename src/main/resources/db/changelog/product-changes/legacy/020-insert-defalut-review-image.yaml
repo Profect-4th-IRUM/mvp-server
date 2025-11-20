@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-10
+      author: isak-kang
+      comment: "기본 리뷰 이미지 데이터 삽입"
+
+      changes:
+        - insert:
+            tableName: p_review_image
+            columns:
+              - column: { name: review_image_id, value: "91000000-0000-0000-0000-000000000001" }
+              - column: { name: image_url, value: "https://example.com/review1_img1.jpg" }
+              - column: { name: review_id, value: "90000000-0000-0000-0000-000000000001" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+
+
+      rollback:
+        - delete:
+            tableName: p_review_image
+            where: "review_image_id IN (
+                '91000000-0000-0000-0000-000000000001'
+            )"

@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-8-discount
+      author: isak-kang
+      comment: "p_discount 테이블 생성"
+
+      changes:
+        - createTable:
+            tableName: p_discount
+            columns:
+              - column:
+                  name: discount_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: amount
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              # BaseEntity 공통 필드
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: p_discount
+            baseColumnNames: product_id
+            referencedTableName: p_product
+            referencedColumnNames: product_id
+            constraintName: fk_discount_product
+
+      rollback:
+        - dropTable:
+            tableName: p_discount

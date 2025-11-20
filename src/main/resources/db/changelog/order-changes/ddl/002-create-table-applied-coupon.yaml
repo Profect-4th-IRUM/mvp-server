@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-2-applied-coupon
+      author: hyeonji91
+      comment: "p_appliedcoupon 테이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_applied_coupon
+            columns:
+              - column:
+                  name: applied_coupon_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: payment_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: coupon_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: FK_APPLIED_COUPON_ON_COUPON
+                    references: p_coupon(coupon_id)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - addForeignKeyConstraint:
+                  baseTableName: p_applied_coupon
+                  baseColumnNames: payment_id
+                  referencedTableName: p_payment
+                  referencedColumnNames: payment_id
+                  constraintName: fk_applied_coupon_on_payment
+      rollback:
+        - dropTable:
+            tableName: p_applied_coupon

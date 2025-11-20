@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-3-delivery_address
+      author: hyeonji91
+      comment: "p_delivery_address 테이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_delivery_address
+            columns:
+              - column:
+                  name: delivery_address_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: member_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: FK_DELIVERY_ADDRESS_ON_MEMBER
+                    references: p_member(member_id)
+                    nullable: false
+              # --- @Embedded Address 필드 ---
+              - column:
+                  name: postal_code
+                  type: VARCHAR(5)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sigungu
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: road_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address_detail
+                  type: VARCHAR(255)
+              # ---------------------------------
+              - column:
+                  name: recipient_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: recipient_contact
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_default
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+      rollback:
+        - dropTable:
+            tableName: p_delivery_address

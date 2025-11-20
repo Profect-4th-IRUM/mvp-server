@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-4-option-group
+      author: isak-kang
+      comment: "p_product_option_group 테이블 생성"
+
+      changes:
+        - createTable:
+            tableName: p_product_option_group
+            columns:
+              - column:
+                  name: option_group_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: p_product_option_group
+            baseColumnNames: product_id
+            referencedTableName: p_product
+            referencedColumnNames: product_id
+            constraintName: fk_option_group_product
+
+      rollback:
+        - dropTable:
+            tableName: p_product_option_group

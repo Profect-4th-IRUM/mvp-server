@@ -1,0 +1,110 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-3-product
+      author: isak-kang
+      comment: "p_product 테이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_product
+            columns:
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: store_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: category_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: detail_description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: is_public
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: avg_rating
+                  type: DOUBLE PRECISION
+
+              - column:
+                  name: review_count
+                  type: INT
+
+              - column:
+                  name: price
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        # Store FK
+        - addForeignKeyConstraint:
+            baseTableName: p_product
+            baseColumnNames: store_id
+            referencedTableName: p_store
+            referencedColumnNames: store_id
+            constraintName: fk_product_store
+
+        # Category FK
+        - addForeignKeyConstraint:
+            baseTableName: p_product
+            baseColumnNames: category_id
+            referencedTableName: p_category
+            referencedColumnNames: category_id
+            constraintName: fk_product_category
+
+      rollback:
+        - dropTable:
+            tableName: p_product

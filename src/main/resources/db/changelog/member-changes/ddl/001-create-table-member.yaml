@@ -1,0 +1,68 @@
+databaseChangeLog:
+        - changeSet:
+                  id: create-table-1-member
+                  author: willjsw
+                  comment: "p_member 테이블 생성 및 기본 컬럼 정의"
+
+                  changes:
+                          - createTable:
+                                    tableName: p_member
+                                    columns:
+                                            - column:
+                                                      name: member_id
+                                                      type: BIGINT
+                                                      autoIncrement: true
+                                                      constraints:
+                                                              primaryKey: true
+                                                              nullable: false
+
+                                            - column:
+                                                      name: email
+                                                      type: VARCHAR(255)
+                                                      constraints:
+                                                              nullable: false
+                                                              unique: true
+
+                                            - column:
+                                                      name: password
+                                                      type: VARCHAR(255)
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: name
+                                                      type: VARCHAR(255)
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: contact
+                                                      type: VARCHAR(255)
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: role
+                                                      type: VARCHAR(20)
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: created_at
+                                                      type: TIMESTAMP WITH TIME ZONE
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: updated_at
+                                                      type: TIMESTAMP WITH TIME ZONE
+                                                      constraints:
+                                                              nullable: false
+
+                                            - column:
+                                                      name: deleted_at
+                                                      type: TIMESTAMP WITH TIME ZONE
+
+                  rollback:
+                          - dropTable:
+                                    tableName: p_member

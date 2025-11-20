@@ -1,0 +1,90 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-11-cart
+      author: willjsw
+      comment: "p_cart 테이블 생성"
+
+      changes:
+        - createTable:
+            tableName: p_cart
+            columns:
+              - column:
+                  name: cart_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: member_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: option_value_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: p_cart
+            baseColumnNames: member_id
+            referencedTableName: p_member
+            referencedColumnNames: member_id
+            constraintName: fk_cart_member
+
+        - addForeignKeyConstraint:
+            baseTableName: p_cart
+            baseColumnNames: option_value_id
+            referencedTableName: p_product_option_value
+            referencedColumnNames: option_value_id
+            constraintName: fk_cart_option_value
+
+        - createIndex:
+            indexName: idx_cart_member_id
+            tableName: p_cart
+            columns:
+              - column:
+                  name: member_id
+
+        - createIndex:
+            indexName: idx_cart_option_value_id
+            tableName: p_cart
+            columns:
+              - column:
+                  name: option_value_id
+
+      rollback:
+        - dropTable:
+            tableName: p_cart

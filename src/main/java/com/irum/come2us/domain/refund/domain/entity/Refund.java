@@ -30,7 +30,8 @@ public class Refund extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private RefundReason reason;
 
-    @Lob private String description;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Column(nullable = false)
     private int price;

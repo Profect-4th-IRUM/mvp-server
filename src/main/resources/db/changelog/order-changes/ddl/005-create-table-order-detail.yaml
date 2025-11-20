@@ -1,0 +1,101 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-5-order-detail
+      author: hyeonji91
+      comment: "p_order_detail 테이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_order_detail
+            columns:
+              - column:
+                  name: order_detail_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: option_value_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: option_name
+                  type: VARCHAR(255)
+              - column:
+                  name: price
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_status_indi
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tracking_number
+                  type: VARCHAR(255)
+              - column:
+                  name: arrived_date
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: order_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: FK_ORDER_DETAIL_ON_ORDER
+                    references: p_order(order_id)
+                    deleteCascade: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - addForeignKeyConstraint:
+                  baseTableName: p_order_detail
+                  baseColumnNames: option_value_id
+                  referencedTableName: p_product_option_value
+                  referencedColumnNames: option_value_id
+                  constraintName: fk_option_value_id
+              - addForeignKeyConstraint:
+                  baseTableName: p_order_detail
+                  baseColumnNames: product_id
+                  referencedTableName: p_product
+                  referencedColumnNames: product_id
+                  constraintName: fk_product_id
+
+      rollback:
+        - dropTable:
+            tableName: p_order_detail

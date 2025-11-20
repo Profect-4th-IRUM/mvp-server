@@ -78,7 +78,7 @@ public class Store extends BaseEntity {
         this.telemarketingRegistrationNumber =
                 validTelemarketingRegistrationNumber(telemarketingRegistrationNumber);
         this.member = member;
-        this.deliveryPolicy = null;
+        this.deliveryPolicy = deliveryPolicy; // 삭제
     }
 
     public static Store createStore(

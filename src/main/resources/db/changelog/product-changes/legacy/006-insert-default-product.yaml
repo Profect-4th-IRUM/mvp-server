@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-3
+      author: isak-kang
+      comment: "기본 상품 3개 삽입"
+
+      changes:
+        - insert:
+            tableName: p_product
+            columns:
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000001" }
+              - column: { name: store_id, value: "00000000-0000-0000-0000-000000000001" }
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000111" } # 패션 > 남성의류 > 상의
+              - column: { name: name, value: "남성 기본 반팔티" }
+              - column: { name: description, value: "가볍고 편한 기본 반팔" }
+              - column: { name: detail_description, value: "코튼 100%, 데일리 착용" }
+              - column: { name: is_public, valueBoolean: true }
+              - column: { name: avg_rating, valueNumeric: 0 }
+              - column: { name: review_count, valueNumeric: 0 }
+              - column: { name: price, valueNumeric: 12900 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product
+            columns:
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000002" }
+              - column: { name: store_id, value: "00000000-0000-0000-0000-000000000001" }
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000212" } # 뷰티 > 스킨케어 > 에센스
+              - column: { name: name, value: "수분 에센스" }
+              - column: { name: description, value: "촉촉한 데일리 에센스" }
+              - column: { name: detail_description, value: "모든 피부타입 사용 가능" }
+              - column: { name: is_public, valueBoolean: true }
+              - column: { name: avg_rating, valueNumeric: 0 }
+              - column: { name: review_count, valueNumeric: 0 }
+              - column: { name: price, valueNumeric: 23900 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product
+            columns:
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000003" }
+              - column: { name: store_id, value: "00000000-0000-0000-0000-000000000001" }
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000221" } # 뷰티 > 메이크업 > 립
+              - column: { name: name, value: "매트 립스틱" }
+              - column: { name: description, value: "부드러운 발림성의 립스틱" }
+              - column: { name: detail_description, value: "지속력 좋은 매트 텍스처" }
+              - column: { name: is_public, valueBoolean: true }
+              - column: { name: avg_rating, valueNumeric: 0 }
+              - column: { name: review_count, valueNumeric: 0 }
+              - column: { name: price, valueNumeric: 19900 }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+      rollback:
+        - delete:
+            tableName: p_product
+            where: "product_id IN (
+                '11111111-1111-1111-1111-111111111111',
+                '22222222-2222-2222-2222-222222222222',
+                '33333333-3333-3333-3333-333333333333'
+            )"

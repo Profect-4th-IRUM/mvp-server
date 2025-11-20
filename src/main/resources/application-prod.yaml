@@ -13,7 +13,7 @@ spring:
         session.events.log.LOG_QUERIES_SLOWER_THAN_MS: 200
         default_batch_fetch_size: 100
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   sql:
     init:

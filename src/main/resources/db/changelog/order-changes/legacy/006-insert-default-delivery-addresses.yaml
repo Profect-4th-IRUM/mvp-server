@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-delivery-address-data-1
+      author: hyeonji91
+      comment: "기본 배송지 주소 데이터 삽입"
+
+      changes:
+        - insert:
+            tableName: p_delivery_address
+            columns:
+              - column:
+                  name: delivery_address_id
+                  value: "33333333-1111-1111-1111-111111111111"
+              - column:
+                  name: member_id
+                  valueNumeric: 1
+              - column:
+                  name: postal_code
+                  value: "12345"
+              - column:
+                  name: city
+                  value: "서울특별시"
+              - column:
+                  name: sigungu
+                  value: "강남구"
+              - column:
+                  name: road_name
+                  value: "테헤란로145"
+              - column:
+                  name: address_detail
+                  value: "13층"
+              - column:
+                  name: recipient_name
+                  value: "홍길동"
+              - column:
+                  name: recipient_contact
+                  value: "010-1234-5678"
+              - column:
+                  name: is_default
+                  valueBoolean: true
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+      rollback:
+        - delete:
+            tableName: p_delivery_address
+            where: "delivery_address_id = '33333333-1111-1111-1111-111111111111'"
+

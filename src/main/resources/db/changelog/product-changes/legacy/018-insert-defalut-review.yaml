@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-9
+      author: isak-kang
+      comment: "기본 리뷰 데이터 3개 삽입"
+
+      changes:
+        - insert:
+            tableName: p_review
+            columns:
+              - column: { name: review_id, value: "90000000-0000-0000-0000-000000000001" }
+              - column: { name: content, value: "가격 대비 만족도가 높아요!" }
+              - column: { name: rate, valueNumeric: 5 }
+              - column: { name: member_id, valueNumeric: 1 }
+              - column: { name: order_detail_id, value: "55555555-1111-1111-1111-111111111111" }
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000001" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+      rollback:
+        - delete:
+            tableName: p_review
+            where: "review_id IN (
+                '90000000-0000-0000-0000-000000000001'
+            )"

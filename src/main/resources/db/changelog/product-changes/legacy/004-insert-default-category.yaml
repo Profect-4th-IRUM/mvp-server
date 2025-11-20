@@ -1,0 +1,310 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-2
+      author: isak-kang
+      comment: "카테고리 기본 데이터 삽입(root + sub)"
+
+      changes:
+        # ------ ROOT CATEGORIES (depth = 1) ------
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000100" }
+              - column: { name: name, value: "패션" }
+              - column: { name: depth, valueNumeric: 1 }
+              - column: { name: parent_id, value: null }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000200" }
+              - column: { name: name, value: "뷰티" }
+              - column: { name: depth, valueNumeric: 1 }
+              - column: { name: parent_id, value: null }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000300" }
+              - column: { name: name, value: "디지털" }
+              - column: { name: depth, valueNumeric: 1 }
+              - column: { name: parent_id, value: null }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000400" }
+              - column: { name: name, value: "식품" }
+              - column: { name: depth, valueNumeric: 1 }
+              - column: { name: parent_id, value: null }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000500" }
+              - column: { name: name, value: "스포츠" }
+              - column: { name: depth, valueNumeric: 1 }
+              - column: { name: parent_id, value: null }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+
+
+        # ------ SUB CATEGORIES (depth = 2) ------
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000110" }
+              - column: { name: name, value: "남성의류" }
+              - column: { name: depth, valueNumeric: 2 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000100" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000120" }
+              - column: { name: name, value: "여성의류" }
+              - column: { name: depth, valueNumeric: 2 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000100" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000130" }
+              - column: { name: name, value: "패션잡화" }
+              - column: { name: depth, valueNumeric: 2 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000100" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000210" }
+              - column: { name: name, value: "스킨케어" }
+              - column: { name: depth, valueNumeric: 2 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000200" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000220" }
+              - column: { name: name, value: "메이크업" }
+              - column: { name: depth, valueNumeric: 2 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000200" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000230" }
+              - column: { name: name, value: "헤어/바디" }
+              - column: { name: depth, valueNumeric: 2 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000200" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+
+        # ------ DEPTH 3 (sub-of-sub) ------
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000111" }
+              - column: { name: name, value: "상의" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000110" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000112" }
+              - column: { name: name, value: "하의" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000110" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000113" }
+              - column: { name: name, value: "아우터" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000110" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000121" }
+              - column: { name: name, value: "원피스" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000120" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000122" }
+              - column: { name: name, value: "상의" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000120" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000123" }
+              - column: { name: name, value: "아우터" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000120" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000211" }
+              - column: { name: name, value: "토너" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000210" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000212" }
+              - column: { name: name, value: "에센스" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000210" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000213" }
+              - column: { name: name, value: "크림" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000210" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000221" }
+              - column: { name: name, value: "립" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000220" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000222" }
+              - column: { name: name, value: "아이" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000220" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_category
+            columns:
+              - column: { name: category_id, value: "00000000-0000-0000-0000-000000000223" }
+              - column: { name: name, value: "페이스" }
+              - column: { name: depth, valueNumeric: 3 }
+              - column: { name: parent_id, value: "00000000-0000-0000-0000-000000000220" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+      rollback:
+        - delete:
+            tableName: p_category
+            where: "category_id IN (
+                '00000000-0000-0000-0000-000000000100',
+                '00000000-0000-0000-0000-000000000200',
+                '00000000-0000-0000-0000-000000000300',
+                '00000000-0000-0000-0000-000000000400',
+                '00000000-0000-0000-0000-000000000500',
+
+                '00000000-0000-0000-0000-000000000110',
+                '00000000-0000-0000-0000-000000000120',
+                '00000000-0000-0000-0000-000000000130',
+                '00000000-0000-0000-0000-000000000210',
+                '00000000-0000-0000-0000-000000000220',
+                '00000000-0000-0000-0000-000000000230',
+
+                '00000000-0000-0000-0000-000000000111',
+                '00000000-0000-0000-0000-000000000112',
+                '00000000-0000-0000-0000-000000000113',
+
+                '00000000-0000-0000-0000-000000000121',
+                '00000000-0000-0000-0000-000000000122',
+                '00000000-0000-0000-0000-000000000123',
+
+                '00000000-0000-0000-0000-000000000211',
+                '00000000-0000-0000-0000-000000000212',
+                '00000000-0000-0000-0000-000000000213',
+
+                '00000000-0000-0000-0000-000000000221',
+                '00000000-0000-0000-0000-000000000222',
+                '00000000-0000-0000-0000-000000000223'
+            )"

@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-4-order
+      author: hyeonji91
+      comment: "p_order 테이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_order
+            columns:
+              - column:
+                  name: order_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: order_num
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: INTEGER
+              - column:
+                  name: delivery_fee
+                  type: INTEGER
+              - column:
+                  name: delivery_request
+                  type: VARCHAR(255)
+              - column:
+                  name: order_status_all
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payment_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: member_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: FK_ORDER_ON_MEMBER
+                    references: p_member(member_id)
+              - column:
+                  name: store_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: FK_ORDER_ON_STORE
+                    references: p_store(store_id)
+              - column:
+                  name: total_discount_amount
+                  type: INTEGER
+              - column:
+                  name: paying_amount
+                  type: INTEGER
+              - column:
+                  name: delivery_address_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: FK_ORDER_ON_DELIVERY_ADDRESS
+                    references: p_delivery_address(delivery_address_id)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - addForeignKeyConstraint:
+                  baseTableName: p_order
+                  baseColumnNames: payment_id
+                  referencedTableName: p_payment
+                  referencedColumnNames: payment_id
+                  constraintName: fk_payment_on_order
+      rollback:
+        - dropTable:
+            tableName: p_order

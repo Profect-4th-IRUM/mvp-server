@@ -1,0 +1,168 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-order-detail-data-1
+      author: hyeonji91
+      comment: "기본 상세 주문 데이터 삽입"
+
+      changes:
+        - insert:
+            tableName: p_order_detail
+            columns:
+              - column:
+                  name: order_detail_id
+                  value: "55555555-1111-1111-1111-111111111111"
+              - column:
+                  name: product_id
+                  value: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1" # TODO : product 맞춰 수정
+              - column:
+                  name: option_value_id
+                  value: "b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1" # TODO : product 맞춰 수정
+              - column:
+                  name: product_name
+                  value: "샘플 상품" # TODO : product 맞춰 수정
+              - column:
+                  name: option_name
+                  value: "L (Large)" # TODO : product 맞춰 수정
+              - column:
+                  name: price
+                  valueNumeric: 5000
+              - column:
+                  name: quantity
+                  valueNumeric: 2
+              - column:
+                  name: order_status_indi
+                  value: "SHIPPED"
+              - column:
+                  name: tracking_number
+                  value: null
+              - column:
+                  name: arrived_date
+                  value: null
+              - column:
+                  name: order_id
+                  value: "44444444-1111-1111-1111-111111111111"
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+        - insert:
+            tableName: p_order_detail
+            columns:
+              - column:
+                  name: order_detail_id
+                  value: "55555555-2222-2222-2222-222222222222"
+              - column:
+                  name: product_id
+                  value: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1" # TODO : product 맞춰 수정
+              - column:
+                  name: option_value_id
+                  value: "b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1" # TODO : product 맞춰 수정
+              - column:
+                  name: product_name
+                  value: "샘플 상품" # TODO : product 맞춰 수정
+              - column:
+                  name: option_name
+                  value: "L (Large)" # TODO : product 맞춰 수정
+              - column:
+                  name: price
+                  valueNumeric: 10000
+              - column:
+                  name: quantity
+                  valueNumeric: 2
+              - column:
+                  name: order_status_indi
+                  value: "SHIPPED"
+              - column:
+                  name: tracking_number
+                  value: null
+              - column:
+                  name: arrived_date
+                  value: null
+              - column:
+                  name: order_id
+                  value: "44444444-1111-1111-1111-111111111111"
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+        - insert:
+            tableName: p_order_detail
+            columns:
+              - column:
+                  name: order_detail_id
+                  value: "55555555-3333-3333-3333-333333333333"
+              - column:
+                  name: product_id
+                  value: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1" # TODO : product 맞춰 수정
+              - column:
+                  name: option_value_id
+                  value: "b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1" # TODO : product 맞춰 수정
+              - column:
+                  name: product_name
+                  value: "샘플 상품" # TODO : product 맞춰 수정
+              - column:
+                  name: option_name
+                  value: "L (Large)" # TODO : product 맞춰 수정
+              - column:
+                  name: price
+                  valueNumeric: 9000
+              - column:
+                  name: quantity
+                  valueNumeric: 1
+              - column:
+                  name: order_status_indi
+                  value: "FAILED"
+              - column:
+                  name: tracking_number
+                  value: null
+              - column:
+                  name: arrived_date
+                  value: null
+              - column:
+                  name: order_id
+                  value: "44444444-2222-2222-2222-222222222222"
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+              - column:
+                  name: created_by
+                  valueNumeric: 1
+              - column:
+                  name: updated_by
+                  valueNumeric: 1
+
+
+      rollback:
+        - delete:
+            tableName: p_order_detail
+            where: "order_detail_id IN ( '55555555-1111-1111-1111-111111111111', '55555555-2222-2222-2222-222222222222','55555555-3333-3333-3333-333333333333')"

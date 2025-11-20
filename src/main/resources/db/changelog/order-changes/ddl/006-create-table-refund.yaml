@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-6-refund
+      author: hyeonji91
+      comment: "p_refund 태이블 생성 및 기본 컬럼 정의"
+
+      changes:
+        - createTable:
+            tableName: p_refund
+            columns:
+              - column:
+                  name: refund_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: reason
+                  type: VARCHAR(20)
+              - column:
+                  name: description
+                  type: CLOB
+              - column:
+                  name: price
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: refund_status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: FK_REFUND_ON_ORDER
+                    references: p_order(order_id)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_by
+                  type: BIGINT
+              - column:
+                  name: updated_by
+                  type: BIGINT
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+      rollback:
+        - dropTable:
+            tableName: p_refund

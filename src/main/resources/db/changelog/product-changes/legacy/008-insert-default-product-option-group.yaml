@@ -1,0 +1,81 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-4
+      author: isak-kang
+      comment: "기본 옵션그룹 데이터 삽입"
+
+      changes:
+        - insert:
+            tableName: p_product_option_group
+            columns:
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000001" }
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000001" } # 상품 1
+              - column: { name: name, value: "색상" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_product_option_group
+            columns:
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000002" }
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000001" } # 상품 1
+              - column: { name: name, value: "사이즈" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_product_option_group
+            columns:
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000003" }
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000001" } # 상품 1
+              - column: { name: name, value: "크기" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product_option_group
+            columns:
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000004" }
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000002" } # 상품 2
+              - column: { name: name, value: "용량" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+        - insert:
+            tableName: p_product_option_group
+            columns:
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000005" }
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000002" } # 상품 2
+              - column: { name: name, value: "크기" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+        - insert:
+            tableName: p_product_option_group
+            columns:
+              - column: { name: option_group_id, value: "10000000-0000-0000-0000-000000000006" }
+              - column: { name: product_id, value: "00000000-0000-0000-0000-000000000003" } # 상품 3
+              - column: { name: name, value: "컬러톤" }
+              - column: { name: created_at, valueDate: now() }
+              - column: { name: created_by, value: "1" }
+              - column: { name: updated_at, valueDate: now() }
+              - column: { name: updated_by, value: "1" }
+
+      rollback:
+        - delete:
+            tableName: p_product_option_group
+            where: "option_group_id IN (
+              '10000000-0000-0000-0000-000000000001',
+              '10000000-0000-0000-0000-000000000002',
+              '10000000-0000-0000-0000-000000000003',
+              '10000000-0000-0000-0000-000000000004',
+              '10000000-0000-0000-0000-000000000005',
+              '10000000-0000-0000-0000-000000000006',
+            )"

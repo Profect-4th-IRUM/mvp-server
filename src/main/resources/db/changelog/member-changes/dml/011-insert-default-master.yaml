@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-data-1-master
+      author: willjsw
+      comment: "기본 관리자/고객/마스터 계정 데이터 삽입"
+
+      changes:
+        - insert:
+            tableName: p_member
+            columns:
+              - column:
+                  name: member_id
+                  value: "100000"
+              - column:
+                  name: email
+                  value: "master@example.com"
+              - column:
+                  name: password
+                  value: "$2a$10$2SyZyEfScRkD6EBeVRk.buXOh.pNKzEKrVjFNlg6I2yXR1zFjLmxS"
+              - column:
+                  name: name
+                  value: "master"
+              - column:
+                  name: contact
+                  value: "010-0000-0000"
+              - column:
+                  name: role
+                  value: "MASTER"
+              - column:
+                  name: created_at
+                  valueDate: now()
+              - column:
+                  name: updated_at
+                  valueDate: now()
+              - column:
+                  name: deleted_at
+                  value: null
+
+      rollback:
+        - delete:
+            tableName: p_member
+            where: "member_id=100000"

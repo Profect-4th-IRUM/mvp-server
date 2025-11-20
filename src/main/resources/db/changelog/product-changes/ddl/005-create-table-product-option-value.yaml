@@ -1,0 +1,73 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-5-option-value
+      author: isak-kang
+      comment: "p_product_option_value 테이블 생성"
+
+      changes:
+        - createTable:
+            tableName: p_product_option_value
+            columns:
+              - column:
+                  name: option_value_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: option_group_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: stock_quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: extra_price
+                  type: INT
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: created_by
+                  type: BIGINT
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: updated_by
+                  type: BIGINT
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: p_product_option_value
+            baseColumnNames: option_group_id
+            referencedTableName: p_product_option_group
+            referencedColumnNames: option_group_id
+            constraintName: fk_option_value_group
+
+      rollback:
+        - dropTable:
+            tableName: p_product_option_value
