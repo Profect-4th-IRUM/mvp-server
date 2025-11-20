@@ -35,7 +35,7 @@ SELECT
     '100000',
     CURRENT_TIMESTAMP,
     '100000'
-FROM generate_series(1, 1000) AS i
+FROM generate_series(1, 100000) AS i
          CROSS JOIN LATERAL (
     SELECT store_id
     FROM p_store
