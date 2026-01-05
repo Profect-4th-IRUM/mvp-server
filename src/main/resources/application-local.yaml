@@ -1,24 +1,37 @@
 spring:
+  task:
+    scheduling:
+      enabled: false
   datasource:
-    url: jdbc:postgresql://${LOCAL_POSTGRESQL_HOST:localhost}:${LOCAL_POSTGRESQL_PORT:5432}/${LOCAL_DB_NAME:come2us_monolithic}
+    url: jdbc:postgresql://${LOCAL_POSTGRESQL_HOST:localhost}:${LOCAL_POSTGRESQL_PORT:5432}/${LOCAL_DB_NAME:come2us}
     username: ${LOCAL_POSTGRESQL_USERNAME:developer}
     password: ${LOCAL_POSTGRESQL_PASSWORD:1234}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     show-sql: false
     properties:
       hibernate:
-        hibernate.format_sql: true
-        hibernate.highlight_sql: true
-        hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS: 200
+        format_sql: true
+        highlight_sql: true
+        session:
+          events:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 200
         default_batch_fetch_size: 100
+
+
+        generate_statistics: true
+
     hibernate:
       ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
   sql:
     init:
       mode: never
       encoding: UTF-8
+
   liquibase:
     enabled: true
     change-log: "classpath:db/changelog/db.changelog-master.yaml"
@@ -28,3 +41,10 @@ spring:
 file:
   storage: local
   upload-dir: ${user.dir}/uploads/
+
+logging:
+  level:
+    com.zaxxer.hikari: DEBUG
+    org.hibernate.SQL: DEBUG
+
+    org.hibernate.stat: DEBUG

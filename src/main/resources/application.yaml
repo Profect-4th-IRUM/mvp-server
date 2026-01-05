@@ -2,7 +2,7 @@ spring:
   application:
     name: come2us
   profiles:
-    active: ${PROFILE_ACTIVE:prod}
+    active: ${PROFILE_ACTIVE:local}
     include:
       - redis
       - toss
