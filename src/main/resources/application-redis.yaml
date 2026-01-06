@@ -1,9 +1,18 @@
 spring:
   config:
     activate:
-      on-profile: "redis"
+      on-profile: redis
+
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+      cache-null-values: false
+      use-key-prefix: true
+      key-prefix: "come2us::"

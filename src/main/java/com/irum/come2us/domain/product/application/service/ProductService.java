@@ -11,8 +11,18 @@ import com.irum.come2us.domain.product.domain.entity.ProductOptionValue;
 import com.irum.come2us.domain.product.domain.repository.ProductOptionGroupRepository;
 import com.irum.come2us.domain.product.domain.repository.ProductOptionValueRepository;
 import com.irum.come2us.domain.product.domain.repository.ProductRepository;
-import com.irum.come2us.domain.product.presentation.dto.request.*;
-import com.irum.come2us.domain.product.presentation.dto.response.*;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCategoryUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductCreateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductOptionGroupRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductOptionValueRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductOptionValueUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductPublicUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.request.ProductUpdateRequest;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductCursorResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductDetailResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionGroupResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductOptionValueResponse;
+import com.irum.come2us.domain.product.presentation.dto.response.ProductResponse;
 import com.irum.come2us.domain.store.domain.entity.Store;
 import com.irum.come2us.domain.store.domain.repository.StoreRepository;
 import com.irum.come2us.global.presentation.advice.exception.CommonException;
@@ -26,22 +36,36 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class ProductService {
+
+    private static final String PRODUCT_DETAIL_CACHE = "product:detail";
+
     private final ProductRepository productRepository;
     private final ProductOptionGroupRepository optionGroupRepository;
     private final ProductOptionValueRepository optionValueRepository;
+
     private final MemberRepository memberRepository;
+
     private final StoreRepository storeRepository;
     private final CategoryRepository categoryRepository;
     private final MemberUtil memberUtil;
 
+    // afterCommit 캐시 무효화용
+    private final CacheManager cacheManager;
+
+
+    @Transactional
     public ProductResponse createProduct(ProductCreateRequest request) {
         Member member = memberUtil.getCurrentMember();
 
@@ -49,9 +73,6 @@ public class ProductService {
                 storeRepository
                         .findByMember(member)
                         .orElseThrow(() -> new CommonException(StoreErrorCode.STORE_NOT_FOUND));
-
-        // memberUtil.assertMemberResourceAccess(store.getMember());
-        // Store를 현재 인증된 유저 기반으로 조회했기 때문에, 다시 한 번 검증할 필요 없다고 생각
 
         if (!member.getRole().equals(Role.OWNER)) {
             log.warn("상품 등록 실패: 비인가 사용자 memberId={}", member.getMemberId());
@@ -61,8 +82,7 @@ public class ProductService {
         Category category =
                 categoryRepository
                         .findById(request.categoryId())
-                        .orElseThrow(
-                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+                        .orElseThrow(() -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
 
         Product product =
                 Product.createProduct(
@@ -76,8 +96,7 @@ public class ProductService {
 
         if (request.optionGroups() != null && !request.optionGroups().isEmpty()) {
             for (ProductOptionGroupRequest groupReq : request.optionGroups()) {
-                ProductOptionGroup group =
-                        ProductOptionGroup.createOptionGroup(product, groupReq.name());
+                ProductOptionGroup group = ProductOptionGroup.createOptionGroup(product, groupReq.name());
                 product.addOptionGroup(group);
 
                 if (groupReq.optionValues() != null) {
@@ -93,10 +112,13 @@ public class ProductService {
         }
 
         productRepository.save(product);
-        log.info("상품 등록 완료: storeId={}, productName={}", store.getId(), product.getName());
+        log.info("상품 등록 완료: storeId={}, productId={}, productName={}",
+                store.getId(), product.getId(), product.getName());
+
         return ProductResponse.from(product);
     }
 
+    @Transactional
     public ProductResponse updateProduct(UUID productId, ProductUpdateRequest request) {
         Product product =
                 productRepository
@@ -115,36 +137,11 @@ public class ProductService {
         }
 
         String updatedName = request.name() != null ? request.name() : product.getName();
-        String updatedDescription =
-                request.description() != null ? request.description() : product.getDescription();
+        String updatedDescription = request.description() != null ? request.description() : product.getDescription();
         String updatedDetailDescription =
-                request.detailDescription() != null
-                        ? request.detailDescription()
-                        : product.getDetailDescription();
+                request.detailDescription() != null ? request.detailDescription() : product.getDetailDescription();
         int updatedPrice = request.price() != null ? request.price() : product.getPrice();
-        boolean updatedIsPublic =
-                request.isPublic() != null ? request.isPublic() : product.isPublic();
-
-        log.info("상품 수정 시작: productId={}", productId);
-
-        if (!product.getName().equals(updatedName)) {
-            log.info("상품명 변경: {} → {}", product.getName(), updatedName);
-        }
-        if (!product.getDescription().equals(updatedDescription)) {
-            log.info("상품 설명 변경: {} → {}", product.getDescription(), updatedDescription);
-        }
-        if (!product.getDetailDescription().equals(updatedDetailDescription)) {
-            log.info(
-                    "상품 상세설명 변경: {} → {}",
-                    product.getDetailDescription(),
-                    updatedDetailDescription);
-        }
-        if (product.getPrice() != updatedPrice) {
-            log.info("상품 가격 변경: {} → {}", product.getPrice(), updatedPrice);
-        }
-        if (product.isPublic() != updatedIsPublic) {
-            log.info("공개여부 변경: {} → {}", product.isPublic(), updatedIsPublic);
-        }
+        boolean updatedIsPublic = request.isPublic() != null ? request.isPublic() : product.isPublic();
 
         product.updateProduct(
                 updatedName,
@@ -153,12 +150,14 @@ public class ProductService {
                 updatedPrice,
                 updatedIsPublic);
 
+        evictProductDetailAfterCommit(productId);
+
         log.info("상품 수정 완료: productId={}", productId);
         return ProductResponse.from(product);
     }
 
-    public ProductResponse updateProductPublicStatus(
-            UUID productId, ProductPublicUpdateRequest request) {
+    @Transactional
+    public ProductResponse updateProductPublicStatus(UUID productId, ProductPublicUpdateRequest request) {
         Product product =
                 productRepository
                         .findById(productId)
@@ -174,8 +173,6 @@ public class ProductService {
             throw new CommonException(ProductErrorCode.PRODUCT_NOT_MODIFIED);
         }
 
-        log.info("상품 공개 상태 변경: productId={}, {} -> {}", productId, currentStatus, newStatus);
-
         product.updateProduct(
                 product.getName(),
                 product.getDescription(),
@@ -183,11 +180,14 @@ public class ProductService {
                 product.getPrice(),
                 newStatus);
 
+        evictProductDetailAfterCommit(productId);
+
+        log.info("상품 공개 상태 변경 완료: productId={}, {} -> {}", productId, currentStatus, newStatus);
         return ProductResponse.from(product);
     }
 
-    public ProductResponse updateProductCategory(
-            UUID productId, ProductCategoryUpdateRequest request) {
+    @Transactional
+    public ProductResponse updateProductCategory(UUID productId, ProductCategoryUpdateRequest request) {
         Product product =
                 productRepository
                         .findById(productId)
@@ -198,16 +198,18 @@ public class ProductService {
         Category category =
                 categoryRepository
                         .findById(request.categoryId())
-                        .orElseThrow(
-                                () -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+                        .orElseThrow(() -> new CommonException(CategoryErrorCode.CATEGORY_NOT_FOUND));
 
         product.updateCategory(category);
+
+        evictProductDetailAfterCommit(productId);
+
+        log.info("상품 카테고리 변경 완료: productId={}, categoryId={}", productId, category.getCategoryId());
         return ProductResponse.from(product);
     }
 
     @Transactional(readOnly = true)
-    public ProductCursorResponse getProductList(
-            UUID categoryId, UUID cursor, Integer size, String keyword) {
+    public ProductCursorResponse getProductList(UUID categoryId, UUID cursor, Integer size, String keyword) {
         if (size == null || (size != 10 && size != 30 && size != 50)) {
             log.warn("허용되지 않은 size 요청: {} -> 기본값 10으로 대체", size);
             size = 10;
@@ -217,26 +219,28 @@ public class ProductService {
 
         if (categoryId != null && keyword != null && !keyword.trim().isEmpty()) {
             List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
-            products =
-                    productRepository.findProductsByCategoryIdsAndKeyword(
-                            cursor, size, categoryIds, keyword);
+            products = productRepository.findProductsByCategoryIdsAndKeyword(cursor, size, categoryIds, keyword);
         } else if (categoryId != null) {
             List<UUID> categoryIds = getAllDescendantCategoryIds(categoryId);
             products = productRepository.findProductsByCategoryIds(cursor, size, categoryIds);
         } else if (keyword != null && !keyword.trim().isEmpty()) {
-            log.info("상품 검색 요청: keyword={}, cursor={}, size={}", keyword, cursor, size);
             products = productRepository.findProductsByKeyword(cursor, size, keyword);
         } else {
-            log.info("상품 목록 조회 요청: cursor={}, size={}", cursor, size);
             products = productRepository.findProductsByCursor(cursor, size);
         }
 
-        log.info("상품 목록 조회 완료: keyword={}, count={}", keyword, products.size());
         return ProductCursorResponse.of(products);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(
+            cacheNames = PRODUCT_DETAIL_CACHE,
+            key = "#productId.toString()",
+            sync = true
+    )
     public ProductDetailResponse getProductById(UUID productId) {
+        log.info("DB HIT (product detail) productId={}", productId);
+
         Product product =
                 productRepository
                         .findById(productId)
@@ -245,6 +249,7 @@ public class ProductService {
         return ProductDetailResponse.from(product);
     }
 
+    @Transactional
     public void deleteProduct(UUID productId) {
         Product product =
                 productRepository
@@ -253,9 +258,13 @@ public class ProductService {
 
         memberUtil.assertMemberResourceAccess(product.getStore().getMember());
         product.softDelete(memberUtil.getCurrentMember().getMemberId());
+
+        evictProductDetailAfterCommit(productId);
+
         log.info("상품 삭제 완료: productId={}", productId);
     }
 
+    @Transactional
     public void createOptionGroup(UUID productId, ProductOptionGroupRequest request) {
         Product product =
                 productRepository
@@ -269,21 +278,23 @@ public class ProductService {
 
         if (request.optionValues() != null && !request.optionValues().isEmpty()) {
             for (ProductOptionValueRequest valueReq : request.optionValues()) {
-                ProductOptionValue.createOptionValue(
-                        group, valueReq.name(), valueReq.stockQuantity(), valueReq.extraPrice());
+                ProductOptionValue.createOptionValue(group, valueReq.name(), valueReq.stockQuantity(), valueReq.extraPrice());
             }
         }
 
         productRepository.save(product);
+
+        evictProductDetailAfterCommit(productId);
+
         log.info("상품 옵션 그룹 추가 완료: productId={}, groupName={}", productId, request.name());
     }
 
+    @Transactional
     public void createOptionValue(UUID optionGroupId, ProductOptionValueRequest request) {
         ProductOptionGroup optionGroup =
                 optionGroupRepository
                         .findById(optionGroupId)
-                        .orElseThrow(
-                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
 
         memberUtil.assertMemberResourceAccess(optionGroup.getProduct().getStore().getMember());
 
@@ -294,34 +305,36 @@ public class ProductService {
                 request.extraPrice() != null ? request.extraPrice() : 0);
 
         optionGroupRepository.save(optionGroup);
+
+        evictProductDetailAfterCommit(optionGroup.getProduct().getId());
+
         log.info("옵션 값 추가 완료: optionGroupId={}, valueName={}", optionGroupId, request.name());
     }
 
-    public ProductOptionGroupResponse updateProductOptionGroup(
-            UUID optionGroupId, ProductOptionGroupRequest request) {
+    @Transactional
+    public ProductOptionGroupResponse updateProductOptionGroup(UUID optionGroupId, ProductOptionGroupRequest request) {
         ProductOptionGroup optionGroup =
                 optionGroupRepository
                         .findById(optionGroupId)
-                        .orElseThrow(
-                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
 
         memberUtil.assertMemberResourceAccess(optionGroup.getProduct().getStore().getMember());
 
         optionGroup.updateOptionGroupName(request.name());
 
+        evictProductDetailAfterCommit(optionGroup.getProduct().getId());
+
         return ProductOptionGroupResponse.from(optionGroup);
     }
 
-    public ProductOptionValueResponse updateProductOptionValue(
-            UUID optionValueId, ProductOptionValueUpdateRequest request) {
+    @Transactional
+    public ProductOptionValueResponse updateProductOptionValue(UUID optionValueId, ProductOptionValueUpdateRequest request) {
         ProductOptionValue optionValue =
                 optionValueRepository
                         .findById(optionValueId)
-                        .orElseThrow(
-                                () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
 
-        memberUtil.assertMemberResourceAccess(
-                optionValue.getOptionGroup().getProduct().getStore().getMember());
+        memberUtil.assertMemberResourceAccess(optionValue.getOptionGroup().getProduct().getStore().getMember());
 
         if ((request.name() == null || request.name().isBlank())
                 && request.stockQuantity() == null
@@ -331,14 +344,10 @@ public class ProductService {
         }
 
         String updatedName =
-                request.name() != null && !request.name().isBlank()
-                        ? request.name().trim()
-                        : optionValue.getName();
+                request.name() != null && !request.name().isBlank() ? request.name().trim() : optionValue.getName();
 
         int updatedStockQuantity =
-                request.stockQuantity() != null
-                        ? request.stockQuantity()
-                        : optionValue.getStockQuantity();
+                request.stockQuantity() != null ? request.stockQuantity() : optionValue.getStockQuantity();
 
         Integer updatedExtraPrice =
                 request.extraPrice() != null ? request.extraPrice() : optionValue.getExtraPrice();
@@ -346,35 +355,46 @@ public class ProductService {
         optionValue.updateOptionValue(updatedName, updatedStockQuantity, updatedExtraPrice);
         optionValueRepository.save(optionValue);
 
+        evictProductDetailAfterCommit(optionValue.getOptionGroup().getProduct().getId());
+
         log.info("상품 옵션 값 수정 완료: optionValueId={}", optionValueId);
 
         return ProductOptionValueResponse.from(optionValue);
     }
 
+    @Transactional
     public void deleteProductOptionGroup(UUID optionGroupId) {
         ProductOptionGroup optionGroup =
                 optionGroupRepository
                         .findById(optionGroupId)
-                        .orElseThrow(
-                                () -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_GROUP_NOT_FOUND));
 
         memberUtil.assertMemberResourceAccess(optionGroup.getProduct().getStore().getMember());
 
+        UUID productId = optionGroup.getProduct().getId();
+
         optionGroupRepository.delete(optionGroup);
+
+        evictProductDetailAfterCommit(productId);
+
         log.info("상품 옵션 그룹 삭제 완료: groupId={}", optionGroupId);
     }
 
+    @Transactional
     public void deleteProductOptionValue(UUID optionValueId) {
         ProductOptionValue optionValue =
                 optionValueRepository
                         .findById(optionValueId)
-                        .orElseThrow(
-                                () -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
+                        .orElseThrow(() -> new CommonException(ProductErrorCode.OPTION_VALUE_NOT_FOUND));
 
-        memberUtil.assertMemberResourceAccess(
-                optionValue.getOptionGroup().getProduct().getStore().getMember());
+        memberUtil.assertMemberResourceAccess(optionValue.getOptionGroup().getProduct().getStore().getMember());
+
+        UUID productId = optionValue.getOptionGroup().getProduct().getId();
 
         optionValueRepository.delete(optionValue);
+
+        evictProductDetailAfterCommit(productId);
+
         log.info("상품 옵션 값 삭제 완료: valueId={}", optionValueId);
     }
 
@@ -390,5 +410,33 @@ public class ProductService {
         for (Category child : children) {
             collectDescendants(child.getCategoryId(), ids);
         }
+    }
+
+    private void evictProductDetailAfterCommit(UUID productId) {
+        if (productId == null) return;
+
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            // 트랜잭션이 없으면 즉시 evict
+            evictProductDetailNow(productId);
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        evictProductDetailNow(productId);
+                    }
+                });
+    }
+
+    private void evictProductDetailNow(UUID productId) {
+        Cache cache = cacheManager.getCache(PRODUCT_DETAIL_CACHE);
+        if (cache == null) {
+            log.warn("Cache not found: {}", PRODUCT_DETAIL_CACHE);
+            return;
+        }
+        cache.evict(productId.toString());
+        log.info("Evicted cache. cache={}, key={}", PRODUCT_DETAIL_CACHE, productId);
     }
 }
